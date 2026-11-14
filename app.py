@@ -1,35 +1,36 @@
-
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify, render_template
 
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.get("/")
 def inicio():
     return render_template("index.html")
 
 
-@app.route("/astronauta")
+@app.get("/astronauta")
 def astronauta():
     return render_template("astronauta.html")
 
 
-@app.route("/luna")
+@app.get("/despegue")
+def despegue():
+    return render_template("despegue.html")
+
+
+@app.get("/luna")
 def luna():
     return render_template("luna.html")
 
 
-@app.route("/bitacora")
+@app.get("/bitacora")
 def bitacora():
     return render_template("bitacora.html")
 
 
 @app.get("/api/health")
 def health():
-    return jsonify({
-        "proyecto": "StarStep",
-        "estado": "ok"
-    })
+    return jsonify(project="StarStep", chapter="Rock & Roll", status="ok")
 
 
 if __name__ == "__main__":
