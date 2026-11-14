@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>StarStep | Exploración lunar</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/juego.css') }}">
+</head>
+
+<body>
+
+    <main class="contenedor">
+
+        <header>
+            <p>OUTSTRIP</p>
+            <h1>STARSTEP</h1>
+            <h2>Capítulo 01 — La Luna</h2>
+        </header>
+
+        <canvas
+            id="gameCanvas"
+            width="960"
+            height="400">
+        </canvas>
+
+        <section class="dialogo">
+            <p id="mensaje">
+                LITO: Bienvenido a la superficie lunar.
+            </p>
+        </section>
+
+        <section class="controles">
+            <p>
+                A / D o flechas: Mover rover |
+                E: Interactuar
+            </p>
+        </section>
+
+        <nav class="navegacion">
+            <a href="{{ url_for('inicio') }}">
+                Volver al inicio
+            </a>
+
+            <a href="{{ url_for('astronauta') }}">
+                Astronauta
+            </a>
+
+            <a href="{{ url_for('bitacora') }}">
+                Ver bitácora
+            </a>
+        </nav>
+
+    </main>
+
+    <script type="module"
+            src="{{ url_for('static', filename='js/juego/luna.js') }}">
+    </script>
+
+</body>
+</html>

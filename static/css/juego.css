@@ -60,3 +60,27 @@ canvas {
     color: #94a3b8;
     text-align: center;
 }
+
+
+.navegacion {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.navegacion a {
+    background: #17243d;
+    border: 1px solid #60a5fa;
+    color: #ffffff;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.navegacion a:hover {
+    background: #2563eb;
+    box-shadow: 0 0 15px #2563eb;
+}

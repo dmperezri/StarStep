@@ -14,6 +14,11 @@ def astronauta():
     return render_template("astronauta.html")
 
 
+@app.route("/luna")
+def luna():
+    return render_template("luna.html")
+
+
 @app.route("/bitacora")
 def bitacora():
     return render_template("bitacora.html")
