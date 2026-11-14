@@ -1,0 +1,8 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StarStep · Marte</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script defer src="{{ url_for('static',filename='js/main.js') }}"></script><script defer src="{{ url_for('static',filename='js/audio.js') }}"></script><script defer src="{{ url_for('static',filename='js/progreso.js') }}"></script><script defer src="{{ url_for('static',filename='js/scene.js') }}"></script><script defer src="{{ url_for('static',filename='js/visor-fallback.js') }}"></script><script defer src="{{ url_for('static',filename='js/marte.js') }}"></script></head>
+<body class="star-page"><main class="stage"><canvas id="world" width="480" height="270"></canvas>
+<header class="hud"><a class="hud-link" href="/luna">← LUNA</a><div class="hud-actions"><button class="hud-button" data-lang="es">ES</button><button class="hud-button" data-lang="en">EN</button><a class="hud-button" href="/bitacora">BITÁCORA</a></div></header>
+<section class="pixel-panel mars-panel"><h1>ACTO II · MARTE</h1><p>DETECTIVE DE AGUA · OPORTUNITY</p><p>LITO: Las rocas guardan pistas del agua antigua.</p>
+<div class="station-list"><button id="inspectOpportunity" class="pixel-button mint">ROVER OPPORTUNITY 3D</button><button id="inspectBlueberries" class="pixel-button">HEMATITA 3D</button></div><a class="pixel-button mint" href="/huellas">CONTINUAR A HUELLAS</a></section></main></body></html>

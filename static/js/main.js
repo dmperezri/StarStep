@@ -15,7 +15,7 @@ window.StarI18n=(()=>{
 
 /* El resto solo corre en la portada. */
 document.addEventListener('DOMContentLoaded',()=>{
- const canvas=document.getElementById('world');if(!canvas||!document.getElementById('start'))return;
+ const canvas=document.getElementById('world');if(!canvas)return;
  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
  const $=id=>document.getElementById(id);let step=-1,typingTimer=null,transition=false;
  function typeText(text){clearInterval(typingTimer);const node=$('speechText');node.textContent='';let i=0;typingTimer=setInterval(()=>{i=Math.min(text.length,i+2);node.textContent=text.slice(0,i);if(i%6===0)StarSound.effect('type');if(i>=text.length)clearInterval(typingTimer);},23);}
