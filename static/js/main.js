@@ -166,10 +166,39 @@ window.StarI18n=(()=>{
  "viewer.store": "SAVE DISCOVERY",
  "viewer.close": "CLOSE"
 });
+
+ // Textos generados por JS. No duplicar traducciones en cada página.
+ const extra={
+  es:{'welcome.initial':'¡Comenzá la transmisión para escuchar tu bienvenida!','welcome.speaker':'CONTROL DE MISIÓN','avatar.message':'¡Listo, cadete {name}! ¿Despegamos hacia la Luna?',
+  'avatar.cadet':'CADETE','avatar.vice':'Vice','avatar.astronauta':'Astronauta','avatar.jaguar':'Jaguar UAM','avatar.geologa':'Geóloga','avatar.piloto':'Piloto','avatar.guardian':'Guardián',
+  'launch.crew.dynamic':'TRIPULACIÓN · {avatar} · {name} + LITO',
+  'launch.phase.pan':'CENTRO DE MISIÓN · TIERRA','launch.phase.launch':'ASCENSO · DE LA TIERRA AL ESPACIO',
+  'launch.phase.travel':'RUMBO A LA LUNA · 384 400 km','launch.phase.descent':'ALUNIZAJE · MAR DE LA TRANQUILIDAD',
+  'launch.phase.arrived':'LITO: ¡LO LOGRAMOS!','launch.liftoff':'¡DESPEGUE!',
+  'diary.notes.placeholder':'¿Qué aprendiste en tu misión?',
+  'diary.photo.error':'Usá una foto JPG, PNG o WEBP menor de 5 MB.',
+  'diary.photo.storage':'No hay espacio para almacenar la foto.',
+  'diary.explorer':'EXPLORADOR',
+  'facts.eagle.title':'Eagle · Apollo 11','facts.easep.title':'EASEP · Apollo 11','facts.reflector.title':'Retrorreflector láser',
+  'facts.opportunity.title':'Rover Opportunity','facts.blueberries.title':'Esférulas de hematita'},
+  en:{'welcome.initial':'Start the transmission to hear your welcome!','welcome.speaker':'MISSION CONTROL','avatar.message':'Ready, cadet {name}! Shall we launch for the Moon?',
+  'avatar.cadet':'CADET','avatar.vice':'Vice','avatar.astronauta':'Astronaut','avatar.jaguar':'UAM Jaguar','avatar.geologa':'Geologist','avatar.piloto':'Pilot','avatar.guardian':'Guardian',
+  'launch.crew.dynamic':'CREW · {avatar} · {name} + LITO',
+  'launch.phase.pan':'MISSION CONTROL · EARTH','launch.phase.launch':'ASCENT · EARTH TO SPACE',
+  'launch.phase.travel':'TO THE MOON · 384,400 km','launch.phase.descent':'LANDING · SEA OF TRANQUILITY',
+  'launch.phase.arrived':'LITO: WE DID IT!','launch.liftoff':'LIFTOFF!',
+  'diary.notes.placeholder':'What did you learn during your mission?',
+  'diary.photo.error':'Use a JPG, PNG or WEBP photo under 5 MB.',
+  'diary.photo.storage':'Not enough space to save the photo.',
+  'diary.explorer':'EXPLORER',
+  'facts.eagle.title':'Eagle · Apollo 11','facts.easep.title':'EASEP · Apollo 11','facts.reflector.title':'Laser retroreflector',
+  'facts.opportunity.title':'Opportunity rover','facts.blueberries.title':'Hematite spherules'}
+ };
+ Object.assign(dict.es,extra.es); Object.assign(dict.en,extra.en);
  let lang=localStorage.getItem('starstep_lang')==='en'?'en':'es';
  function t(key,vars={}){let value=dict[lang][key]??dict.es[key]??key;if(typeof value==='string')for(const [k,v] of Object.entries(vars))value=value.replaceAll('{'+k+'}',String(v));return value;}
- function apply(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n);if(typeof v==='string')el.textContent=v;});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const v=t(el.dataset.i18nPlaceholder);if(typeof v==='string')el.placeholder=v;});document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));document.dispatchEvent(new CustomEvent('starstep:language',{detail:{lang}}));}
- function setLang(next){if(next!=='es'&&next!=='en')return;lang=next;localStorage.setItem('starstep_lang',lang);apply();}
+ function apply(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n);if(typeof v==='string')el.textContent=v;});document.querySelectorAll('[data-i18n-title]').forEach(el=>{el.title=t(el.dataset.i18nTitle);});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const v=t(el.dataset.i18nPlaceholder);if(typeof v==='string')el.placeholder=v;});document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));document.dispatchEvent(new CustomEvent('starstep:language',{detail:{lang}}));}
+ function setLang(next){if(next!=='es'&&next!=='en')return;if(next===lang)return;lang=next;localStorage.setItem('starstep_lang',lang);apply();}
  document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));apply();});
  return {get lang(){return lang;},t,apply,setLang};
 })();
@@ -177,19 +206,19 @@ window.StarI18n=(()=>{
 /* El resto solo corre en la portada. */
 document.addEventListener('DOMContentLoaded',()=>{
  const canvas=document.getElementById('world');if(!canvas || !document.getElementById('start') || !document.getElementById('welcome'))return;
- const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+ const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;document.getElementById('speaker').textContent=StarI18n.t('welcome.speaker');document.getElementById('speechText').textContent=StarI18n.t('welcome.initial');
  const $=id=>document.getElementById(id);let step=-1,typingTimer=null,transition=false;
  function typeText(text){clearInterval(typingTimer);const node=$('speechText');node.textContent='';let i=0;typingTimer=setInterval(()=>{i=Math.min(text.length,i+2);node.textContent=text.slice(0,i);if(i%6===0)StarSound.effect('type');if(i>=text.length)clearInterval(typingTimer);},23);}
  function showStep(){const lines=StarI18n.t('speech'),line=lines[step];$('speaker').textContent=line[0];typeText(line[1]);$('start').textContent=step===2?StarI18n.t('menu'):StarI18n.t('continue');StarSound.effect('radio');StarSound.speak(line[1],{lito:step===2,onStart:()=>{window.litoState='talking';},onEnd:()=>{window.litoState='idle';}});}
- function openMenu(){clearInterval(typingTimer);StarSound.stopVoice();$('welcome').hidden=true;$('menu').hidden=false;StarSound.effect('success');}
+ function openMenu(){clearInterval(typingTimer);StarSound.stopVoice();window.litoState='idle';$('welcome').hidden=true;$('menu').hidden=false;StarSound.effect('success');}
  $('start').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();step++;if(step<3)showStep();else openMenu();});
  $('skip').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();openMenu();});
  $('how').addEventListener('click',()=>{$('help').hidden=false;$('closeHelp').focus();StarSound.effect('button');});
  $('closeHelp').addEventListener('click',()=>{$('help').hidden=true;$('how').focus();});
  $('music').addEventListener('click',()=>{StarSound.setMusic(!StarSound.musicOn);$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';});
  $('voice').addEventListener('click',()=>{StarSound.setVoice(!StarSound.voiceOn);$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';});
- document.addEventListener('starstep:language',()=>{if($('music'))$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';if($('voice'))$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';if(step>=0&&step<3){clearInterval(typingTimer);StarSound.stopVoice();showStep();}});
+ document.addEventListener('starstep:language',()=>{if($('music'))$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';if($('voice'))$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';if(step<0&&!$('welcome').hidden){$('speaker').textContent=StarI18n.t('welcome.speaker');$('speechText').textContent=StarI18n.t('welcome.initial');}else if(step>=0&&step<3&&!$('welcome').hidden){clearInterval(typingTimer);StarSound.stopVoice();showStep();}});
  document.querySelectorAll('a[href]').forEach(a=>a.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.button!==0)return;ev.preventDefault();if(transition)return;transition=true;StarSound.effect('travel');StarSound.stopAll();document.querySelector('.curtain').classList.add('is-dark');setTimeout(()=>location.assign(a.href),430);}));
- function render(ms){StarArt.earthScene(ctx,ms/1000,{litoState:window.litoState||'idle'});requestAnimationFrame(render);}requestAnimationFrame(render);
- window.addEventListener('pagehide',()=>{clearInterval(typingTimer);StarSound.stopAll();});
+ let animationId=0;function render(ms){StarArt.earthScene(ctx,ms/1000,{litoState:window.litoState||'idle'});animationId=requestAnimationFrame(render);}animationId=requestAnimationFrame(render);
+ window.addEventListener('pagehide',()=>{clearInterval(typingTimer);cancelAnimationFrame(animationId);StarSound.stopAll();});
 });

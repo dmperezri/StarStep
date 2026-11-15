@@ -1,8 +1,8 @@
 "use strict";
 document.addEventListener('DOMContentLoaded',()=>{
  const c=document.getElementById('world'),ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
- const $=id=>document.getElementById(id),p=StarProgress.player();$('crew').textContent=`${p.avatar||'astronauta'} · ${(p.alias||'Cadete').toUpperCase()} + LITO`;
- let phase='pan',start=performance.now(),countShown=0,launched=false,arrived=false;
+ const $=id=>document.getElementById(id),p=StarProgress.player();function renderCrew(){$('crew').textContent=StarI18n.t('launch.crew.dynamic',{avatar:StarI18n.t('avatar.'+(p.avatar||'astronauta')),name:(p.alias||StarI18n.t('avatar.cadet')).toUpperCase()});}renderCrew();
+ let phase='pan',start=performance.now(),countShown=0;function updateCaption(){const key=phase==='countdown'?'pan':phase;const el=$('travelCaption');if(el)el.textContent=StarI18n.t('launch.phase.'+key);}document.addEventListener('starstep:language',()=>{renderCrew();updateCaption();});
  $('startLaunch').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();StarSound.effect('button');phase='countdown';start=performance.now();$('startLaunch').hidden=true;});
  function smooth(x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);}
  function curtain(on){document.querySelector('.curtain').classList.toggle('is-dark',on);}
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   else if(phase==='countdown'){
    const n=Math.max(1,3-Math.floor(sec));if(n!==countShown){countShown=n;StarSound.effect('count');}
    ctx.translate(Math.sin(t*24)*Math.min(2,sec*.6),0);StarArt.earthScene(ctx,t);$('countdown').textContent=n;
-   if(sec>=3){phase='launch';start=now;StarSound.effect('launch');$('countdown').textContent='¡DESPEGUE!';}
+   if(sec>=3){phase='launch';start=now;StarSound.effect('launch');$('countdown').textContent=StarI18n.t('launch.liftoff');}
   }
   else if(phase==='launch'){
    progress=smooth(sec/4.5);StarArt.launchScene(ctx,t,progress*.53);$('travelCaption').textContent=(StarI18n.lang==='es'?'ASCENSO · DE LA TIERRA AL ESPACIO':'ASCENT · FROM EARTH TO SPACE');
@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   else if(phase==='arrived'){
    StarArt.descentScene(ctx,t,1);$('actCard').hidden=false;$('enterMoon').hidden=false;$('travelCaption').textContent=StarI18n.lang==='es'?'LITO: ¡LO LOGRAMOS!':'LITO: WE MADE IT!';
   }
-  ctx.restore();requestAnimationFrame(render);
+  ctx.restore();animationId=requestAnimationFrame(render);
  }
- requestAnimationFrame(render);
- window.addEventListener('pagehide',()=>StarSound.stopAll());
+ let animationId=requestAnimationFrame(render);
+ window.addEventListener('pagehide',()=>{cancelAnimationFrame(animationId);StarSound.stopAll();});
 });

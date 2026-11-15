@@ -19,26 +19,34 @@
 @media print{.diary-cover,.diary-top,.pixel-button,.hud{display:none!important}.certificate{display:block!important;min-height:80vh;margin:0}}
 @media(max-width:550px){.matching-game{gap:7px}.match-column button{font-size:.65rem}}
 
-/* StarStep visual system integration: 16:9, never stretch the pixel world. */
+/* Ajuste consolidado basado en la referencia original StarStep — 14/11/2026. */
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.stage{isolation:isolate;min-height:max(540px,100svh)}
 .stage>canvas#world{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.hud{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
-.hud-actions{flex-wrap:wrap;justify-content:flex-end;align-items:center}
-.hud-button{white-space:nowrap;min-height:34px}
-.logo{top:clamp(76px,12vh,135px);width:min(92%,900px)}
-.logo h1{font-size:clamp(2.3rem,7vw,5.5rem);overflow-wrap:normal;white-space:nowrap}
-.speech-panel{width:min(735px,calc(100% - 36px));bottom:clamp(18px,5vh,64px);max-height:42vh;overflow-y:auto;padding:clamp(12px,2vw,20px)}
-.speech-actions{flex-wrap:wrap}.speech-actions .pixel-button{min-width:110px}
+.hud{top:clamp(10px,2vh,22px);left:clamp(12px,2vw,28px);right:clamp(12px,2vw,28px);align-items:center;flex-wrap:wrap;row-gap:8px;min-width:0}
+.hud-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:7px;max-width:100%}
+.hud-button{font-size:clamp(.68rem,1vw,.8rem);padding:8px 10px;border:2px solid var(--border);box-shadow:2px 2px 0 var(--purple);line-height:1.15;white-space:nowrap;min-height:36px}
+.hud-button[aria-pressed="true"]{background:var(--mint);border-color:var(--night)}
+.logo{top:clamp(66px,11vh,110px);width:min(82%,620px);max-width:620px;display:flex;align-items:center;flex-direction:column;gap:0}
+.logo-reference{display:block;width:min(100%,600px);height:auto;max-height:clamp(110px,27vh,230px);object-fit:contain;image-rendering:pixelated;mix-blend-mode:screen}
+.logo small{max-width:95%;margin-top:-12px;position:relative;z-index:1;white-space:normal;line-height:1.5}
+.speech-panel{z-index:5;bottom:clamp(14px,4vh,40px);width:min(735px,calc(100% - 28px));max-height:45vh;overflow-y:auto;padding:clamp(12px,2vw,20px)}
+.speech-panel p{line-height:1.55;overflow-wrap:anywhere}
+.speech-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.speech-actions .pixel-button{min-width:110px}
 .science-wrap{width:min(1180px,96%);margin:0 auto;padding:16px 0 70px}
 .science-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 30px}
-.science-hero{background:#1A1F4D;border:3px solid #ABA1F5;padding:22px 28px}
-.science-hero h1{font-size:clamp(1.7rem,4vw,2.9rem);color:#8FF0D8}
+.science-hero{background:var(--panel);border:3px solid var(--violet);padding:22px 28px}
+.science-hero h1{font-size:clamp(1.7rem,4vw,2.9rem);color:var(--mint)}
 .science-hero p{line-height:1.55}
-.science-section{margin:36px 0}.science-section h2{color:#FFE066;font-size:1.2rem}
+.science-section{margin:36px 0}.science-section h2{color:var(--moon);font-size:1.2rem}
 .science-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
-.science-card{background:#262C66;border:3px solid #ABA1F5;padding:12px 12px 18px;display:flex;flex-direction:column;gap:9px}
-.science-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E1233;border:2px solid #1A1340}
-.science-card h3{font-size:1.03rem;margin:5px 0;color:#8FF0D8}
+.science-card{background:var(--raised);border:3px solid var(--violet);padding:12px 12px 18px;display:flex;flex-direction:column;gap:9px}
+.science-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--night);border:2px solid var(--border)}
+.science-card h3{font-size:1.03rem;margin:5px 0;color:var(--mint)}
 .science-card p{font-size:.84rem;line-height:1.5;margin:0;flex:1}
-.science-card small{color:#B9BEE6}.science-card a{color:#FFE066}
-@media(max-width:700px){.logo{top:clamp(75px,15vh,115px)}.logo h1{font-size:clamp(1.7rem,8.4vw,3.6rem)}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:44vh}.chapter-label{display:none}}
-@media(max-height:570px){.logo{top:60px}.logo h1{font-size:2.4rem}.speech-panel{bottom:6px;max-height:50vh}.menu{top:30%}}
+.science-card small{color:var(--soft)}.science-card a{color:var(--moon)}
+@media(max-width:700px){.logo{top:clamp(100px,17vh,160px);width:min(92%,540px)}.logo small{margin-top:-8px}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:46vh}.chapter-label{display:none}}
+@media(max-width:600px){.stage{min-height:600px}.hud{gap:6px}.hud strong{font-size:.63rem}.hud-button{font-size:.64rem;padding:7px 8px}.speech-panel{padding:12px 14px}.speech-actions .pixel-button{min-width:0;flex:1;font-size:.68rem}}
+@media(max-height:570px){.logo{top:52px;width:min(54%,450px)}.logo-reference{max-height:145px}.speech-panel{bottom:6px;max-height:53vh}.menu{top:30%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
