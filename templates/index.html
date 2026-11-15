@@ -16,7 +16,7 @@
     <!-- Nueva identidad visual -->
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/identidad.css') }}"
+      href="{{ url_for('static', filename='css/identidad.css', v='intro-video-3') }}"
     >
 
     <!-- Scripts del videojuego -->
@@ -27,7 +27,7 @@
     <script defer src="{{ url_for('static', filename='js/planetas.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/scene.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script defer src="{{ url_for('static', filename='js/intro-secuencia.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/intro-secuencia.js', v='intro-video-3') }}"></script>
     <script defer src="{{ url_for('static', filename='js/science-content.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mision.css') }}">
     <script defer src="{{ url_for('static', filename='js/creditos.js') }}"></script>
@@ -343,7 +343,40 @@
             aria-hidden="true"
           ></canvas>
 
-          <div id="introCaption" class="intro-caption">
+          
+    <video id="historyVideo"
+           class="intro-canvas"
+           preload="metadata"
+           playsinline
+           hidden
+           src="{{ url_for('static', filename='assets/videos/starstep-introduccion.mp4') }}">
+    </video>
+
+    <div id="historyVideoPanel" class="intro-caption" hidden>
+
+        <h2 id="historyVideoTitle">CAMINO AL APOLO 11</h2>
+
+        <progress id="historyVideoProgress" max="1" value="0"></progress>
+
+        <div class="speech-actions">
+
+            <button type="button" class="pixel-button" id="historyVideoMute">
+                AUDIO
+            </button>
+
+            <button type="button" class="pixel-button" id="historyVideoSkip" hidden>
+                SALTAR
+            </button>
+
+            <button type="button" class="pixel-button mint" id="historyVideoPlay">
+                REPRODUCIR
+            </button>
+
+        </div>
+    </div>
+
+    <div id="introCaption" class="intro-caption">
+    
             <h2 id="introSceneTitle">La curiosidad humana</h2>
             <p id="introSceneText" aria-live="polite"></p>
 

@@ -1216,3 +1216,36 @@
     margin: 0 16px;
 }
 
+
+/* INTRO VIDEO */
+
+#introHistory [hidden] {
+    display: none !important;
+}
+
+#historyVideo {
+    object-fit: contain;
+    image-rendering: auto;
+    background: #06091D;
+}
+
+#historyVideoProgress {
+    width: 100%;
+    height: 9px;
+    accent-color: #8FF0D8;
+    margin: 10px 0;
+}
+
+#historyVideoPanel .speech-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#historyVideoTitle {
+    color: #FFE066;
+}
+
+.home-page .intro-history.video-mode {
+    overflow-y: auto;
+}

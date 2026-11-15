@@ -234,9 +234,152 @@
   }
 
   // 3. Introducción histórica.
+
+  let videoActive = false;
+
+  const hv = () => $("historyVideo");
+
+  const trVideo = (es, en) => lang() === "en" ? en : es;
+
+  function updateHistoryVideo() {
+
+    if (!videoActive) return;
+
+    const v = hv();
+
+    $("historyVideoTitle").textContent =
+      trVideo("CAMINO AL APOLO 11", "ROAD TO APOLLO 11");
+
+    $("historyVideoPlay").textContent =
+      v.paused
+        ? trVideo("REPRODUCIR", "PLAY")
+        : trVideo("PAUSAR", "PAUSE");
+
+    $("historyVideoMute").textContent =
+      v.muted
+        ? trVideo("ACTIVAR AUDIO", "UNMUTE")
+        : trVideo("SILENCIAR", "MUTE");
+
+    $("historyVideoSkip").textContent =
+      trVideo("SALTAR", "SKIP");
+
+    $("historyVideoSkip").hidden = !canSkipHistory;
+
+    const d =
+      Number.isFinite(v.duration) && v.duration > 0
+        ? v.duration
+        : 157;
+
+    $("historyVideoProgress").value =
+      Math.min(1, v.currentTime / d || 0);
+
+    const fmt = n =>
+      `${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,"0")}`;
+
+    $("introSceneCount").textContent =
+      `${fmt(v.currentTime || 0)} / ${fmt(d)}`;
+  }
+
+  function playHistoryVideo() {
+
+    sound()?.stopAll?.();
+
+    hv().play().catch(updateHistoryVideo);
+  }
+
+  function openHistoryVideo() {
+
+    const v = hv();
+
+    if (!v || v.error) return false;
+
+    videoActive = true;
+
+    stopNarration();
+
+    $("introHistory").classList.add("video-mode");
+
+    $("introHistory").setAttribute(
+      "aria-labelledby", "historyVideoTitle"
+    );
+
+    for (const id of [
+      "introCanvas", "introCaption", "introVoice"
+    ]) {
+      $(id).hidden = true;
+    }
+
+    v.hidden = false;
+
+    $("historyVideoPanel").hidden = false;
+
+    v.muted = sound()?.voiceOn === false;
+
+    try { v.currentTime = 0; } catch {}
+
+    updateHistoryVideo();
+
+    playHistoryVideo();
+
+    focus($("historyVideoPlay"));
+
+    return true;
+  }
+
+  function closeHistoryVideo() {
+
+    videoActive = false;
+
+    hv().pause();
+    hv().hidden = true;
+
+    $("historyVideoPanel").hidden = true;
+
+    for (const id of [
+      "introCanvas", "introCaption", "introVoice"
+    ]) {
+      $(id).hidden = false;
+    }
+
+    $("introHistory").classList.remove("video-mode");
+
+    $("introHistory").setAttribute(
+      "aria-labelledby", "introSceneTitle"
+    );
+
+    sound()?.startMusic?.();
+  }
+
+  function finishHistoryVideo(completed) {
+
+    if (!videoActive || step !== "history" ||
+        (!completed && (!canSkipHistory || busy))) return;
+
+    closeHistoryVideo();
+
+    if (completed) {
+      window.StarProgress?.markCinematicSeen?.("history_intro");
+    }
+
+    next();
+  }
+
+  function fallbackHistoryVideo() {
+
+    if (!videoActive) return;
+
+    closeHistoryVideo();
+
+    sceneIndex = 0;
+
+    renderScene(true);
+    startCanvas("history");
+  }
+
   function showHistory() {
     sceneIndex = 0;
     canSkipHistory = window.StarProgress?.hasSeenCinematic?.("history_intro") === true;
+    if (openHistoryVideo()) return;
     renderScene(true);
     startCanvas("history");
   }
@@ -503,7 +646,56 @@
     bound = true;
     $("introLangEs")?.addEventListener("click", () => chooseLanguage("es"));
     $("introLangEn")?.addEventListener("click", () => chooseLanguage("en"));
+
+    const video = hv();
+
+    if (video) {
+
+      $("historyVideoPlay").addEventListener("click", () => {
+
+        if (!videoActive || busy) return;
+
+        if (video.paused) {
+          playHistoryVideo();
+        } else {
+          video.pause();
+        }
+
+      });
+
+      $("historyVideoMute").addEventListener("click", () => {
+        video.muted = !video.muted;
+      });
+
+      $("historyVideoSkip").addEventListener("click", () => {
+        finishHistoryVideo(false);
+      });
+
+      for (const event of [
+        "play", "pause", "timeupdate",
+        "loadedmetadata", "volumechange"
+      ]) {
+        video.addEventListener(event, updateHistoryVideo);
+      }
+
+      video.addEventListener("ended", () => {
+        finishHistoryVideo(true);
+      });
+
+      video.addEventListener("error", fallbackHistoryVideo);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && videoActive) video.pause();
+      });
+
+      window.addEventListener("pagehide", () => {
+        if (videoActive) video.pause();
+      });
+
+    }
+
     $("introNext")?.addEventListener("click", nextScene);
+    
     $("introSkip")?.addEventListener("click", skipHistory);
     $("introVoice")?.addEventListener("click", toggleVoice);
     $("litoVoice")?.addEventListener("click", toggleVoice);
@@ -511,7 +703,15 @@
     $("litoText")?.addEventListener("click", completeTyping);
     document.addEventListener("starstep:language", () => {
       if (step === "language") renderLanguage();
-      else if (step === "history") renderScene(true);
+
+      else if (step === "history") {
+        if (videoActive) {
+          updateHistoryVideo();
+        } else {
+          renderScene(true);
+        }
+      }
+    
       else if (step === "lito") renderLito(true);
       else if (step === "newgame" && !leaving) renderBrief(true);
     });
