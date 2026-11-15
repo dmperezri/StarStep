@@ -86,12 +86,13 @@
     const mk = (label, key) => { const b = el("button", "mg-btn", label); b.type = "button"; b.addEventListener("click", () => { input[key] = true; tick(0.05); }); pad.append(b); return b; };
     mk("▲", "up"); mk("▼", "down"); mk("◀", "slower"); mk("▶", "faster");
     const actions = el("div", "mg-actions"); const go = el("button", "mg-btn primary", t("start")); go.type = "button"; actions.append(go);
-    panel.append(close, kicker, title, text, canvas, hud, pad, feedback, actions); root.append(panel); document.body.append(root);
+    const frame = el("div", "evidence-scene-photo");frame.append(canvas);const historical = window.StarEvidenceVisual?.figure("ascent");if(historical) frame.append(historical);
+    panel.append(close, kicker, title, text, frame, hud, pad, feedback, actions); root.append(panel); document.body.append(root);
     let s = Core.initialDock(), running = false, raf = 0, last = 0, finished = false;
     function draw() {
       const c = canvas.getContext?.("2d"); if (!c) return;
       c.fillStyle = "#0E1233"; c.fillRect(0, 0, 480, 220); c.fillStyle = "#FFF8E7"; for (let i = 0; i < 40; i++) c.fillRect((i * 83) % 480, (i * 37) % 160, 1, 1);
-      c.fillStyle = "#C3C7D6"; c.fillRect(0, 190, 480, 30); c.fillStyle = "#868CA4"; c.fillRect(60, 196, 30, 6);
+      for(let y=160;y<220;y+=2){const half=Math.sqrt(Math.max(0,180*180-(y-340)**2));c.fillStyle="#C3C7D6";c.fillRect(240-half,y,half*2,2);}c.fillStyle="#868CA4";c.fillRect(200,208,30,7);
       c.fillStyle = "#E4DFFF"; c.fillRect(380, 92, 80, 26); c.fillStyle = "#868CA4"; c.fillRect(370, 98, 12, 14);   // Columbia
       const x = 380 - s.distance - 34, y = 92 + s.offset;
       c.fillStyle = "#C3C7D6"; c.fillRect(x, y, 30, 24); c.fillStyle = "#3FD0E0"; c.fillRect(x + 20, y + 6, 6, 6); c.fillStyle = "#FFE066"; c.fillRect(x - 6, y + 10, 6, 4);
@@ -141,12 +142,17 @@
     const s3 = el("p", "mg-text", t("step3")); s3.hidden = true; const q = el("p", "mg-title"); q.hidden = true;
     const opts = el("div", "mg-options"); opts.hidden = true;
     const feedback = el("p", "mg-feedback"); feedback.setAttribute("aria-live", "polite");
-    panel.append(close, title, text, s1, canvas, count, s2, list, s3, q, opts, feedback); root.append(panel); document.body.append(root);
+    panel.append(close, title, text); const historicalRock = window.StarEvidenceVisual?.figure("basalt"); if (historicalRock) panel.append(historicalRock); panel.append(s1, canvas, count, s2, list, s3, q, opts, feedback); root.append(panel); document.body.append(root);
     const found = new Set(), classified = new Set();
     function drawRock() {
       const c = canvas.getContext?.("2d"); if (!c) return;
-      c.fillStyle = "#E4DFFF"; c.fillRect(0, 0, 480, 240); c.fillStyle = "#3E4256"; c.fillRect(90, 50, 300, 150); c.fillStyle = "#575C74"; c.fillRect(110, 40, 260, 20); c.fillRect(80, 70, 20, 110);
-      Core.VESICLES.forEach((v, i) => { c.fillStyle = found.has(i) ? "#8FF0D8" : "#1A1F4D"; c.fillRect(v.x - v.r / 2, v.y - v.r / 2, v.r, v.r); });
+      c.fillStyle="#1A1F4D";c.fillRect(0,0,480,240);c.fillStyle="#262C66";c.fillRect(0,200,480,40);c.fillStyle="#ABA1F5";c.fillRect(0,197,480,3);
+      for(let i=0;i<5;i++){c.fillStyle="#14162B";c.fillRect(10+i*96,9,72,22);}
+      // Textured rock cross section, matching the original prototype laboratory.
+      const oval=(cx,cy,rx,ry,col)=>{c.fillStyle=col;for(let dy=-ry;dy<=ry;dy+=2){const w=Math.floor(rx*Math.sqrt(Math.max(0,1-dy*dy/(ry*ry+.5))));c.fillRect(cx-w,cy+dy,w*2+1,2);}};
+      oval(240,124,183,91,"#14162B");oval(240,124,178,86,"#4D5268");oval(221,108,155,65,"#5A6078");
+      for(let i=0;i<50;i++){const x=112+(i*73)%250,y=66+(i*37)%120;c.fillStyle=i%4?"#3E4256":"#868CA4";c.fillRect(x,y,2+i%5,2+i%3);}
+      Core.VESICLES.forEach((v, i) => { c.fillStyle = found.has(i) ? "#8FF0D8" : "#1A1F4D"; oval(v.x,v.y,Math.max(3,Math.floor(v.r/2)),Math.max(3,Math.floor(v.r/2)),found.has(i)?"#8FF0D8":"#14162B"); });
       c.fillStyle = "#2B2F40"; for (let i = 0; i < 12; i++) c.fillRect(110 + (i * 23) % 260, 70 + (i * 31) % 110, 3, 3);
     }
     function clickRock(x, y) {

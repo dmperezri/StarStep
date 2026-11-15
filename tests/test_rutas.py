@@ -123,11 +123,13 @@ class RutasExistentes(unittest.TestCase):
         for campo in ["notes", "saveNotes", "photoInput", "explorerName"]:
             self.assertIn('id="%s"' % campo, html)
         marte = self.cliente.get("/marte").get_data(as_text=True)
-        self.assertIn("js/viaje-marte.js", marte)
-        self.assertIn('id="starMarsTransit"', marte)
+        self.assertNotIn("js/viaje-marte.js", marte)
+        self.assertIn("js/cinematica.js", marte)
+        self.assertIn("js/marte-mision.js", marte)
+        self.assertIn('id="marsCinematic"', marte)
         luna = self.cliente.get("/luna").get_data(as_text=True)
         self.assertIn("js/luna-estado.js", luna)
-        self.assertIn('href="/marte?viaje=luna"', luna)
+        self.assertIn('href="/marte?viaje=luna&amp;cine=3"', luna)
         for ruta in ["/", "/astronauta", "/despegue", "/marte", "/bitacora"]:
             with self.subTest(ruta=ruta):
                 pagina = self.cliente.get(ruta).get_data(as_text=True)

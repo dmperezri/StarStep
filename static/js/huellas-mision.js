@@ -106,15 +106,16 @@
   function openMirror() {
     if (stage() !== "mirror_method") return false;
     const ui = shell(t("mirrorTitle"), t("mirrorText"));
-    const table = el("div", "mg-options"); const work = el("div"); const feedback = el("p", "mg-feedback"); feedback.setAttribute("aria-live", "polite");
+    const table = el("div", "mirror-table"); const work = el("div"); const feedback = el("p", "mg-feedback"); feedback.setAttribute("aria-live", "polite");
     ui.panel.append(table, work, feedback);
     const recorded = n => !!F().getState().objectives["mirror_method.step" + n];
     function renderTable() {
       table.replaceChildren();
+      const header=el("div","mirror-row mirror-header");header.append(el("strong","",lang()==="en"?"Step":"Paso"),el("strong","",t("tMoon")),el("strong","",t("tMars")));table.append(header);
       for (const s of Core.MIRROR) {
-        const cell = el("div", "mg-option" + (recorded(s.step) ? " good" : "")); cell.dataset.row = String(s.step);
+        const cell = el("div", "mirror-row mg-option" + (recorded(s.step) ? " good" : "")); cell.dataset.row = String(s.step);
         cell.append(el("strong", "", t("step", { n: s.step, name: pick(s.name) })));
-        if (recorded(s.step)) for (const c of s.cards) cell.append(el("p", "", (c.side === "moon" ? "🌕 " : "🔴 ") + c[lang()]));
+        for(const side of ["moon","mars"]){const c=s.cards.find(x=>x.side===side);cell.append(el("p","",recorded(s.step)?c[lang()]:"—"));}
         table.append(cell);
       }
     }

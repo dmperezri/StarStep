@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('starMarsTransit');
   const canvas = document.getElementById('starMarsJourneyCanvas');
   if (!overlay || !canvas) return;
+  // La cinemática MP4 reemplaza el viaje decorativo al iniciar el Acto II.
+  // El reproductor oficial gestiona también las partidas antiguas y las visitas posteriores.
+  // Nunca superponer la animación decorativa a la cinemática MP4.
+  if (window.StarCinematic && document.getElementById("marsCinematic")) return;
   // La URL de la navegación válida identifica la cinemática, aunque el referrer se pierda.
   // Esto no desbloquea ningún nivel y no crea claves de almacenamiento nuevas.
   const fromMoon = (() => {

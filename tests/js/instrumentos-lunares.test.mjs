@@ -88,3 +88,34 @@ test("retrorreflector: posición y orientación con margen; luego prismas y sopo
   const ob = m.F.getState().objectives;
   assert.ok(ob["moon_install_reflector.install"] && ob["moon_install_reflector.orient"]);
 });
+
+test("instrumentos: se fijan tras validar, el EASEP usa la misma referencia al recargar y no arrastra el láser", () => {
+  const tab = tabAtInstruments();
+  let m = openInstruments(tab);
+  m.I.open(); m.I.move(2, 14); m.I.confirm();
+  assert.ok(Math.abs(m.I.state.pos.x) < 1e-9, "EASEP encajado en posición nominal");
+  assert.equal(m.I.state.pos.y, 17);
+  const locked = JSON.stringify(m.I.state);
+  m.I.move(5, 5); m.I.rotate(90);
+  assert.equal(JSON.stringify(m.I.state), locked, "no se mueve durante inspección");
+  m.parts()[0].click();
+  m = openInstruments(tab); m.I.open();
+  assert.equal(m.parts().length, 3);
+  assert.equal(m.parts()[0].disabled, true, "conserva inspección parcial tras recarga");
+  for (const b of m.parts().filter(b=>!b.disabled)) b.click();
+  assert.equal(m.I.state.phase, "lrrr");
+  const goal = Core.target(Core.easepTarget(),5,337.5);
+  m.I.move(Math.round(goal.x)-m.I.state.pos.x,Math.round(goal.y)-m.I.state.pos.y);
+  m.I.rotate(60); m.I.confirm();
+  const fixed = JSON.stringify(m.I.state);
+  m.I.move(8, 5); m.I.rotate(-90); m.I.confirm();
+  assert.equal(JSON.stringify(m.I.state),fixed);
+  assert.equal(m.F.getArtifact("reflector").state,"inspection_pending");
+  m = openInstruments(tab); m.I.open();
+  assert.equal(m.I.state.angle,60);
+  assert.equal(m.parts().length,2);
+  for(const b of m.parts()) b.click();
+  assert.equal(m.F.getArtifact("reflector").state,"registered");
+  m.I.confirm();
+  assert.equal(m.I.state.open,false,"Continuar cierra el diálogo terminado");
+});

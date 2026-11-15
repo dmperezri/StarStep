@@ -64,6 +64,11 @@
   const ROCK_ROLL_SLIDES = Object.freeze([[0, 1], [2, 4], [5, 8], [9, 11], [12, 15], [16, 18], [19, 23], [24, 27], [28, 33], [34, 35]]);
 
   const VIDEOS = Object.freeze({
+    mars_intro: Object.freeze({
+      src: "/static/assets/videos/mars-blueberry-hunt.mp4", duration: 168.4, width: 1280, height: 720,
+      tracks: Object.freeze({es:"/static/assets/videos/mars-blueberry-hunt.es.vtt",en:"/static/assets/videos/mars-blueberry-hunt.en.vtt"}),
+      cues: Object.freeze([[0, 9, "La Luna guarda las huellas del fuego. Marte guarda las del agua.", "The Moon holds traces of fire. Mars holds traces of water."], [9, 17, "¿Alguna vez hubo agua en Marte?", "Was Mars ever wet?"], [17, 27, "En julio de 2003, Opportunity partió hacia Marte.", "In July 2003, Opportunity launched toward Mars."], [27, 42, "Las bolsas de aire amortiguaron el aterrizaje en el cráter Eagle.", "Airbags cushioned the landing in Eagle Crater."], [42, 54, "Diseñado para 90 soles, el rover comenzó a estudiar rocas en capas.", "Designed for 90 sols, the rover began studying layered rocks."], [54, 66, "Halló pequeñas esférulas, llamadas blueberries.", "It found tiny spherules, nicknamed blueberries."], [66, 78, "Cámaras, microscopio, RAT y espectrómetros ayudaron a investigar.", "Cameras, a microscope, RAT and spectrometers helped investigate."], [78, 90, "En El Capitan observó sulfatos y huellas de cristales de sal.", "At El Capitan, it observed sulfates and traces of salt crystals."], [90, 103, "El análisis de las esférulas mostró hematita.", "Analysis of the spherules revealed hematite."], [103, 120, "El agua pudo favorecer el crecimiento de esférulas; la erosión las dejó al descubierto.", "Water may have helped spherules grow; erosion exposed them."], [120, 132, "Se compararon distintas explicaciones. El agua era la que mejor encajaba.", "Different explanations were compared. Water was the best fit."], [132, 145, "Opportunity recorrió más de 45 km durante casi 15 años.", "Opportunity covered more than 45 km in nearly 15 years."], [145, 162, "Una tormenta global de polvo cortó su energía. El último contacto fue el 10 de junio de 2018.", "A global dust storm cut its power. Last contact was June 10, 2018."], [162, 168, "Ahora te toca investigar las rocas de Marte.", "Now it is your turn to investigate the rocks of Mars."]]), slides: Object.freeze([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12], [13, 13]])
+    }),
     rock_roll_intro: Object.freeze({
       src: "/static/assets/videos/rock-roll-intro.mp4",
       duration: 152.5,
@@ -272,7 +277,7 @@
       caption.hidden = !text || !captionsVisible() || fallback;
     }
     function render() {
-      root.setAttribute("aria-label", t("label"));
+      root.setAttribute("aria-label", id === "mars_intro" ? (lang() === "en" ? "Cinematic · Opportunity" : "Cinemática · Opportunity") : t("label"));
       startButton.textContent = t("start");
       playButton.textContent = video.paused ? t("play") : t("pause");
       muteButton.textContent = video.muted ? t("soundOff") : t("soundOn");

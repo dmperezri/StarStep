@@ -1,28 +1,6 @@
 "use strict";
 document.addEventListener('DOMContentLoaded',()=>{
  const canvas=document.getElementById('world'),c=canvas.getContext('2d');c.imageSmoothingEnabled=false;
- // Localización PROVISIONAL (mars_panel_scan) hasta implementar la exploración con el rover.
- // StarFlow valida la etapa: las esférulas solo se localizan después de registrar Opportunity.
- function scan(id){const found=window.StarFlow?.locateArtifact(id,{mechanic:'mars_panel_scan'});if(found&&!found.ok&&found.code!=='ARTIFACT_NOT_IMPLEMENTED'){window.StarFlow.notify('locked');return;}window.openStarArtifact(id,{context:'mission'});}
- document.getElementById('inspectOpportunity').addEventListener('click',()=>scan('opportunity'));
- // Enigma de instrumentos (enigma-hematita.js): reemplaza la localización provisional de la hematita.
- document.getElementById('inspectBlueberries').addEventListener('click',()=>{if(window.StarHematiteEnigma)window.StarHematiteEnigma.open();else scan('blueberries');});
- // Los dos descubrimientos son los objetivos implementados de Marte.
- // Mostrar el estado real del flujo ayuda a entender por qué Huellas sigue cerrada.
- function updateGuide(){
-   const guide=document.getElementById('marsMissionGuide');
-   if(!guide)return;
-   const F=window.StarFlow;
-   const registered=id=>F?.getArtifact(id)?.state==='registered';
-   const en=window.StarI18n?.lang==='en';
-   const opportunity=registered('opportunity'), hematite=registered('blueberries');
-   guide.textContent=en
-     ? `Mars progress: Opportunity ${opportunity?'✓':'○'} · Hematite ${hematite?'✓':'○'}. ${opportunity&&hematite?'You can continue to Footprints.':'Inspect both artifacts and their components to continue.'}`
-     : `Progreso de Marte: Opportunity ${opportunity?'✓':'○'} · Hematita ${hematite?'✓':'○'}. ${opportunity&&hematite?'Ya podés continuar a Huellas.':'Inspeccioná ambos artefactos y sus componentes para continuar.'}`;
- }
- updateGuide();
- document.addEventListener('starflow:change',updateGuide);
- document.addEventListener('starstep:language',updateGuide);
  // Escenario marciano pixel art. Mantiene intacta la progresión y los eventos del visor.
  const fill=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
  function frame(now){

@@ -83,7 +83,7 @@
     const close = el("button", "enigma-close"); close.type = "button"; close.addEventListener("click", hide);
     const head = el("div", "enigma-head");
     const figure = el("figure", "enigma-photo");
-    const img = el("img"); img.src = "/static/assets/nasa/hematite-spherules.webp"; img.loading = "lazy";
+    const img = el("img"); img.src = "/static/assets/evidencias/hematita.webp"; img.loading = "lazy";
     const cap = el("figcaption"); const capText = el("span"); const credit = el("small", "enigma-credit");
     cap.append(capText, credit); figure.append(img, cap);
     const intro = el("div", "enigma-intro"); const kicker = el("p", "enigma-kicker"); const question = el("h2", "enigma-question"); const pick = el("p", "enigma-pick");
@@ -101,12 +101,15 @@
     const block = cls => { const d = el("div", "enigma-block " + cls); const tag = el("span", "enigma-tag"); const p = el("p"); d.append(tag, p); return { d, tag, p }; };
     const obs = block("observed"), inter = block("interpreted"), narr = block("narrative");
     const save = el("button", "enigma-save"); save.type = "button"; save.addEventListener("click", saveDiscovery);
-    result.append(rTitle, obs.d, inter.d, narr.d, save);
+    result.append(rTitle);
+    const proof = window.StarEvidenceVisual?.figure("hematite");
+    if (proof) { proof.classList.add("enigma-result-photo"); result.append(proof); }
+    result.append(obs.d, inter.d, narr.d, save);
     panel.append(close, head, grid, feedback, analyze, result);
     root.append(panel);
     root.addEventListener("keydown", e => { if (e.key === "Escape") hide(); });
     document.body.append(root);
-    ui = { root, close, capText, credit, kicker, question, pick, cards, feedback, analyze, result, rTitle, obs, inter, narr, save, selected: new Set(), feedbackKey: null, solved: false };
+    ui = { root, close, head, grid, proof, capText, credit, kicker, question, pick, cards, feedback, analyze, result, rTitle, obs, inter, narr, save, selected: new Set(), feedbackKey: null, solved: false };
     document.addEventListener("starstep:language", render);
   }
   function render() {
@@ -116,6 +119,7 @@
     ui.kicker.textContent = t("kicker"); ui.question.textContent = t("question"); ui.pick.textContent = t("pick");
     for (const c of ui.cards) { c.desc.textContent = c.inst[lang()]; c.b.setAttribute("aria-pressed", String(ui.selected.has(c.inst.id))); c.b.disabled = ui.solved; }
     ui.analyze.textContent = t("analyze"); ui.analyze.hidden = ui.solved;
+    if (ui.proof) { ui.head.hidden = ui.solved; ui.grid.hidden = ui.solved; }
     ui.feedback.textContent = ui.feedbackText ? ui.feedbackText() : "";
     const card = Core.CARD[lang()];
     ui.rTitle.textContent = t("title");
@@ -147,7 +151,7 @@
   function saveDiscovery() {
     if (!ui.solved) return;
     const F = flow(); if (!F) return;
-    const located = F.locateArtifact(ID, { mechanic: "mars_panel_scan" });
+    const located = F.locateArtifact(ID, { mechanic: "mars_rover_scan" });
     if (!located.ok) { ui.feedbackText = () => t("saveFailed", { code: located.code }); render(); return; }
     const begin = F.beginInspection(ID, { context: "mission", viewer: "fallback" });
     if (!begin.ok) { ui.feedbackText = () => t("saveFailed", { code: begin.code }); render(); return; }
@@ -167,7 +171,7 @@
     try { ui.cards[0].b.focus?.({ preventScroll: true }); } catch { /* sin foco */ }
     return true;
   }
-  function hide() { if (ui) ui.root.hidden = true; try { document.getElementById("inspectBlueberries")?.focus?.(); } catch { /* sin foco */ } }
+  function hide() { if (ui) ui.root.hidden = true; try { document.getElementById("openMarsRoute")?.focus?.(); } catch { /* sin foco */ } }
 
   window.StarHematiteEnigma = Object.freeze({ open, hide, get state() { return ui ? { open: !ui.root.hidden, solved: ui.solved, selected: [...ui.selected] } : null; } });
 })();

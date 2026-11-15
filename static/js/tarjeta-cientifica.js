@@ -27,13 +27,17 @@
     const head = el("div", "sci-head");
     const icon = el("canvas", "sci-icon"); icon.width = 48; icon.height = 48; icon.setAttribute("aria-hidden", "true");
     try { const c = icon.getContext?.("2d"); if (c && typeof card.icon === "function") { c.imageSmoothingEnabled = false; card.icon(c); } } catch { /* sin icono */ }
-    const titles = el("div"); const kind = el("p", "sci-kind"); const title = el("h2", "sci-title"); titles.append(kind, title);
+    const titles = el("div", "sci-titles"); const kind = el("p", "sci-kind"); const title = el("h2", "sci-title"); title.id = "science-card-title"; root.setAttribute("aria-labelledby", title.id); titles.append(kind, title);
     const closeBtn = el("button", "sci-close"); closeBtn.type = "button"; closeBtn.addEventListener("click", () => close(true));
     icon.hidden = typeof card.icon !== "function";
     head.append(icon, titles, closeBtn);
     const figure = el("figure", "sci-photo"); figure.hidden = !card.photo;
     const img = el("img"); const cap = el("figcaption");
-    if (card.photo) { img.src = card.photo.src; img.loading = "lazy"; figure.append(img, cap); }
+    if (card.photo) { img.src = card.photo.src; img.loading = "eager"; figure.append(img, cap); }
+    const related = card.photo?.related;
+    const relatedFigure = el("figure", "sci-photo sci-related"); relatedFigure.hidden = !related;
+    const relatedImg = el("img"), relatedCap = el("figcaption");
+    if (related) { relatedImg.src = related.src; relatedImg.loading = "lazy"; relatedFigure.append(relatedImg, relatedCap); }
     const body = el("div", "sci-body"); body.hidden = true;
     const block = cls => { const d = el("div", "sci-block " + cls); const tag = el("span", "sci-tag"); const p = el("p"); d.append(tag, p); body.append(d); return { d, tag, p }; };
     const obs = block("observed"), inter = block("interpreted"), narr = block("narrative"), data = block("data");
@@ -43,7 +47,7 @@
     const inspect = el("button", "sci-inspect"); inspect.type = "button";
     const confirm = el("button", "sci-confirm"); confirm.type = "button";
     actions.append(inspect, confirm);
-    panel.append(head, figure, body, status, actions); root.append(panel);
+    panel.append(head, figure, relatedFigure, body, status, actions); root.append(panel);
     document.body.append(root);
     let inspected = !!card.preInspected, finished = !!card.finished, statusKey = null, statusText = "";
     function render() {
@@ -51,6 +55,7 @@
       kind.textContent = pick(card.kind) || ""; title.textContent = pick(card.title) || "";
       closeBtn.textContent = t.close;
       if (card.photo) { img.alt = pick(card.photo.alt) || ""; cap.textContent = pick(card.photo.caption) || ""; }
+      if (related) { relatedImg.alt = pick(related.alt) || ""; relatedCap.textContent = pick(related.caption) || ""; }
       obs.tag.textContent = t.observed; obs.p.textContent = pick(card.observed) || "";
       inter.tag.textContent = t.interpreted; inter.p.textContent = pick(card.interpreted) || "";
       narr.tag.textContent = t.narrative; narr.p.textContent = pick(card.narrative) || "";
@@ -58,8 +63,8 @@
       link.textContent = `${t.source}: ${pick(card.source) || ""}`; link.href = card.sourceUrl || "#"; src.hidden = !card.source;
       body.hidden = !inspected;
       inspect.textContent = t.inspect; inspect.hidden = inspected;
-      confirm.textContent = finished ? t.done : (pick(card.confirm) || "OK"); confirm.disabled = finished;
-      status.textContent = statusKey ? t[statusKey] : statusText;
+      confirm.textContent = finished ? t.done : (pick(card.confirm) || "OK"); confirm.disabled = finished; confirm.hidden = !inspected;
+      status.textContent = statusKey ? t[statusKey] : statusText; status.hidden = !status.textContent;
     }
     inspect.addEventListener("click", () => { inspected = true; statusKey = null; window.StarSound?.effect?.("scan"); render(); try { confirm.focus?.(); } catch { /* sin foco */ } card.onInspect?.(); });
     confirm.addEventListener("click", () => {

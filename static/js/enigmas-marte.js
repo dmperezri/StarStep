@@ -96,9 +96,15 @@
   }
   function drawArt(canvas, id) {
     const c = canvas.getContext?.("2d"); if (!c) return;
-    c.fillStyle = "#D9593A"; c.fillRect(0, 0, 240, 150); c.fillStyle = "#A63A26"; c.fillRect(0, 100, 240, 50);
-    if (id === "gypsum") { c.fillStyle = "#7A2818"; c.fillRect(30, 40, 180, 70); c.fillStyle = "#FFF8E7"; for (let i = 0; i < 18; i++) c.fillRect(40 + i * 9, 60 + Math.round(Math.sin(i) * 6), 10, 4); }
-    else { c.fillStyle = "#F7B08E"; c.fillRect(40, 45, 160, 65); c.fillStyle = "#3FD0E0"; c.fillRect(105, 65, 30, 30); c.fillStyle = "#575C74"; c.fillRect(110, 70, 20, 20); }
+    const px=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+    px(0,0,240,150,"#7A3424");
+    for(let i=0;i<80;i++)px((i*73)%240,(i*37)%150,2+i%4,2,i%3?"#A65B45":"#4E1E14");
+    // Layered outcrop, using the reference's hand-drawn pixel terrain palette.
+    for(let x=12;x<228;x+=4){const y=34+Math.round(12*Math.sin(x*.043)+7*Math.cos(x*.12));px(x,y,4,111-y,"#4E1E14");px(x,y+2,4,100-y,"#A85A3C");px(x,y+8,4,3,"#C06A4A");}
+    if(id==="gypsum"){for(let x=20;x<220;x+=3){const y=68+Math.round(8*Math.sin(x*.04)+5*Math.cos(x*.12));px(x,y,4,7,"#FFF8E7");px(x,y+5,4,2,"#CDD0DD");}}
+    else {for(let x=65;x<184;x+=4){const y=58+Math.round(7*Math.sin(x*.09));px(x,y,4,43,"#B9A28D");px(x,y,4,3,"#E4DFFF");}for(let i=0;i<6;i++){px(105+i*5,75,4,20,"#575C74");px(105+i*5,75,4,2,"#C3C7D6");}}
+    px(7,130,226,2,"#A65B45");
+
   }
 
   function openEnigma(id) {
@@ -109,7 +115,7 @@
     const art = el("canvas", "mg-canvas"); art.width = 240; art.height = 150; art.style && (art.style.maxWidth = "320px"); drawArt(art, id);
     const artNote = el("p", "moon-sim-note", t("art"));
     const q = el("p", "mg-text", pick(e.question)); const pickText = el("p", "mg-kicker", t("pick"));
-    const grid = el("div", "mg-options"); const selected = new Set();
+    const grid = el("div", "mg-options evidence-enigma-grid"); const selected = new Set();
     for (const inst of INSTRUMENTS()) {
       const b = el("button", "mg-option"); b.type = "button"; b.dataset.instrument = inst.id;
       b.append(el("strong", "", inst.name), el("br"), el("span", "", inst[lang()]));
@@ -123,13 +129,16 @@
     const block = (cls, tagKey, text) => { const d = el("div", "sci-block " + cls); d.append(el("span", "sci-tag", t(tagKey)), el("p", "", pick(text))); return d; };
     result.append(block("observed", "observed", e.card.observed), block("interpreted", "interpreted", e.card.interpreted), block("narrative", "narrative", e.card.narrative));
     const save = el("button", "mg-btn primary", t("save")); save.type = "button"; const saveRow = el("div", "mg-actions"); saveRow.append(save); result.append(saveRow);
-    ui.panel.append(art, artNote, q, pickText, grid, feedback, actions, result);
+    const ref = window.StarEvidenceVisual?.figure(id);
+    const head = el("div", "evidence-enigma-head"); const prompt = el("div"); prompt.append(q, pickText);
+    if (ref) head.append(ref, prompt); else { const fallback = el("div"); fallback.append(art, artNote); head.append(fallback, prompt); }
+    ui.panel.append(head, grid, feedback, actions, result);
     let solved = false;
     analyze.addEventListener("click", () => {
       const r = Core.evaluate(id, [...selected]);
       if (r.result === "incomplete") { feedback.textContent = t("incomplete"); return; }
       if (r.result === "wrong") { const h = e.hints[lang()]; feedback.textContent = [t("wrong"), ...r.hints.map(x => h[x]).filter(Boolean), t("retry")].join(" "); return; }
-      solved = true; feedback.textContent = t("correct"); analyze.hidden = true; result.hidden = false; window.StarSound?.effect?.("scan");
+      solved = true; feedback.textContent = t("correct"); analyze.hidden = true; grid.hidden = true; pickText.hidden = true; q.hidden = true; result.hidden = false; window.StarSound?.effect?.("scan");
     });
     save.addEventListener("click", () => {
       if (!solved || save.disabled) return;

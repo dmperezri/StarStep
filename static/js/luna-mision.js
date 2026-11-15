@@ -39,6 +39,7 @@
   const BOX = Object.freeze(["cont", "basalt10057", "regolith10084", "core", "swc"]);
   const CARDS = Object.freeze({
     cont: {
+      photo: {"src": "/static/assets/evidencias/artefactos/cont-frame.jpg", "alt": {"es": "Recolección de contingencia · recreación del video StarStep", "en": "Contingency collection · StarStep video reconstruction"}, "caption": {"es": "Recolección de contingencia · recreación del video StarStep", "en": "Contingency collection · StarStep video reconstruction"}},
       kind: { es: "MUESTRA GEOLÓGICA · LA PRIMERA", en: "GEOLOGICAL SAMPLE · THE FIRST ONE" },
       title: { es: "Muestra de contingencia", en: "Contingency sample" },
       observed: { es: "Minutos después de bajar, Armstrong guardó suelo y fragmentos de roca con un muestreador de mango largo.", en: "Minutes after stepping down, Armstrong bagged soil and rock fragments with a long-handled sampler." },
@@ -48,6 +49,7 @@
       source: "NASA NSSDCA · Apollo 11 (1969-059C)", sourceUrl: SOURCE_NSSDCA
     },
     basalt10057: {
+      photo: {"src": "/static/assets/evidencias/artefactos/basalt10057.jpg", "alt": {"es": "Basalto 10057,0 · NASA S69-46287", "en": "Basalt 10057,0 · NASA S69-46287"}, "caption": {"es": "Basalto 10057,0 · NASA S69-46287", "en": "Basalt 10057,0 · NASA S69-46287"}},
       kind: { es: "MUESTRA GEOLÓGICA · ROCA", en: "GEOLOGICAL SAMPLE · ROCK" },
       title: { es: "Roca · basalto 10057", en: "Rock · basalt 10057" },
       observed: { es: "Roca oscura de 919 g llena de agujeritos: las vesículas.", en: "A dark 919 g rock full of tiny holes: vesicles." },
@@ -57,6 +59,7 @@
       source: "NASA · Lunar Sample Compendium", sourceUrl: SOURCE_LSC
     },
     regolith10084: {
+      photo: {"src": "/static/assets/evidencias/artefactos/regolith10084.svg", "alt": {"es": "Regolito 10084 · ilustración StarStep", "en": "Regolith 10084 · StarStep illustration"}, "caption": {"es": "Regolito 10084 · ilustración StarStep", "en": "Regolith 10084 · StarStep illustration"}, "related": {"src": "/static/assets/evidencias/huella.webp", "alt": {"es": "Huella en regolito lunar, no la muestra 10084 · NASA AS11-40-5880", "en": "Footprint in lunar regolith, not sample 10084 · NASA AS11-40-5880"}, "caption": {"es": "Regolito en superficie · NASA AS11-40-5880", "en": "Surface regolith · NASA AS11-40-5880"}}},
       kind: { es: "MUESTRA GEOLÓGICA · SUELO", en: "GEOLOGICAL SAMPLE · SOIL" },
       title: { es: "Regolito lunar 10084", en: "Lunar regolith 10084" },
       observed: { es: "Polvo gris muy fino con granitos de roca y trocitos de vidrio brillante.", en: "Very fine gray dust with rock grains and shiny bits of glass." },
@@ -66,6 +69,7 @@
       source: "NASA · Lunar Sample Compendium", sourceUrl: SOURCE_LSC
     },
     core: {
+      photo: {"src": "/static/assets/evidencias/artefactos/core.svg", "alt": {"es": "Tubo de núcleo · esquema StarStep", "en": "Core tube · StarStep diagram"}, "caption": {"es": "Tubo de núcleo · esquema StarStep", "en": "Core tube · StarStep diagram"}},
       kind: { es: "MUESTRA GEOLÓGICA · NÚCLEO", en: "GEOLOGICAL SAMPLE · CORE" },
       title: { es: "Tubo de núcleo", en: "Core tube" },
       observed: { es: "Un tubo hueco clavado en el suelo con un martillo; al sacarlo, la tierra queda adentro.", en: "A hollow tube hammered into the ground; when pulled out, the soil stays inside." },
@@ -75,6 +79,7 @@
       source: "NASA NSSDCA · Apollo 11 (1969-059C)", sourceUrl: SOURCE_NSSDCA
     },
     swc: {
+      photo: {"src": "/static/assets/evidencias/artefactos/swc.svg", "alt": {"es": "Experimento SWC · esquema StarStep", "en": "SWC experiment · StarStep diagram"}, "caption": {"es": "Experimento SWC · esquema StarStep", "en": "SWC experiment · StarStep diagram"}, "related": {"src": "/static/assets/evidencias/a3_easep.jpg", "alt": {"es": "SWC al fondo, detrás de la pata derecha de Eagle · NASA AS11-40-5931", "en": "SWC in the background beyond Eagle’s right leg · NASA AS11-40-5931"}, "caption": {"es": "SWC al fondo · NASA AS11-40-5931", "en": "SWC in the background · NASA AS11-40-5931"}}},
       kind: { es: "EXPERIMENTO · NO ES UNA ROCA", en: "EXPERIMENT · NOT A ROCK" },
       title: { es: "Experimento de viento solar (SWC)", en: "Solar Wind Composition (SWC)" },
       observed: { es: "Una lámina de aluminio en un mástil, expuesta al Sol durante 77 minutos.", en: "An aluminum foil sheet on a pole, exposed to the Sun for 77 minutes." },
@@ -84,6 +89,7 @@
       source: "NASA NSSDCA · Apollo 11 (1969-059C)", sourceUrl: SOURCE_NSSDCA
     },
     plaque: {
+      photo: {"src": "/static/assets/evidencias/artefactos/plaque.jpg", "alt": {"es": "Placa conmemorativa · NASA AS11-40-5899", "en": "Commemorative plaque · NASA AS11-40-5899"}, "caption": {"es": "Placa conmemorativa · NASA AS11-40-5899", "en": "Commemorative plaque · NASA AS11-40-5899"}, "related": {"src": "/static/assets/evidencias/artefactos/flag.jpg", "alt": {"es": "Bandera lunar · NASA AS11-37-5545", "en": "Lunar flag · NASA AS11-37-5545"}, "caption": {"es": "Bandera lunar · NASA AS11-37-5545", "en": "Lunar flag · NASA AS11-37-5545"}}},
       kind: { es: "PATRIMONIO · MEMORIA", en: "HERITAGE · MEMORY" },
       title: { es: "Placa y bandera", en: "Plaque and flag" },
       observed: { es: "Una placa en una pata de Eagle y la bandera clavada cerca del módulo.", en: "A plaque on one of Eagle's legs and the flag planted near the module." },
@@ -110,15 +116,15 @@
   const Core = window.StarMoonCore;
   const T = {
     es: { o2: "O₂", box: "Caja", left: "◀", right: "▶", action: "ACCIÓN", pause: "PAUSA", resume: "SEGUIR", save: "Guardar en la caja", saveMemorial: "Guardar en la bitácora",
-      near: "Detecto {name}. Presioná E o ACCIÓN.", firstCont: "Primero la muestra de contingencia: está junto a Eagle.", tank: "Tanque de oxígeno: +30 s.", tankUsed: "Tanque vacío.",
+      near: "{name} · E para inspeccionar.", firstCont: "Primero la muestra de contingencia: está junto a Eagle.", tank: "Tanque de oxígeno: +30 s.", tankUsed: "Tanque vacío.",
       safe: "Punto seguro guardado.", empty: "¡Sin oxígeno! Volvemos al último punto seguro. Lo registrado se conserva.", warn: "Oxígeno bajo: buscá un tanque o un punto seguro.",
-      sim: "El rover es una herramienta de simulación del juego: Apollo 11 no usó vehículo (el primero llegó con Apollo 15). Los tiempos de oxígeno son del minijuego.",
-      intro: "LITO: Explorá con ◀ ▶ (A/D). Recogé las 5 piezas de la caja y revisá Eagle y la placa.", allDone: "LITO: ¡Exploración completa! Ahora toca instalar los instrumentos.", locked: "Esto se habilita más adelante en la misión." },
+      sim: "Simulación: Apollo 11 no usó rover. O₂ de juego.",
+      intro: "¡Vamos! Buscá las muestras, Eagle y la placa.", allDone: "¡Exploración completa! Instalemos los instrumentos.", locked: "Esto se habilita más adelante en la misión." },
     en: { o2: "O₂", box: "Box", left: "◀", right: "▶", action: "ACTION", pause: "PAUSE", resume: "RESUME", save: "Save to the box", saveMemorial: "Save to logbook",
-      near: "I detect {name}. Press E or ACTION.", firstCont: "Contingency sample first: it is next to Eagle.", tank: "Oxygen tank: +30 s.", tankUsed: "Empty tank.",
+      near: "{name} · E to inspect.", firstCont: "Contingency sample first: it is next to Eagle.", tank: "Oxygen tank: +30 s.", tankUsed: "Empty tank.",
       safe: "Safe point saved.", empty: "Out of oxygen! Back to the last safe point. What you registered is kept.", warn: "Low oxygen: find a tank or a safe point.",
-      sim: "The rover is a game simulation tool: Apollo 11 used no vehicle (the first came with Apollo 15). Oxygen times are minigame values.",
-      intro: "LITO: Explore with ◀ ▶ (A/D). Collect the 5 box items and check Eagle and the plaque.", allDone: "LITO: Exploration complete! Next, install the instruments.", locked: "This unlocks later in the mission." }
+      sim: "Simulation: Apollo 11 used no rover. Game O₂.",
+      intro: "Let’s go! Find the samples, Eagle and the plaque.", allDone: "Exploration complete! Let’s install the instruments.", locked: "This unlocks later in the mission." }
   };
   const lang = () => (window.StarI18n?.lang === "en" ? "en" : "es");
   const t = (k, v) => { let s = T[lang()][k] ?? k; for (const [a, b] of Object.entries(v || {})) s = s.replace("{" + a + "}", b); return s; };
@@ -146,6 +152,7 @@
     if (!located.ok) { say(located.code === "STAGE_LOCKED" ? t("locked") : located.code); return; }
     const begin = F.beginInspection(id, { context: "mission", viewer: "fallback" });
     if (!begin.ok) { say(begin.code); return; }
+    window.StarSound?.effect?.("pick");
     window.StarScienceCard?.open({
       ...card, icon: c => drawIcon(c, id), confirm: id === "plaque" ? t("saveMemorial") : t("save"),
       onConfirm: () => {
@@ -153,6 +160,7 @@
         let last = null;
         for (const comp of comps) last = F.inspectComponent(id, comp, { context: "mission", viewer: "fallback" });
         const ok = F.getArtifact(id)?.state === "registered";
+        if(ok)window.StarSound?.effect?.("ok");
         renderHud();
         if (ok && Core.BOX.every(x => F.getArtifact(x)?.state === "registered") && F.getArtifact("plaque")?.state === "registered" && F.getArtifact("eagle")?.state === "registered") say(t("allDone"), 6000);
         return ok ? { ok: true } : { ok: false, message: last?.code || "" };
@@ -165,10 +173,10 @@
     const active = !paused();
     if (active) {
       state.o2 = Core.stepOxygen(state.o2, dt, true);
-      if (state.o2 <= Core.O2_WARN && !state.warned) { state.warned = true; say(t("warn")); window.StarSound?.effect?.("button"); }
+      if (state.o2 <= Core.O2_WARN && !state.warned) { state.warned = true; say(t("warn")); window.StarSound?.effect?.("beep"); }
       if (state.o2 <= 0) {
         rover.x = state.safeX - rover.width / 2; state.o2 = Core.O2_MAX; state.warned = false;
-        say(t("empty"), 5000); window.StarSound?.effect?.("button");
+        say(t("empty"), 5000); window.StarSound?.effect?.("bad");
       }
     }
     // Puntos seguros y tanques por contacto.
@@ -216,7 +224,10 @@
       const done = reg.has(p.id), lock = Core.locked(p.id, reg);
       if (p.kind === "memorial") { px(ctx, x - 1, y - 54, 3, 54, "#C3C7D6"); px(ctx, x + 2, y - 54, 26, 16, "#FFF8E7"); px(ctx, x + 2, y - 54, 11, 9, "#4F86D9"); for (let i = 0; i < 3; i++) px(ctx, x + 13, y - 52 + i * 5, 15, 2, "#D9593A"); }
       else if (p.kind === "experiment") { px(ctx, x - 1, y - 50, 3, 50, "#C3C7D6"); px(ctx, x + 2, y - 50, 22, 30, "#FFF8E7"); }
-      else { px(ctx, x - 9, y - 12, 18, 12, p.id === "regolith10084" ? "#868CA4" : "#575C74"); px(ctx, x - 6, y - 16, 12, 4, "#575C74"); }
+      else if(p.id==="cont"){px(ctx,x-2,y-29,3,20,"#CDD0DD");px(ctx,x-10,y-12,19,12,"#1A1340");px(ctx,x-8,y-11,15,10,"#FFF8E7");px(ctx,x-5,y-14,9,4,"#B9BEE6");}
+      else if(p.id==="core"){for(const dx of [-7,4]){px(ctx,x+dx,y-24,6,24,"#1A1340");px(ctx,x+dx+1,y-23,4,21,"#CDD0DD");px(ctx,x+dx+3,y-21,2,17,"#868CA4");}}
+      else if(p.id==="regolith10084"){px(ctx,x-12,y-5,24,5,"#3E4256");px(ctx,x-9,y-9,18,5,"#868CA4");px(ctx,x-5,y-13,10,5,"#C3C7D6");}
+      else {px(ctx,x-13,y-12,26,12,"#1A1340");px(ctx,x-10,y-16,20,14,"#575C74");px(ctx,x-6,y-19,13,4,"#868CA4");for(const [dx,dy] of [[-6,-11],[4,-7],[6,-14]])px(ctx,x+dx,y+dy,3,3,"#1A1340");}
       // Marcador: amarillo pendiente, menta registrado, gris bloqueado.
       px(ctx, x - 4, y - 74, 8, 8, done ? "#8FF0D8" : lock ? "#868CA4" : "#FFE066");
     }

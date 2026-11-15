@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(selected!==id){feedback.textContent=StarI18n.t('puzzle.bad');selected=null;window.StarSound?.effect('button');draw();return;}
     solved.add(id);selected=null;feedback.textContent=StarI18n.t('puzzle.good');window.StarSound?.effect('success');window.StarFlow?.recordObjective('footprints.pair.'+id,{source:'matching_game'});draw();if(solved.size===pairs.length){finish.hidden=!window.StarFlow?.isStageCompleted('footprints');feedback.textContent=StarI18n.t('puzzle.complete');}
    });if(selected===id&&!answer)b.classList.add('selected');return b;};
+  const label=(text)=>{const n=document.createElement('h3');n.className='match-label';n.textContent=text;return n;};
+  left.append(label(language==='en'?'Pieces left behind':'Piezas que quedaron'));right.append(label(language==='en'?'What they taught us':'Lo que nos enseñaron'));
   for(const pair of pairs)left.append(button(pair[language][0],pair.id,false));for(const pair of [...pairs].reverse())right.append(button(pair[language][1],pair.id,true));root.append(left,right);
  }
  draw();document.addEventListener('starstep:language',()=>{draw();if(solved.size===pairs.length)feedback.textContent=StarI18n.t('puzzle.complete');});

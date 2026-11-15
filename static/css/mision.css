@@ -53,3 +53,25 @@
 .moon-sim-note { max-width: 860px; margin: 6px auto; color: #B9BEE6; font-size: 12px; text-align: center; }
 @media (max-width: 640px) { .sci-panel, .mg-panel { padding: 14px; } .sci-head { grid-template-columns: 44px 1fr; } .sci-close { grid-column: 1 / -1; justify-self: end; } }
 #creditsDialog h3.mg-kicker { margin: 18px 0 4px; }
+
+/* Instruments: keep confirmation beside movement controls, not below the photo. */
+.mg[data-instrument-map] .mg-panel{padding:12px 16px;box-sizing:border-box}
+.mg[data-instrument-map] .mg-text{font-size:13px;margin:4px 0}
+.mg[data-instrument-map] .mg-canvas{max-width:min(100%,68dvh);margin-inline:auto;background:#71778f}
+.mg[data-instrument-map] .evidence-photo img{max-height:28dvh;object-fit:contain}
+.mg[data-instrument-map] .mg-pad{gap:5px;margin-top:5px}
+.mg[data-instrument-map] .mg-pad .mg-btn{min-width:38px;min-height:36px;padding:6px 10px}
+.mg[data-instrument-map] .mg-hud{margin:5px 0;font-size:12px}
+.mg[data-instrument-map] .mg-hud [data-valid="true"]{color:#8ff0d8}
+.mg[data-instrument-map] .mg-hud [data-valid="false"]{color:#ffe066}
+.mg[data-instrument-map] .mg-feedback{font-size:12px;margin:5px 0;min-height:0}
+@media(max-width:680px){.mg[data-instrument-map] .evidence-scene-photo{display:flex;flex-direction:column}.mg[data-instrument-map] .evidence-scene-photo .evidence-photo{order:2;width:100%;display:flex;gap:6px;align-items:center}.mg[data-instrument-map] .evidence-photo img{width:80px;max-height:64px}.mg[data-instrument-map] .mg-canvas{max-width:100%}.mg[data-instrument-map] .mg-panel{padding:10px}.mg[data-instrument-map] .mg-pad .mg-btn.primary{flex-basis:100%}}
+
+/* Rock & Roll prototype: pixel-console finish, without changing layout or controls. */
+.mg .mg-canvas { border:3px solid #6E62CE; box-shadow: inset 0 0 0 1px #1A1340; }
+.mg .mg-hud span { border-bottom:2px solid #4F45A6; }
+.mg .mg-btn:not(:disabled), .mg .mg-option:not(:disabled) { transition: background .12s,border-color .12s; }
+.mg .mg-btn:not(:disabled):hover, .mg .mg-option:not(:disabled):hover { border-color:#FFE066; }
+.mg .mg-panel > button.mg-btn:first-child { float:right; width:auto; min-height:34px; padding:5px 10px; margin-left:10px; font-size:12px; }
+.mg .mg-title { overflow-wrap:anywhere; }
+@media (prefers-reduced-motion:reduce) { .mg .mg-btn,.mg .mg-option { transition:none!important; } }

@@ -37,7 +37,7 @@ window.StarViewerFallback={
    b.onclick=()=>reveal(componentId);list.append(b);
   }
   const close=document.createElement('button');close.className='pixel-button';close.textContent=StarI18n.t('viewer.close');close.onclick=()=>overlay.remove();
-  panel.append(heading,warning,list,content,info,story,status,close);overlay.append(panel);document.body.append(overlay);
+  panel.append(heading);const photo=window.StarEvidenceVisual?.artifactFigure?.(id);if(photo)panel.append(photo);panel.append(warning,list,content,info,story,status,close);overlay.append(panel);document.body.append(overlay);
   setStatus({ok:true,mode:context==='journal'?'consult':'start'});
   close.focus();
  }

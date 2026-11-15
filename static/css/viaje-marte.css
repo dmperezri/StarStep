@@ -11,3 +11,136 @@
 
 /* Estado de objetivos de Marte, sin alterar el panel ni los controles existentes */
 .mars-mission-guide{max-width:520px;margin:10px auto;padding:8px 12px;background:#101536;color:#fff8e7;border:2px solid #8ff0d8;line-height:1.5;font-size:clamp(11px,1.3vw,15px);text-align:center}
+
+.mars-landing-modal {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.mars-landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mars-landing-title {
+  margin: 0;
+  font-size: 2rem;
+  color: #fff6d6;
+}
+
+.mars-landing-subtitle {
+  margin: 8px 0 0;
+  color: #f7e9dc;
+  line-height: 1.5;
+}
+
+.mars-landing-stage {
+  border: 4px solid #8e85d8;
+  background: #221f64;
+  padding: 12px;
+  box-shadow: 8px 8px 0 #120f3d;
+}
+
+.mars-landing-canvas-wrap {
+  position: relative;
+  border: 3px solid #b8aeea;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    #a56f5a 0%,
+    #b57e66 18%,
+    #c99579 36%,
+    #d6a88a 55%,
+    #ddb49b 70%,
+    #8a3e22 100%
+  );
+}
+
+.mars-landing-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.mars-landing-overlay {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.mars-landing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mars-chip {
+  border: 2px solid #8fe8de;
+  background: #28306f;
+  color: #b8fff5;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.mars-chip strong {
+  color: #fff3a1;
+}
+
+.mars-phase {
+  margin-top: 14px;
+  border: 2px solid #6fd1d5;
+  background: #161b53;
+  padding: 10px 14px;
+  color: #d9fff8;
+  font-weight: 700;
+}
+
+.mars-phase strong {
+  color: #ffe36c;
+}
+
+.mars-landing-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.mars-landing-controls .pixel-button {
+  min-width: 180px;
+}
+
+.mars-landing-help {
+  margin-top: 14px;
+  color: #e8dbff;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.mars-result {
+  margin-top: 16px;
+  padding: 14px;
+  border: 2px solid #c9bb8a;
+  background: #ede2be;
+  color: #1d1d3f;
+  font-weight: 700;
+}
+
+.mars-result.success {
+  border-color: #8ff0d8;
+}
+
+.mars-result.fail {
+  border-color: #e98b76;
+}
+
+.mars-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}

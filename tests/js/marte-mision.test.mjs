@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { makePage, newTab, openHome, completeGroup } from "./navegador-simulado.mjs";
+import { makePage, newTab, openHome, completeGroup, FakeElement } from "./navegador-simulado.mjs";
 
 const require = createRequire(import.meta.url);
 const Mars = require("../../static/js/marte-mision.js");
@@ -86,13 +86,15 @@ test("Acto II completo: transición, aterrizaje, ruta, enigmas, habitabilidad y 
   m.M.openTransition();
   m.find(n => n.className === "mg-btn primary")[0].click();
   assert.equal(F.getCurrentStage(), "mars_landing");
-  // Aterrizaje: el paracaídas demasiado pronto falla.
+  // Aterrizaje: el paracaídas demasiado pronto no cuenta.
   const L = m.M.landing;
   L.start(); L.act(0);
   assert.equal(F.getState().objectives["mars_landing.touchdown"], undefined);
   L.start(); while (L.state.alt > 9) L.tick(0.1); L.act(0);
   while (L.state.alt > 0.3) L.tick(0.1); L.act(1);
   while (L.state.alt > 0.05) L.tick(0.05); L.act(2);
+  assert.equal(L.state.done, false, "los rebotes deben terminar antes de registrar la llegada");
+  L.tick(2);
   assert.equal(L.state.done, true);
   assert.equal(F.getCurrentStage(), "mars_exploration");
   // Ruta: hasta la plataforma y la tarjeta.
@@ -138,3 +140,124 @@ test("Acto II completo: transición, aterrizaje, ruta, enigmas, habitabilidad y 
   assert.equal(S.state.result, "sent");
   assert.equal(F.isActComplete("marte"), true);
 });
+
+
+test("Marte: cinemática oficial antes del aterrizaje, sin saltos ni recompensas", () => {
+  const host = new FakeElement("div", {id:"marsCinematic"}); host.hidden = true;
+  const page = makePage({path:"/marte",tab:tabAtMars(),elements:[host]});
+  page.document.removeEventListener=()=>{};
+  page.ctx.setTimeout=()=>0; page.ctx.requestAnimationFrame=()=>0;
+  let config, calls=0;
+  page.ctx.StarCinematic={mount(container,options){assert.equal(container,host);config=options;calls++;return {state:{done:false}};}};
+  page.load("main.js","progreso.js","flujo-definicion.js","flujo.js","tarjeta-cientifica.js","enigma-hematita.js","enigmas-marte.js","marte-mision.js").ready();
+  const F=page.ctx.StarFlow, M=page.ctx.StarMarsMission;
+  assert.equal(F.getCurrentStage(),"mars_transition");assert.equal(config.id,"mars_intro");
+  M.openTransition();assert.equal(calls,1);
+  assert.equal(M.landing,null);
+  config.onDone({completed:true,via:"video"});
+  assert.equal(F.getCurrentStage(),"mars_landing");assert.ok(M.landing);
+  assert.equal(F.isStageCompleted("mars_landing"),false);
+  assert.equal(F.getArtifact("opportunity").state,"undiscovered");
+});
+
+
+test("aterrizaje guiado: espera en cada ventana sin fallar, exige las tres acciones", () => {
+  const m = openMars(tabAtMars()); m.M.openTransition(); m.find(n=>n.className === "mg-btn primary")[0].click();
+  const L=m.M.landing; L.start(); L.act(2); L.act(0); assert.equal(L.state.phase,0);
+  for(let i=0;i<3;i++){
+    for(let n=0;n<800;n++) L.tick(.1);
+    assert.equal(L.state.alt,Mars.LANDING_HOLD[i]);
+    assert.equal(Mars.landingAction(L.state.alt,i),"ok");
+    assert.equal(m.F.isStageCompleted("mars_landing"),false);
+    L.act(i);
+  }
+  assert.equal(L.state.done,false); L.tick(1); assert.equal(m.F.isStageCompleted("mars_landing"),false);
+  L.tick(1); assert.equal(m.F.getCurrentStage(),"mars_exploration"); assert.equal(L.state.done,true);
+});
+
+test("ruta única: plataforma y Opportunity se inspeccionan desde la primera estación; hematita desde la siguiente", () => {
+  const m = openMars(tabAtMars()); m.M.openTransition(); m.find(n=>n.className === "mg-btn primary")[0].click();
+  const F=m.F, L=m.M.landing;
+  L.start(); for(let i=0;i<3;i++){while(L.state.alt>Mars.LANDING_HOLD[i]) L.tick(.1); L.act(i);} L.tick(2);
+  assert.equal(F.getCurrentStage(),"mars_exploration");
+  let selected=[];
+  m.page.ctx.openStarArtifact=(id,opts)=>{selected.push([id,opts.context]); return F.beginInspection(id,opts);};
+  let R=m.M.openRoute(); R.investigate(); assert.equal(selected.length,0,"no se puede inspeccionar desde lejos");
+  for(let i=0;i<6;i++) R.move(1);
+  R.investigate(); m.find(n=>n.className==="sci-inspect")[0].click(); m.find(n=>n.className==="sci-confirm")[0].click();
+  assert.equal(F.getArtifact("lander").state,"registered"); assert.equal(F.getCurrentStage(),"mars_exploration");
+  m.page.ctx.StarScienceCard.close(false);
+  R=m.M.openRoute(); assert.equal(R.state.x,120); R.investigate();
+  assert.deepEqual(selected,[["opportunity","mission"]]); assert.notEqual(F.getArtifact("opportunity").state,"registered");
+  for(const c of ["pancam","solar_panels","wheels"]) F.inspectComponent("opportunity",c,{context:"mission",viewer:"fallback"});
+  assert.equal(F.getCurrentStage(),"mars_hematite"); R=m.M.openRoute();
+  R.investigate(); assert.equal(m.page.ctx.StarHematiteEnigma.state,null,"la hematita requiere llegar a su estación");
+  for(let i=0;i<9;i++) R.move(1); R.investigate();
+  assert.equal(m.page.ctx.StarHematiteEnigma.state.open,true); assert.equal(F.getArtifact("blueberries").state,"undiscovered");
+  assert.equal(F.canEnter("footprints"),false);
+});
+
+test("panel de Marte: un único acceso y Huellas solo tras el acto completo", () => {
+  const button=new FakeElement("button",{id:"openMarsRoute"}), list=new FakeElement("div",{id:"marsActions"}); list.append(button);
+  const next=new FakeElement("a",{id:"marsNext"}), guide=new FakeElement("p",{id:"marsMissionGuide"}), count=new FakeElement("strong",{id:"marsProgressCount"});
+  const page=makePage({path:"/marte",tab:tabAtMars(),elements:[button,list,next,guide,count]});
+  page.load("main.js","progreso.js","flujo-definicion.js","flujo.js","marte-mision.js").ready();
+  page.document.dispatchEvent({type:"starflow:change"});
+  assert.equal(next.hidden,true); assert.equal(button.hidden,false); assert.equal(list.children.length,1); assert.equal(count.textContent,"0 / 6");
+  const F=page.ctx.StarFlow; F.recordObjective("mars_transition.seen",{source:"transition_sequence"}); assert.equal(next.hidden,true);
+  completeGroup(F,page.ctx.StarFlowDefinition,"mars");
+  page.document.dispatchEvent({type:"starflow:change"});
+  assert.equal(F.canEnter("footprints"),true); assert.equal(next.hidden,false); assert.equal(button.hidden,true); assert.equal(count.textContent,"6 / 6");
+});
+
+test("ruta guiada: recarga automática al detenerse, sin botón de carga y sin investigar desde lejos", () => {
+  const m=openMars(tabAtMars());m.M.openTransition();m.find(n=>n.className === "mg-btn primary")[0].click();
+  const L=m.M.landing;L.start();for(let i=0;i<3;i++){while(L.state.alt>Mars.LANDING_HOLD[i]) L.tick(.1);L.act(i);}L.tick(2);
+  const R=m.M.openRoute();const buttons=R.ui.root.findAll(n=>n.tagName==="BUTTON");
+  const inv=R.ui.root.findAll(n=>n.textContent==="INVESTIGAR")[0];assert.ok(inv.disabled);assert.ok(!buttons.some(b=>/CARGAR|CHARGE/.test(b.textContent)));
+  const energy=R.state.energy;R.move(1);assert.equal(R.state.energy,energy-2);R.chargeTick();assert.equal(R.state.energy,energy-2);R.chargeTick();assert.equal(R.state.energy,energy);
+  for(let i=0;i<5;i++)R.move(1);assert.equal(inv.disabled,false);R.ui.hide();const before=R.state.energy;R.chargeTick();R.move(1);assert.equal(R.state.energy,before);
+});
+
+test("tormenta guiada: dos acciones como máximo, foto válida y transmisión posterior con energía suficiente",()=>{
+  const s={sol:4,battery:70,photo:false};
+  const photographed=Mars.stormSol(s,["photo","transmit","science"]);assert.equal(photographed.photo,true);assert.equal(photographed.sent,false);assert.equal(photographed.result,null);
+  assert.equal(Mars.stormSol(photographed,["heaters","transmit"]).result,"sent");
+  assert.equal(Mars.stormSol({sol:5,battery:12,photo:true},["transmit"]).result,"lost");
+  assert.equal(Mars.stormSol({sol:3,battery:100},["photo"]).photo,false);
+  const all=Mars.stormSol(s,["heaters","minimal","science","science"]);const two=Mars.stormSol(s,["heaters","minimal"]);assert.equal(all.battery,two.battery);
+});
+
+test("Marte: una partida avanzada vuelve desde Luna al MP4 sin reiniciar objetivos ni mostrar la animación antigua", () => {
+  const tab = tabAtMars();
+  const first = openMars(tab);
+  first.F.recordObjective("mars_transition.seen", {source:"transition_sequence"});
+  first.F.recordObjective("mars_landing.touchdown", {source:"mars_landing_sequence"});
+  assert.equal(first.F.getCurrentStage(), "mars_exploration");
+  first.page.ctx.StarProgress.markCinematicSeen("mars_intro");
+  const before = JSON.stringify(first.F.getState());
+  const host = new FakeElement("div", {id:"marsCinematic", hidden:true});
+  const overlay = new FakeElement("section", {id:"starMarsTransit", hidden:true});
+  const canvas = new FakeElement("canvas", {id:"starMarsJourneyCanvas"});
+  canvas.getContext = () => { throw Error("No debe abrirse la animación antigua"); };
+  const page = makePage({path:"/marte",search:"?viaje=luna",tab,elements:[host,overlay,canvas]});
+  let config, calls=0, cleaned;
+  page.ctx.history.replaceState = (_,__,url) => { cleaned=url; };
+  page.ctx.StarCinematic = {mount(node,options) { assert.equal(node,host); calls++; config=options; return {state:{done:false}}; }};
+  page.load("main.js","progreso.js","flujo-definicion.js","flujo.js","marte-mision.js","viaje-marte.js").ready();
+  assert.equal(calls,1); assert.equal(config.id,"mars_intro"); assert.equal(cleaned,"/marte"); assert.equal(overlay.hidden,true);
+  config.onDone({completed:true,via:"video"});
+  assert.equal(JSON.stringify(page.ctx.StarFlow.getState()),before);
+  assert.equal(page.ctx.StarMarsMission.landing,null);
+});
+
+test("Marte: partida antigua sin video lo reproduce una vez; recargar después no lo obliga a repetir",()=>{
+  const tab=tabAtMars(); const first=openMars(tab);
+  first.F.recordObjective("mars_transition.seen",{source:"transition_sequence"});
+  assert.equal(first.F.getCurrentStage(),"mars_landing");
+  let calls=0;
+  function load(){const host=new FakeElement("div",{id:"marsCinematic",hidden:true});const page=makePage({path:"/marte",tab,elements:[host]});page.ctx.StarCinematic={mount(){calls++;return {state:{done:false}};}};page.load("main.js","progreso.js","flujo-definicion.js","flujo.js","marte-mision.js").ready();return page;}
+  const page=load(); assert.equal(calls,1); assert.equal(page.ctx.StarFlow.getCurrentStage(),"mars_landing");
+  page.ctx.StarProgress.markCinematicSeen("mars_intro"); load(); assert.equal(calls,1);
+});
+

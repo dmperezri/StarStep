@@ -14,16 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const stage = window.StarFlow?.getCurrentStage?.();
     const next = {
       moon_exploration: en ? 'Explore: Eagle, the plaque and the 5 items of the sample box.' : 'Explorá: Eagle, la placa y las 5 piezas de la caja de muestras.',
-      moon_install_easep: en ? 'Install the EASEP (INSTALL INSTRUMENTS button).' : 'Instalá el EASEP (botón INSTALAR INSTRUMENTOS).',
+      moon_install_easep: en ? 'Install EASEP.' : 'Instalá el EASEP.',
       moon_install_reflector: en ? 'Install and aim the retroreflector.' : 'Instalá y orientá el retrorreflector.',
-      moon_return: en ? 'Return: dock with Columbia (RETURN TO EARTH button).' : 'Regreso: acoplá con Columbia (botón REGRESO A LA TIERRA).',
+      moon_return: en ? 'Dock with Columbia.' : 'Acoplá con Columbia.',
       moon_lab: en ? 'Analyze the samples in the laboratory.' : 'Analizá las muestras en el laboratorio.'
     }[stage] || (en ? 'Inspect all Eagle components to register the discovery.' : 'Inspeccioná todos los componentes de Eagle para registrar el descubrimiento.');
-    guide.textContent = en
-      ? (unlocked ? '✓ Lunar mission complete. Your lunar diploma is available in the logbook. Board the ship for Mars.'
-        : `Lunar mission: landing ${arrived?'✓':'○'} · Eagle ${eagle?'✓':'○'}. ${!arrived?'Finish the launch and Moon landing sequence.':next}`)
-      : (unlocked ? '✓ Misión lunar completada. Tu diploma lunar está disponible en la bitácora. Abordá la nave rumbo a Marte.'
-        : `Misión lunar: alunizaje ${arrived?'✓':'○'} · Eagle ${eagle?'✓':'○'}. ${!arrived?'Completá el despegue y alunizaje.':next}`);
+    guide.textContent = unlocked ? (en ? '✓ Moon complete · On to Mars' : '✓ Luna completada · Rumbo a Marte')
+      : !arrived ? (en ? 'Complete the landing.' : 'Completá el alunizaje.')
+      : stage === 'moon_exploration' ? (en ? `Eagle ${eagle?'✓':'○'} · Plaque ${window.StarFlow?.getArtifact?.('plaque')?.state==='registered'?'✓':'○'}` : `Eagle ${eagle?'✓':'○'} · Placa ${window.StarFlow?.getArtifact?.('plaque')?.state==='registered'?'✓':'○'}`) : next;
     link.setAttribute('aria-disabled', String(!unlocked));
     link.title = unlocked ? '' : (en ? 'Complete the Moon mission first' : 'Completá la misión lunar primero');
   }
