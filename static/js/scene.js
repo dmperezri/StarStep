@@ -993,29 +993,44 @@ window.StarArt = (() => {
 
         skyStars(c, t);
 
-        // Tierra.
+        // Tierra y Luna: planetas 16-bit compartidos (planetas.js) si están cargados;
+        // si no, el dibujo anterior.
 
-        dot(
-            c,
-            40 - progress * 75,
-            175 + progress * 20,
-            Math.max(5, 31 - progress * 20),
-            '#447FD2'
-        );
+        if (window.StarPlanets) {
 
-        dot(
-            c,
-            33 - progress * 75,
-            175 + progress * 20,
-            Math.max(2, 8 - progress * 5),
-            '#60AD77'
-        );
+            window.StarPlanets.draw(
+                c,
+                'earth',
+                40 - progress * 75,
+                175 + progress * 20,
+                Math.max(5, 31 - progress * 20),
+                t
+            );
 
-        // Luna.
+            window.StarPlanets.draw(c, 'moon', 415, 146, 30, t);
 
-        dot(c, 415, 146, 30, '#C3C7D6');
-        dot(c, 405, 140, 8, '#868CA4');
-        dot(c, 430, 157, 5, '#868CA4');
+        } else {
+
+            dot(
+                c,
+                40 - progress * 75,
+                175 + progress * 20,
+                Math.max(5, 31 - progress * 20),
+                '#447FD2'
+            );
+
+            dot(
+                c,
+                33 - progress * 75,
+                175 + progress * 20,
+                Math.max(2, 8 - progress * 5),
+                '#60AD77'
+            );
+
+            dot(c, 415, 146, 30, '#C3C7D6');
+            dot(c, 405, 140, 8, '#868CA4');
+            dot(c, 430, 157, 5, '#868CA4');
+        }
 
         // Nave.
 
@@ -1079,10 +1094,17 @@ window.StarArt = (() => {
 
         skyStars(c, t);
 
-        // Tierra en el horizonte.
+        // Tierra en el horizonte (planetas.js si está cargado).
 
-        dot(c, 63, 75, 13, '#3D86D8');
-        dot(c, 60, 74, 4, '#63AA79');
+        if (window.StarPlanets) {
+
+            window.StarPlanets.draw(c, 'earth', 63, 75, 13, t);
+
+        } else {
+
+            dot(c, 63, 75, 13, '#3D86D8');
+            dot(c, 60, 74, 4, '#63AA79');
+        }
 
         // Superficie lunar.
 

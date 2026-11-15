@@ -282,6 +282,33 @@
       return changed;
     }
 
+    // Repara partidas guardadas que ya tienen evidencia verificable de Eagle,
+    // pero que perdieron los hitos previos por una integración antigua.
+    // Nunca inventa descubrimientos ni completa la exploración: solo reconoce
+    // que una inspección lunar registrada implica haber llegado a la Luna.
+    // (Aporte de feature/integracion-visual. Las etapas agregadas después —capítulo,
+    // presentación y vuelo— se reconocen a continuación como legacy_access, nunca
+    // como juego oficial.)
+    function recoverLunarArrivalEvidence() {
+      if (state.artifacts.eagle?.state !== "registered") return false;
+      const profile = (() => { try { return storage.legacyProfile?.() || {}; } catch { return {}; } })();
+      const validAlias = normalizeAlias(profile.alias).ok;
+      if (!validAlias) return false;
+      const repaired = [];
+      for (const id of ["lito_welcome", "profile", "cadet_custom", "launch", "moon_landing"]) {
+        const stage = stageById(id);
+        if (stage?.implemented && !own(state.completed, id)) {
+          state.completed[id] = { at: now(), via: "registered_eagle_evidence" };
+          repaired.push(id);
+        }
+      }
+      if (repaired.length) {
+        state.legacy = isObject(state.legacy) ? state.legacy : {};
+        state.legacy.lunarArrivalRepaired = { at: now(), stages: repaired };
+      }
+      return repaired.length > 0;
+    }
+
     function load() {
       let raw = null;
       try { raw = storage.load?.() ?? null; } catch { raw = null; }
@@ -296,6 +323,7 @@
       } else {
         state = sanitize(parsed);
       }
+      recoverLunarArrivalEvidence();
       // Compatibilidad: un lanzamiento ya registrado prueba que la partida antigua
       // había entrado al único capítulo disponible. No inventar objetivos ni premios.
       if (isCompleted("launch")) {

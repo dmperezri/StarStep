@@ -66,6 +66,16 @@
     ctx.imageSmoothingEnabled = false;
 
     function paintEarth(time = 0) {
+        ctx.clearRect(0,0,earth.width,earth.height);
+        if (window.StarPlanets) {
+            const r=Math.min(earth.width,earth.height)*0.44;
+            window.StarPlanets.draw(ctx,'earth',earth.width/2,earth.height/2,r,time/1000);
+        } else {
+            paintEarthLegacy(time);
+        }
+    }
+    function paintEarthLegacy(time = 0) {
+
         const w = 64;
         const scale = 2;
         const rotation = time * 0.00007;

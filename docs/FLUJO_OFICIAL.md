@@ -525,3 +525,31 @@ Sin librerías nuevas. Tiempo de ejecución: navegador con LocalStorage; Three.j
 ## Integración del vuelo espacial
 
 `launch.liftoff` conduce a `/vuelo` (`space_travel`). El motor de paso fijo de 24 s guarda los límites de 0, 6, 12 y 18 s y fallos mediante StarFlow, sin claves de almacenamiento adicionales. Recargar recupera el último límite seguro. La asistencia aumenta a los 3/6/9 fallos y no elimina colisiones. Solo la victoria registra `space_travel.arrive`, con fuente `travel_minigame`, 24 s y último checkpoint de 18 s; después `/despegue` comienza en descenso, sin repetir el lanzamiento. Partidas con alunizaje previo conservan acceso (`legacy_access`, sin victoria ficticia). El prólogo lunar narrativo sigue previsto. La validación es cliente local, no una protección contra manipulación deliberada ni sincronización de servidor.
+
+## Integración de la bitácora, diplomas y Eagle 3D (feature/integracion-visual)
+
+Integración de `origin/feature/integracion-visual` (`5c7b2e2`) sobre `integration/starstep-equipo` (`1fd33c1`). Ancestro común: `f12bdad`.
+
+**Qué se incorporó (de la rama entrante):**
+
+* Bitácora tipo libro con cuatro secciones (Mi diario, Logros, Medallas, Diplomas): `bitacora-libro.js`, `bitacora-libro.css` y `templates/bitacora.html`. Incluye credencial del explorador, foto opcional, notas de campo y vista del certificado.
+* Diploma lunar independiente (`diploma-lunar.js`) y certificado general que exige un nombre de cadete válido (`certificado.js`, `bitacora.js`).
+* Visor 3D con el GLB oficial de Eagle: selección directa sobre la malla, resaltado, rotación y zoom (`visor3d.js`).
+* Indicadores de progreso lunar (`luna-estado.js`), guía de progreso de Marte, escenario marciano renovado (`marte.js`) y cinemática del viaje a Marte (`viaje-marte.js`, `viaje-marte.css`, `/marte?viaje=luna`).
+* Planetas 16-bit compartidos (`planetas.js`) en las escenas de viaje y descenso, con el dibujo anterior como respaldo.
+* Reparación de partidas antiguas con Eagle registrado (`recoverLunarArrivalEvidence` en `flujo.js`) y sus dos pruebas.
+* Recursos de referencia: `static/bitacora_preview.html` (prototipo de diseño con datos de ejemplo; no está enlazado y no modifica el progreso) y las imágenes del certificado de referencia.
+
+**Qué se descartó de la rama entrante, y por qué:** la rama traía copias anteriores al rediseño (iguales a `ef924bf`) de `main.js`, `progreso.js`, `docs/FLUJO_OFICIAL.md`, `tests/js/navegador-simulado.mjs` y `tests/js/nueva-partida.test.mjs`. `scene.js` e `index.html` también eran esas versiones, más el uso de `planetas.js`. Aplicarlas habría borrado la presentación OUTSTRIP, el idioma, la intro, la bienvenida de LITO, NUEVA PARTIDA rápida, la estación terrestre y sus pruebas. Se mantuvieron nuestras versiones y se aplicaron encima solo los cambios nuevos de esa rama (planetas en `scene.js`, `planetas.js` en las plantillas).
+
+**StarFlow sigue siendo la autoridad:**
+
+* La bitácora, los logros, las medallas, los diplomas, el estado lunar y el viaje a Marte solo **leen** StarFlow y StarProgress. No registran objetivos ni artefactos.
+* Abrir el visor no es un descubrimiento: el registro sigue exigiendo localizar, inspeccionar todos los componentes y confirmar.
+* Las notas y la foto siguen en `PLAYER_KEYS` (`starstep_notas`, `starstep_foto`): son de la partida y NUEVA PARTIDA las borra.
+* La reparación lunar corre antes de la compatibilidad de capítulos y vuelo. Capítulo, presentación y vuelo quedan como `legacy_access` (nunca `official_complete`), no se inventa la victoria del vuelo y sin un alias válido no se repara nada (prueba de integración en `tests/js/flujo.test.mjs`).
+* El diploma lunar exige `isActComplete('luna')` y un nombre. El certificado general distingue provisional de oficial con `getChapterStatus()`.
+
+**Eagle 3D:** `static/assets/models/eagle.glb` (glTF 2.0, Blender I/O 4.2, 134 mallas) exige `KHR_draco_mesh_compression` y usa `EXT_texture_webp`. El repositorio solo incluye Three.js r170 (`three.module.js`, `GLTFLoader`, `OrbitControls`). El visor busca primero `static/vendor/three/examples/jsm/loaders/DRACOLoader.js` y `static/vendor/draco/`; si no están, usa la CDN con la misma versión (jsDelivr para el cargador y gstatic para el decodificador 1.5.7). Sin red o sin WebGL queda el modelo procedural con sus puntos de inspección. El GLB no se modificó.
+
+**Pruebas agregadas por la integración:** una prueba de StarFlow (reparación lunar con las etapas nuevas) y una de rutas (recursos de la bitácora, el viaje a Marte, el estado lunar y el orden `planetas.js` → `scene.js`).

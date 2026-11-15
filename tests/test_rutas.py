@@ -111,6 +111,33 @@ class RutasExistentes(unittest.TestCase):
         self.assertEqual(respuesta.status_code, 200)
         respuesta.close()
 
+    def test_integracion_bitacora_viaje_y_planetas(self):
+        # Integración con feature/integracion-visual: sus recursos siguen enlazados y
+        # planetas.js se carga antes que scene.js donde se dibujan los escenarios.
+        html = self.cliente.get("/bitacora").get_data(as_text=True)
+        for recurso in ["js/bitacora-libro.js", "css/bitacora-libro.css", "js/diploma-lunar.js", "js/certificado.js"]:
+            self.assertIn(recurso, html)
+        for pestana in ["diario", "logros", "medallas", "diplomas"]:
+            self.assertIn('data-diary-tab="%s"' % pestana, html)
+            self.assertIn('id="diary-tab-%s"' % pestana, html)
+        for campo in ["notes", "saveNotes", "photoInput", "explorerName"]:
+            self.assertIn('id="%s"' % campo, html)
+        marte = self.cliente.get("/marte").get_data(as_text=True)
+        self.assertIn("js/viaje-marte.js", marte)
+        self.assertIn('id="starMarsTransit"', marte)
+        luna = self.cliente.get("/luna").get_data(as_text=True)
+        self.assertIn("js/luna-estado.js", luna)
+        self.assertIn('href="/marte?viaje=luna"', luna)
+        for ruta in ["/", "/astronauta", "/despegue", "/marte", "/bitacora"]:
+            with self.subTest(ruta=ruta):
+                pagina = self.cliente.get(ruta).get_data(as_text=True)
+                pos_planetas, pos_scene = pagina.find("js/planetas.js"), pagina.find("js/scene.js")
+                self.assertTrue(0 <= pos_planetas < pos_scene, "planetas.js antes de scene.js")
+        for archivo in ["js/planetas.js", "js/viaje-marte.js", "js/luna-estado.js", "js/bitacora-libro.js", "assets/models/eagle.glb"]:
+            respuesta = self.cliente.get("/static/" + archivo)
+            self.assertEqual(respuesta.status_code, 200, archivo)
+            respuesta.close()
+
     def test_salud(self):
         datos = self.cliente.get("/api/health").get_json()
         self.assertEqual(datos["status"], "ok")

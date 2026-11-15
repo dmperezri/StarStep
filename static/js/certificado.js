@@ -1,9 +1,9 @@
 "use strict";
 document.addEventListener('DOMContentLoaded',()=>{
  const button=document.getElementById('printCertificate');if(!button)return;
- button.hidden=!window.StarProgress?.canFinish();
+ button.hidden=!(window.StarProgress?.canFinish() && String(window.StarProgress?.player?.()?.alias||'').trim());
  button.addEventListener('click',()=>{
-  if(!StarProgress.canFinish())return;
+  if(!StarProgress.canFinish() || !String(StarProgress.player()?.alias||'').trim())return;
   const lang=StarI18n.lang,es=lang==='es',player=StarProgress.player();
   // Recorrido provisional ≠ capítulo oficial: el oficial exige también las etapas previstas.
   const official=window.StarFlow?.getChapterStatus()==='official_complete';const name=String(player.alias||'CADETE').slice(0,18);

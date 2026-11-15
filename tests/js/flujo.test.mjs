@@ -456,3 +456,64 @@ test("recompensas provisionales no se confunden con oficiales", () => {
   assert.equal(full.getActStatus("luna"), "official");
   assert.equal(full.getChapterStatus(), "official_complete");
 });
+
+// Regresión: algunas integraciones antiguas conservaron Eagle registrado,
+// pero perdieron los hitos narrativos de despegue y alunizaje.
+test('partida previa con Eagle registrado recupera el alunizaje documentado, sin otorgar Marte', () => {
+  const {flow,storage}=makeFlow();
+  playIntro(flow);
+  discover(flow,'eagle','rover_proximity_scan');
+  const saved=JSON.parse(storage.box.flow);
+  delete saved.completed.launch;
+  delete saved.completed.moon_landing;
+  saved.current='launch';
+  const prior={flow:JSON.stringify(saved),profile:{alias:'ARIEL',avatar:'vice'}};
+  const {flow:reopened}=makeFlow(prior);
+  assert.equal(reopened.getArtifact('eagle').state,'registered');
+  assert.equal(reopened.isStageCompleted('launch'),true);
+  assert.equal(reopened.isStageCompleted('moon_landing'),true);
+  assert.equal(reopened.isActComplete('luna'),true);
+  assert.equal(reopened.canEnter('mars_exploration'),true);
+  assert.equal(reopened.isActComplete('marte'),false);
+  assert.equal(reopened.getArtifact('opportunity').state,'undiscovered');
+});
+
+test('la recuperación lunar no desbloquea misiones sin evidencia de Eagle',()=>{
+  const {flow,storage}=makeFlow();
+  playIntro(flow);
+  const saved=JSON.parse(storage.box.flow);
+  delete saved.completed.moon_landing;
+  delete saved.objectives['moon_landing.touchdown'];
+  saved.current='moon_landing';
+  const {flow:reopened}=makeFlow({flow:JSON.stringify(saved),profile:{alias:'ARIEL'}});
+  assert.equal(reopened.isStageCompleted('moon_landing'),false);
+  assert.equal(reopened.canEnter('mars_exploration'),false);
+  assert.equal(reopened.isActComplete('luna'),false);
+});
+
+// Integración (feature/integracion-visual + capítulos y vuelo): la recuperación lunar
+// convive con las etapas agregadas después. Esas etapas se reconocen como legacy_access,
+// nunca como juego real, y nada se otorga sin un alias válido.
+test('integración: la recuperación lunar marca capítulo, presentación y vuelo solo como legacy_access', () => {
+  const {flow,storage}=makeFlow();
+  playIntro(flow);
+  discover(flow,'eagle','rover_proximity_scan');
+  const saved=JSON.parse(storage.box.flow);
+  // Partida antigua: sin las etapas nuevas ni los hitos de despegue y alunizaje.
+  for (const id of ['launch','moon_landing','chapter_select','chapter_briefing','space_travel']) delete saved.completed[id];
+  for (const id of ['launch.liftoff','moon_landing.touchdown','chapter_select.chapter1','chapter_briefing.ready','space_travel.arrive']) delete saved.objectives[id];
+  delete saved.checkpoint;
+  saved.current='chapter_select';
+  const {flow:reopened}=makeFlow({flow:JSON.stringify(saved),profile:{alias:'ARIEL',avatar:'vice'}});
+  const st=reopened.getState();
+  assert.equal(st.completed.launch.via,'registered_eagle_evidence');
+  assert.equal(st.completed.moon_landing.via,'registered_eagle_evidence');
+  for (const id of ['chapter_select','chapter_briefing','space_travel']) assert.equal(st.completed[id].via,'legacy_access',id);
+  assert.equal(st.objectives['space_travel.arrive'],undefined,'no se inventa la victoria del vuelo');
+  assert.equal(reopened.getArtifact('opportunity').state,'undiscovered');
+  assert.notEqual(reopened.getChapterStatus(),'official_complete');
+  // Sin alias válido no hay reparación.
+  const {flow:invalid}=makeFlow({flow:JSON.stringify(saved),profile:{alias:' A ',avatar:'vice'}});
+  assert.equal(invalid.isStageCompleted('launch'),false);
+  assert.equal(invalid.canEnter('moon_exploration'),false);
+});
