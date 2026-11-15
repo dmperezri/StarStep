@@ -1,17 +1,6 @@
-:root {
-            --night: #0E1233;
-            --panel: #1A1F4D;
-            --raised: #262C66;
-            --border: #1A1340;
-            --cream: #FFF8E7;
-            --soft: #B9BEE6;
-            --mint: #8FF0D8;
-            --violet: #ABA1F5;
-            --purple: #6E62CE;
-            --moon: #FFE066;
-            --mars: #D9593A;
-            --water: #3FD0E0;
-        }
+@import url("paleta.css");
+
+
 
         * {
             box-sizing: border-box;

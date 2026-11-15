@@ -1,0 +1,146 @@
+/* =====================================================
+   STARSTEP - COMPONENTES GLOBALES
+   OUTSTRIP
+   ===================================================== */
+
+@import url("paleta.css");
+
+:root {
+    --font-title: "Pixelify Sans", "Courier New", monospace;
+    --font-body: "Nunito", Arial, sans-serif;
+    --font-counter: "Press Start 2P", monospace;
+    --pixel-shadow: 3px 3px 0 var(--border);
+    --control-height: 44px;
+}
+
+/* Accesibilidad */
+
+:focus-visible {
+    outline: 3px solid var(--mint);
+    outline-offset: 3px;
+}
+
+button,
+a,
+input,
+select {
+    touch-action: manipulation;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+.hud button,
+.hud a,
+.language button,
+.language a,
+.home-page .pixel-button {
+    min-height: var(--control-height);
+}
+
+/* Logotipo compacto */
+
+.ss-logo {
+    width: 105px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Paneles compartidos */
+
+.ss-panel {
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--violet);
+    padding: 16px;
+    box-shadow: var(--pixel-shadow);
+}
+
+/* Botones compartidos */
+
+.ss-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--control-height);
+    padding: 10px 16px;
+    background: var(--raised);
+    color: var(--cream);
+    border: 2px solid var(--violet);
+    box-shadow: var(--pixel-shadow);
+    font-family: var(--font-title);
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ss-button:hover:not(:disabled) {
+    background: var(--purple-dark);
+    border-color: var(--mint);
+}
+
+.ss-button.primary {
+    background: var(--mint);
+    color: var(--night);
+    border-color: var(--border);
+}
+
+.ss-button:disabled {
+    opacity: .55;
+}
+
+/* Identidad por mundo */
+
+.ss-earth {
+    --world-accent: var(--mint);
+}
+
+.ss-moon {
+    --world-accent: var(--moon);
+}
+
+.ss-mars {
+    --world-accent: var(--water);
+}
+
+/* Evidencias cientificas */
+
+.ss-evidence {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    font-weight: bold;
+    color: var(--night);
+    border: 2px solid var(--border);
+}
+
+.ss-evidence.observed {
+    background: var(--evidence-observed);
+}
+
+.ss-evidence.interpreted {
+    background: var(--evidence-interpreted);
+}
+
+.ss-evidence.narrative {
+    background: var(--evidence-narrative);
+}
+
+/* Progreso */
+
+.ss-chapter-progress {
+    width: 100%;
+    accent-color: var(--mint);
+}
+
+/* Movimiento reducido */
+
+@media (prefers-reduced-motion: reduce) {
+    .ss-button,
+    .pixel-button,
+    .hud-button {
+        transition: none !important;
+        transform: none !important;
+    }
+}

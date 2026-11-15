@@ -1,0 +1,46 @@
+/* STARSTEP - PALETA OFICIAL */
+
+:root {
+
+    /* Interfaz general */
+    --night: #0E1233;
+    --panel: #1A1F4D;
+    --raised: #262C66;
+    --border: #1A1340;
+    --cream: #FFF8E7;
+    --soft: #B9BEE6;
+
+    /* LITO explorador */
+    --crystal-light: #E4DFFF;
+    --violet: #ABA1F5;
+    --purple: #6E62CE;
+    --purple-dark: #4F45A6;
+    --mint: #8FF0D8;
+
+    /* Luna */
+    --lunar-dust: #C3C7D6;
+    --lunar-basalt: #868CA4;
+    --lunar-dark: #575C74;
+    --lunar-shadow: #3E4256;
+    --moon: #FFE066;
+    --lunar-gold: #FFC93C;
+
+    /* Marte */
+    --martian-dust: #F7B08E;
+    --mars: #D9593A;
+    --martian-oxide: #A63A26;
+    --martian-shadow: #7A2818;
+    --water: #3FD0E0;
+    --blueberry: #4F86D9;
+
+    /* Evidencias científicas */
+    --evidence-observed: #3FD0E0;
+    --evidence-interpreted: #B79CFF;
+    --evidence-narrative: #FFD23F;
+
+    /* Estados */
+    --success: #5BE39A;
+    --error: #FF6681;
+
+    --font-game: "Courier New", monospace;
+}
