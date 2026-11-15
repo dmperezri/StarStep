@@ -4,6 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { completeGroup } from "./navegador-simulado.mjs";
 
 const require = createRequire(import.meta.url);
 const def = require("../../static/js/flujo-definicion.js");
@@ -56,14 +57,17 @@ function discover(flow, id, mechanic) {
 }
 function playToFootprints(flow) {
   playIntro(flow);
-  discover(flow, "eagle", "rover_proximity_scan");
-  discover(flow, "opportunity", "mars_panel_scan");
-  discover(flow, "blueberries", "mars_panel_scan");
+  completeGroup(flow, def, "moon"); // Eagle, 5 muestras y placa (Acto I completo)
+  // Acto II completo: transición, aterrizaje, exploración, enigmas, habitabilidad y tormenta.
+  completeGroup(flow, def, "transition");
+  completeGroup(flow, def, "mars");
 }
 function playFootprints(flow) {
   for (const id of ["eagle", "easep", "reflector", "plaque", "lander", "opportunity"]) {
     assert.equal(flow.recordObjective("footprints.pair." + id, { source: "matching_game" }).ok, true);
   }
+  // Acto III: conexión Eagle–Eagle y método científico en espejo.
+  completeGroup(flow, def, "footprints");
 }
 
 // ── Integridad de la definición ─────────────────────────────────
@@ -134,12 +138,14 @@ test("4. un evento repetido no duplica recompensas", () => {
   const { flow, writer } = makeFlow();
   playIntro(flow);
   assert.equal(flow.recordObjective("lito_welcome.heard", { source: "transmission" }).code, "ALREADY_COMPLETED");
-  discover(flow, "eagle", "rover_proximity_scan");
+  completeGroup(flow, def, "moon"); // Eagle, 5 muestras y placa (Acto I completo)
   const rev = flow.getState().revision;
   assert.equal(flow.registerDiscovery("eagle", M).code, "ALREADY_REGISTERED");
   assert.equal(flow.locateArtifact("eagle", { mechanic: "rover_proximity_scan" }).already, true);
   assert.equal(flow.inspectComponent("eagle", "legs", M).mode, "review");
-  assert.deepEqual(writer.calls.discoveries, ["eagle"]);
+  // Acto I completo: Eagle, 5 muestras y placa, cada uno registrado una sola vez.
+  assert.ok(writer.calls.discoveries.includes("eagle"));
+  assert.equal(writer.calls.discoveries.length, new Set(writer.calls.discoveries).size, "sin recompensas duplicadas");
   assert.deepEqual(writer.calls.acts.filter(a => a === "luna").length, 1);
   assert.equal(flow.getState().revision, rev);
 });
@@ -149,7 +155,9 @@ test("5. no se puede completar una etapa futura", () => {
   const { flow } = makeFlow();
   assert.equal(flow.completeStage("footprints").code, "STAGE_LOCKED");
   assert.equal(flow.recordObjective("footprints.pair.eagle", { source: "matching_game" }).code, "STAGE_LOCKED");
-  assert.equal(flow.completeStage("moon_lab").code, "STAGE_NOT_IMPLEMENTED");
+  // Una etapa todavía prevista (las que quedan; se activan a medida que existen sus minijuegos).
+  const plannedStage = def.STAGES.find(st => !st.implemented);
+  if (plannedStage) assert.equal(flow.completeStage(plannedStage.id).code, "STAGE_NOT_IMPLEMENTED");
   assert.equal(flow.isStageCompleted("footprints"), false);
 });
 
@@ -300,7 +308,8 @@ test("13. las etapas previstas no bloquean la versión actual", () => {
   assert.deepEqual(["luna", "marte", "huellas"].map(flow.isActComplete), [true, true, true]);
   assert.deepEqual([...new Set(writer.calls.acts)].sort(), ["huellas", "luna", "marte"]);
   const planned = flow.getAvailableStages().filter(s => s.status === "planned").map(s => s.id);
-  assert.ok(planned.includes("moon_lab") && planned.includes("mirror_method"));
+  // Las etapas previstas se informan como «planned» y no bloquean el final del capítulo.
+  assert.deepEqual(planned.sort(), def.STAGES.filter(st => !st.implemented).map(st => st.id).sort());
   for (const page of ["/astronauta", "/despegue", "/luna", "/marte", "/huellas"]) assert.equal(flow.checkPage(page).allowed, true, page);
 });
 
@@ -311,7 +320,9 @@ test("14. el controlador rechaza transiciones inválidas", () => {
   assert.equal(flow.completeStage("etapa_falsa").code, "UNKNOWN_STAGE");
   assert.equal(flow.getObjectives("etapa_falsa").code, "UNKNOWN_STAGE");
   assert.equal(flow.locateArtifact("moon_rock", { mechanic: "x" }).code, "UNKNOWN_ARTIFACT");
-  assert.equal(flow.locateArtifact("easep", { mechanic: "easep_install_minigame" }).code, "ARTIFACT_NOT_IMPLEMENTED");
+  // Un artefacto todavía previsto (el que quede: se activan a medida que existen sus minijuegos).
+  const pending = Object.entries(def.ARTIFACTS).find(([, a]) => !a.implemented);
+  if (pending) assert.equal(flow.locateArtifact(pending[0], { mechanic: pending[1].locate[0].mechanic }).code, "ARTIFACT_NOT_IMPLEMENTED");
   assert.equal(flow.locateArtifact("eagle", { mechanic: "rover_proximity_scan" }).code, "STAGE_LOCKED");
   playIntro(flow);
   assert.equal(flow.locateArtifact("blueberries", { mechanic: "mars_panel_scan" }).code, "STAGE_LOCKED", "Marte antes de la Luna");
@@ -353,7 +364,8 @@ test("migración: conserva descubrimientos legítimos y no inventa equivalencias
   assert.equal(s.artifacts.easep, undefined, "alsep (Apollo 15) no se convierte en EASEP");
   assert.deepEqual(s.legacy.unmapped.sort(), ["alsep", "basura", "hem"].sort());
   assert.deepEqual(s.legacy.acts, ["luna"]);
-  assert.equal(flow.getCurrentStage(), "mars_exploration");
+  // Marte empieza con la transición narrativa (Acto II).
+  assert.equal(flow.getCurrentStage(), "mars_transition");
   assert.deepEqual(writer.calls.discoveries, [], "la migración no escribe artefactos nuevos en el inventario");
   // Ejecutar de nuevo es idempotente.
   const { flow: again } = makeFlow(null, { storage });
@@ -410,8 +422,8 @@ test("continuar: jugador nuevo inicia; existente continúa en la etapa actual si
   assert.deepEqual(flow.getState(), before, "consultar el punto de entrada no modifica nada");
   assert.equal(flow.checkPage(entry.page).allowed, true);
   assert.equal(flow.checkPage("/marte").allowed, false, "continuar no abre etapas futuras");
-  discover(flow, "eagle", "rover_proximity_scan");
-  assert.deepEqual(flow.getEntryPoint(), { status: "in_progress", stage: "mars_exploration", page: "/marte" });
+  completeGroup(flow, def, "moon"); // Eagle, 5 muestras y placa (Acto I completo)
+  assert.deepEqual(flow.getEntryPoint(), { status: "in_progress", stage: "mars_transition", page: "/marte" });
 });
 function playIntro2(flow) {
   flow.recordObjective("profile.alias", { source: "avatar_form", alias: "ARIEL" });
@@ -439,12 +451,14 @@ test("recompensas provisionales no se confunden con oficiales", () => {
   const { flow } = makeFlow();
   assert.deepEqual(["luna", "marte", "huellas"].map(flow.getActStatus), ["none", "none", "none"]);
   playToFootprints(flow);
-  assert.equal(flow.getActStatus("luna"), "provisional", "Luna sin EASEP, LRRR, laboratorio ni regreso");
+  assert.equal(flow.getActStatus("luna"), "provisional", "Luna con etapas todavía previstas (prólogo lunar y diploma como etapa)");
   assert.equal(flow.getActStatus("marte"), "provisional");
   assert.equal(flow.getActStatus("huellas"), "none");
   playFootprints(flow);
   flow.recordObjective("chapter_reward.certificate", { source: "certificate_download" });
-  assert.deepEqual(["luna", "marte", "huellas"].map(flow.getActStatus), ["provisional", "provisional", "provisional"]);
+  // Huellas ya tiene todas sus etapas implementadas: su reconocimiento es oficial. Luna y Marte
+  // conservan etapas previstas (prólogo lunar y diplomas como etapa) y siguen provisionales.
+  assert.deepEqual(["luna", "marte", "huellas"].map(flow.getActStatus), ["provisional", "provisional", "official"]);
   assert.equal(flow.getChapterStatus(), "provisional_complete");
   assert.equal(flow.getActStatus("inventado"), "unknown");
   // Con todas las etapas implementadas y completadas, el estado pasa a oficial.
@@ -462,7 +476,7 @@ test("recompensas provisionales no se confunden con oficiales", () => {
 test('partida previa con Eagle registrado recupera el alunizaje documentado, sin otorgar Marte', () => {
   const {flow,storage}=makeFlow();
   playIntro(flow);
-  discover(flow,'eagle','rover_proximity_scan');
+  completeGroup(flow, def, "moon"); // Eagle, 5 muestras y placa (Acto I completo)
   const saved=JSON.parse(storage.box.flow);
   delete saved.completed.launch;
   delete saved.completed.moon_landing;
@@ -473,7 +487,7 @@ test('partida previa con Eagle registrado recupera el alunizaje documentado, sin
   assert.equal(reopened.isStageCompleted('launch'),true);
   assert.equal(reopened.isStageCompleted('moon_landing'),true);
   assert.equal(reopened.isActComplete('luna'),true);
-  assert.equal(reopened.canEnter('mars_exploration'),true);
+  assert.equal(reopened.canEnter('mars_transition'),true, 'el Acto II queda habilitado (empieza por la transición)');
   assert.equal(reopened.isActComplete('marte'),false);
   assert.equal(reopened.getArtifact('opportunity').state,'undiscovered');
 });
@@ -497,7 +511,7 @@ test('la recuperación lunar no desbloquea misiones sin evidencia de Eagle',()=>
 test('integración: la recuperación lunar marca capítulo, presentación y vuelo solo como legacy_access', () => {
   const {flow,storage}=makeFlow();
   playIntro(flow);
-  discover(flow,'eagle','rover_proximity_scan');
+  completeGroup(flow, def, "moon"); // Eagle, 5 muestras y placa (Acto I completo)
   const saved=JSON.parse(storage.box.flow);
   // Partida antigua: sin las etapas nuevas ni los hitos de despegue y alunizaje.
   for (const id of ['launch','moon_landing','chapter_select','chapter_briefing','space_travel']) delete saved.completed[id];

@@ -12,7 +12,10 @@ document.addEventListener('DOMContentLoaded',()=>{
  ];
  let selected=null;const solved=new Set();
  function draw(){root.replaceChildren();const left=document.createElement('div'),right=document.createElement('div');left.className=right.className='match-column';
-  const language=StarI18n.lang;const button=(label,id,answer)=>{const b=document.createElement('button');b.type='button';b.className='pixel-button';b.textContent=label;b.dataset.id=id;if(solved.has(id)){b.disabled=true;b.classList.add('matched');}
+  const language=StarI18n.lang;
+  // Solo se asocian piezas conseguidas en las misiones (huellas-mision.js); las demás, bloqueadas.
+  const available=id=>!window.StarFootprintsCore||!window.StarFlow||window.StarFootprintsCore.pieceAvailable(window.StarFlow,window.StarFlowDefinition,id);
+  const button=(label,id,answer)=>{const b=document.createElement('button');b.type='button';b.className='pixel-button';b.textContent=(!answer&&!available(id)?'🔒 ':'')+label;b.dataset.id=id;if(solved.has(id)){b.disabled=true;b.classList.add('matched');}if(!answer&&!available(id)){b.disabled=true;b.title=language==='en'?'Get this piece in the missions first.':'Conseguí esta pieza en las misiones.';}
    b.addEventListener('click',()=>{if(solved.has(id))return;if(!answer){selected=id;draw();return;}if(!selected){feedback.textContent=StarI18n.t('puzzle.pick');return;}
     if(selected!==id){feedback.textContent=StarI18n.t('puzzle.bad');selected=null;window.StarSound?.effect('button');draw();return;}
     solved.add(id);selected=null;feedback.textContent=StarI18n.t('puzzle.good');window.StarSound?.effect('success');window.StarFlow?.recordObjective('footprints.pair.'+id,{source:'matching_game'});draw();if(solved.size===pairs.length){finish.hidden=!window.StarFlow?.isStageCompleted('footprints');feedback.textContent=StarI18n.t('puzzle.complete');}

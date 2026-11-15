@@ -107,3 +107,24 @@ export function openHome(tab) {
   page.load("main.js", "progreso.js", "flujo-definicion.js", "flujo.js").ready();
   return page;
 }
+
+// Completa las etapas IMPLEMENTADAS de un grupo («moon», «mars», «footprints»…) con la misma
+// evidencia que producen sus minijuegos: localizar → inspeccionar todos los componentes, o el
+// evento con una fuente válida. No salta validaciones: StarFlow decide como en el juego.
+// Sirve para que las pruebas recorran el capítulo aunque se activen etapas nuevas.
+export function completeGroup(F, D, group, viewer = "3d") {
+  const M = { context: "mission", viewer };
+  for (const st of D.STAGES.filter(s => s.group === group && s.implemented)) {
+    for (const ob of st.objectives.filter(o => o.implemented !== false)) {
+      if (ob.type === "artifact") {
+        const a = D.ARTIFACTS[ob.artifact];
+        if (F.getArtifact(ob.artifact).state === "registered") continue;
+        F.locateArtifact(ob.artifact, { mechanic: a.locate[a.locate.length - 1].mechanic });
+        F.beginInspection(ob.artifact, M);
+        for (const c of a.components) F.inspectComponent(ob.artifact, c.id, M);
+      } else if (!F.getState().objectives[ob.id]) {
+        F.recordObjective(ob.id, { source: ob.sources[0], ...(ob.testEvidence || {}) });
+      }
+    }
+  }
+}

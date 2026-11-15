@@ -6,7 +6,9 @@ import { Camara } from "./camara.js";
 const canvas = document.getElementById("gameCanvas");
 const mensaje = document.getElementById("mensaje");
 
-const WORLD_WIDTH = 2800;
+// Exploración lunar ampliada (luna-mision.js): oxígeno, muestras, placa y puntos seguros.
+const Mision = () => window.StarMoonMission;
+const WORLD_WIDTH = window.StarMoonCore?.WORLD_WIDTH || 2800;
 const GROUND_Y = 320;
 
 const motor = new Motor(canvas);
@@ -15,9 +17,10 @@ const camara = new Camara(canvas.width, WORLD_WIDTH);
 
 const artefacto = {
     nombre: "Apollo 11 - Eagle",
-    x: 2100,
+    // Eagle queda junto al punto de partida: ahí empieza la caminata.
+    x: (window.StarMoonCore?.EAGLE_X ?? 2100) - 40,
     width: 80,
-    descubierto: false
+    descubierto: window.StarFlow?.getArtifact?.("eagle")?.state === "registered"
 };
 
 let teclaAnterior = false;
@@ -34,7 +37,16 @@ const rocas = Array.from({ length: 85 }, (_, i) => ({
     size: 4 + Math.random() * 15
 }));
 
-function update(dt, keys) {
+function update(dt, rawKeys) {
+
+    const M = Mision();
+    const keys = M ? M.keys(rawKeys) : rawKeys;
+
+    // Tarjetas, visor 3D, pausa o pestaña oculta: se detiene el rover y el oxígeno.
+    if (M?.paused()) {
+        teclaAnterior = Boolean(keys.KeyE);
+        return;
+    }
 
     rover.update(dt, keys, WORLD_WIDTH);
     camara.update(rover, dt);
@@ -46,12 +58,12 @@ function update(dt, keys) {
 
     const interactuar = Boolean(keys.KeyE);
 
-    if (artefacto.descubierto) {
+    if (artefacto.descubierto && distancia < 100) {
 
         mensaje.textContent =
-            "LITO: ¡Encontramos los restos de Apollo 11!";
+            "LITO: Eagle: el módulo lunar de Apollo 11.";
 
-    } else if (distancia < 100) {
+    } else if (!artefacto.descubierto && distancia < 100) {
 
         mensaje.textContent =
             "LITO: ¡Detecto un artefacto! Presioná E.";
@@ -69,13 +81,14 @@ function update(dt, keys) {
             );
         }
 
-    } else {
+    } else if (!M) {
 
         mensaje.textContent =
             "LITO: Avancemos. Hay una señal más adelante.";
     }
 
     teclaAnterior = interactuar;
+    M?.update(dt, rover);
 }
 
 function dibujarEspacio(ctx) {
@@ -190,9 +203,9 @@ function dibujarEagle(ctx) {
 
 function dibujarHUD(ctx) {
 
-    const progreso = Math.min(
-        rover.x / artefacto.x, 1
-    );
+    const progreso = Mision()
+        ? Mision().state.box / 5
+        : Math.min(rover.x / artefacto.x, 1);
 
     ctx.fillStyle = "#101729";
     ctx.fillRect(20, 20, 220, 54);
@@ -222,6 +235,7 @@ function render(ctx) {
 
     dibujarTerreno(ctx);
     dibujarEagle(ctx);
+    Mision()?.drawWorld(ctx, GROUND_Y);
     rover.draw(ctx);
 
     ctx.restore();

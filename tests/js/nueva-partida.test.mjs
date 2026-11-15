@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
-import { source, template, makeStore, makePage, newTab, openHome } from "./navegador-simulado.mjs";
+import { source, template, makeStore, makePage, newTab, openHome, completeGroup } from "./navegador-simulado.mjs";
 
 const M = { context: "mission", viewer: "3d" };
 
@@ -29,6 +29,7 @@ function playUntilEagle(page, alias = "ARIEL") {
   StarFlow.locateArtifact("eagle", { mechanic: "rover_proximity_scan" });
   StarFlow.beginInspection("eagle", M);
   for (const c of ["structure", "legs", "ladder"]) StarFlow.inspectComponent("eagle", c, M);
+  completeGroup(StarFlow, page.ctx.StarFlowDefinition, "moon"); // resto del Acto I: muestras y placa
   StarProgress.setNotes("Notas del jugador anterior");
   page.ctx.localStorage.setItem("starstep_foto", "data:image/webp;base64,AAAA"); // como bitacora.js
   StarProgress.markCinematicSeen("history_intro"); // como la introducción histórica
@@ -105,7 +106,9 @@ test("nueva partida: se puede jugar otra vez y obtener resultados nuevos", () =>
   playUntilEagle(second, "LUNA");
   assert.equal(second.ctx.StarProgress.player().alias, "LUNA");
   assert.equal(second.ctx.StarFlow.getArtifact("eagle").state, "registered");
-  assert.equal(second.ctx.StarProgress.list().length, 1, "Eagle registrado una sola vez");
+  const ids = second.ctx.StarProgress.list().map(i => i.id);
+  assert.ok(ids.includes("eagle"));
+  assert.equal(ids.length, new Set(ids).size, "cada pieza registrada una sola vez (Acto I: Eagle, muestras y placa)");
   assert.equal(second.ctx.StarFlow.getEntryPoint().page, "/marte");
   assert.equal(second.ctx.StarFlow.getState().legacy.inventory.length, 0);
 });

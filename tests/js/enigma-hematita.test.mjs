@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
-import { FakeElement, makePage, newTab, openHome, template } from "./navegador-simulado.mjs";
+import { FakeElement, makePage, newTab, openHome, template, completeGroup } from "./navegador-simulado.mjs";
 
 const require = createRequire(import.meta.url);
 const Core = require("../../static/js/enigma-hematita.js");
@@ -38,6 +38,13 @@ function tabAtHematite({ opportunity = true } = {}) {
   const M = { context: "mission", viewer: "3d" };
   F.locateArtifact("eagle", { mechanic: "rover_proximity_scan" }); F.beginInspection("eagle", M);
   for (const c of ["structure", "legs", "ladder"]) F.inspectComponent("eagle", c, M);
+  const D = openHome(tab).ctx.StarFlowDefinition;
+  completeGroup(F, D, "moon");
+  // Acto II antes de las esférulas: transición, aterrizaje y plataforma de Opportunity.
+  completeGroup(F, D, "transition");
+  F.recordObjective("mars_landing.touchdown", { source: "mars_landing_sequence" });
+  F.locateArtifact("lander", { mechanic: "mars_rover_scan" }); F.beginInspection("lander", M);
+  for (const c of ["platform", "airbags"]) F.inspectComponent("lander", c, M);
   if (opportunity) {
     F.locateArtifact("opportunity", { mechanic: "mars_panel_scan" }); F.beginInspection("opportunity", M);
     for (const c of ["pancam", "solar_panels", "wheels"]) F.inspectComponent("opportunity", c, M);

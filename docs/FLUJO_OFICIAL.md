@@ -38,24 +38,24 @@ Leyenda: ✅ implementada en el recorrido actual · ⏳ prevista (no bloquea).
 | 8 | Prólogo | `space_travel` | `/vuelo` | ✅ | `space_travel.arrive` |
 | 9 | Prólogo | `moon_prologue` | `/despegue` | ⏳ | — |
 | 10 | Acto I | `moon_landing` | `/despegue` | ✅ | `moon_landing.touchdown` |
-| 11 | Acto I | `moon_exploration` | `/luna` | ✅ | artefacto `eagle` registrado (muestras y placa ⏳) |
-| 12 | Acto I | `moon_install_easep` | `/luna` | ⏳ | — |
-| 13 | Acto I | `moon_install_reflector` | `/luna` | ⏳ | — |
-| 14 | Acto I | `moon_lab` | `/luna` | ⏳ | — |
-| 15 | Acto I | `moon_return` | `/luna` | ⏳ | — |
+| 11 | Acto I | `moon_exploration` | `/luna` | ✅ | 5 muestras (`cont`, `basalt10057`, `regolith10084`, `core`, `swc`), `eagle` y `plaque` registrados |
+| 12 | Acto I | `moon_install_easep` | `/luna` | ✅ | `moon_install_easep.install` + artefacto `easep` |
+| 13 | Acto I | `moon_install_reflector` | `/luna` | ✅ | `.install`, `.orient` + artefacto `reflector` |
+| 14 | Acto I | `moon_return` | `/luna` | ✅ | `moon_return.docking` (acoplamiento con Columbia) |
+| 15 | Acto I | `moon_lab` | `/luna` | ✅ | `moon_lab.analysis` (laboratorio en la Tierra) |
 | 16 | Acto I | `moon_reward` | `/bitacora` | ⏳ | — |
-| 17 | Transición | `mars_transition` | `/marte` | ⏳ | — |
-| 18 | Acto II | `mars_landing` | `/marte` | ⏳ | — |
-| 19 | Acto II | `mars_exploration` | `/marte` | ✅ | artefacto `opportunity` registrado (plataforma ⏳) |
+| 17 | Transición | `mars_transition` | `/marte` | ✅ | `mars_transition.seen` |
+| 18 | Acto II | `mars_landing` | `/marte` | ✅ | `mars_landing.touchdown` |
+| 19 | Acto II | `mars_exploration` | `/marte` | ✅ | artefactos `lander` y `opportunity` registrados |
 | 20 | Acto II | `mars_hematite` | `/marte` | ✅ | artefacto `blueberries` registrado (enigma ⏳) |
-| 21 | Acto II | `mars_gypsum` | `/marte` | ⏳ | — |
-| 22 | Acto II | `mars_clay` | `/marte` | ⏳ | — |
-| 23 | Acto II | `mars_habitability` | `/marte` | ⏳ | — |
-| 24 | Acto II | `mars_storm` | `/marte` | ⏳ | — |
+| 21 | Acto II | `mars_gypsum` | `/marte` | ✅ | `mars_gypsum.enigma` + artefacto `gypsum` |
+| 22 | Acto II | `mars_clay` | `/marte` | ✅ | `mars_clay.enigma` + artefacto `clay` |
+| 23 | Acto II | `mars_habitability` | `/marte` | ✅ | `mars_habitability.answer` |
+| 24 | Acto II | `mars_storm` | `/marte` | ✅ | `mars_storm.survive` |
 | 25 | Acto II | `mars_reward` | `/bitacora` | ⏳ | — |
 | 26 | Acto III | `footprints` | `/huellas` | ✅ | 6 asociaciones `footprints.pair.<id>` |
-| 27 | Acto III | `eagle_connection` | `/huellas` | ⏳ | — |
-| 28 | Acto III | `mirror_method` | `/huellas` | ⏳ | 5 pasos `mirror_method.step1..5` |
+| 27 | Acto III | `eagle_connection` | `/huellas` | ✅ | `eagle_connection.link` |
+| 28 | Acto III | `mirror_method` | `/huellas` | ✅ | 5 pasos `mirror_method.step1..5` |
 | 29 | Final | `chapter_reward` | `/bitacora` | ✅ | `chapter_reward.certificate` |
 | 30 | Final | `return_station` | `/` | ⏳ | — |
 
@@ -592,3 +592,49 @@ Pruebas: `tests/js/cinematica.test.mjs` (11) y `tests/test_rutas.py::test_cinema
 5. **Guardar en la bitácora.** StarFlow localiza (`mars_panel_scan`), inspecciona (`hematite`) y registra `blueberries`. No hay duplicados, y solo se puede después de registrar Opportunity (`canEnter('mars_hematite')`).
 
 `mars_hematite.enigma` sigue `implemented:false`: activarlo como objetivo nuevo bloquearía partidas que ya registraron las esférulas. El enigma se exige en la interfaz antes del registro. Pruebas: `tests/js/enigma-hematita.test.mjs` (4).
+
+## Capítulo 1 · Minijuegos de los tres actos
+
+Todos los minijuegos registran por la API pública de StarFlow (`locateArtifact`, `beginInspection`, `inspectComponent`, `recordObjective`) con su `source` declarado en `flujo-definicion.js`. No hay atajos de prueba en producción. Las piezas comunes son la tarjeta científica (`tarjeta-cientifica.js`: INSPECCIONAR → GUARDAR, con Observado/Interpretado/Narrativa y fuente) y los diálogos `.mg` de `static/css/mision.css`.
+
+### Acto I · Luna (`/luna`)
+
+* **Exploración con oxígeno** (`luna-mision.js`, capturas 03–05): mundo de 3200 px, O₂ de 135 s que baja al moverse y se recarga en los tanques (+30 s). Si se agota, el cadete vuelve al último punto seguro sin perder lo registrado. HUD con O₂, «Caja n/5» y controles táctiles ◀ ▶ ACCIÓN PAUSA. La muestra de contingencia va primero (como en la misión real). Cada muestra y la placa abren su tarjeta con datos del Lunar Sample Compendium y NSSDCA. El juego se pausa con tarjetas, diálogos o la pestaña oculta. El rover es una herramienta del juego (Apollo 11 no llevó rover) y la interfaz lo aclara.
+* **EASEP** (`instrumentos-lunares.js`): mapa cenital con cuadrícula de 1 m. Se coloca el paquete a ~17 m al sur de Eagle (±4 m) y se registran antena, panel solar y sismómetro.
+* **Retrorreflector LRRR**: se coloca a ~5 m al NNO y se orienta hacia la Tierra (60° ± 15°). Un pulso láser confirma la orientación. Se registran prismas y soporte.
+* **Regreso** (`regreso-laboratorio.js`): acoplamiento con Columbia, con velocidad máxima de 1,2 m/s y desvío máximo de 6 m. Si se llega muy rápido, rebota y se reintenta. El orden pasó a ser `moon_return` → `moon_lab`: primero se vuelve y después se analizan las muestras en la Tierra.
+* **Laboratorio:** se encuentran 3 vesículas en el basalto, se clasifican afirmaciones como observadas o interpretadas y se responde una pregunta final.
+
+### Transición y Acto II · Marte (`/marte`)
+
+* **Transición** (`marte-mision.js`): aparece al cerrar el viaje a Marte. Aclara que Apollo 11 nunca fue a Marte y que el puente entre las dos historias es el nombre «Eagle».
+* **Aterrizaje 2004**: tres acciones con ventana de tiempo: paracaídas (11–7 km), retrocohetes (0,35–0,1 km) y bolsas de aire (0,1–0,01 km). Si se falla, se reintenta. Termina en el cráter Eagle.
+* **Ruta de Opportunity**: rover con batería (moverse gasta, CARGAR recarga) y seis estaciones que se habilitan según la etapa actual: plataforma (tarjeta con foto real), cráter Eagle (enigma de la hematita), Homestake, Esperance, habitabilidad y Perseverance.
+* **Enigmas de yeso y arcilla** (`enigmas-marte.js`): mismo mecanismo que la hematita. El yeso de Homestake (2011) se resuelve con Pancam + APXS y la arcilla de Esperance (2013) con RAT + APXS. Una respuesta incorrecta explica por qué cada instrumento no alcanza. La interpretación de la arcilla se presenta como indirecta. Por ahora usan ilustración pixel art; la foto real está pendiente.
+* **¿Hubo vida en Marte?**: se clasifican cuatro afirmaciones (agua antigua, condición habitable, sin evidencia). Una de ellas es falsa a propósito: los fósiles de microbios. La respuesta correcta es «agua y lugares habitables, pero no se encontró vida».
+* **Tormenta de 2018**: seis soles con τ creciente hasta 10,8. Se eligen hasta dos acciones por sol. Con τ ≥ 4,7, sin calefactores el frío consume batería. La última foto solo vale con τ ≥ 9 y hay que transmitirla. Una mala estrategia pierde. La nota final recuerda que Opportunity no volvió a despertar y que la misión terminó en febrero de 2019. Los parámetros están inspirados en la tormenta real; no son datos de ingeniería.
+
+### Acto III · Huellas (`/huellas`)
+
+* **Asociación**: las piezas que todavía no se consiguieron aparecen 🔒 y deshabilitadas. Las de `legacy_access` siguen disponibles.
+* **Eagle y Eagle** (`huellas-mision.js`): cuatro datos que se asignan al módulo (Luna, 1969) o al cráter (Marte, 2004), y una pregunta final. Elegir «Apollo 11 fue a Marte» no avanza.
+* **Método en espejo**: cinco pasos con una afirmación lunar y otra marciana cada uno (captura 13). El último deja abierta la pregunta de la vida. Al terminar, la etapa actual pasa a `chapter_reward`.
+
+### Bitácora y portada
+
+* **Diploma marciano** (`diploma-marciano.js`, pestaña Diplomas): PNG independiente del diploma lunar. Se habilita con `isActComplete('marte')` y un nombre de cadete. No registra objetivos (`mars_reward` sigue ⏳).
+* **Créditos** (`creditos.js`, botón CRÉDITOS en la portada): equipo OUTSTRIP, reto Space Apps 2026 Managua, fuentes NASA, herramientas y uso de IA. El modelo Eagle y el video aparecen con autoría y licencia **pendientes de verificación**. También aclara que StarStep no es un sitio oficial de la NASA.
+
+### Partidas existentes
+
+Las etapas ya completadas se conservan. Una etapa recién implementada que la partida nunca completó pasa a ser la actual. Por ejemplo, una partida que ya estaba en Marte vuelve a `moon_install_easep` para instalar los instrumentos, sin perder nada registrado. Es intencional: así el capítulo se recorre completo.
+
+### Pendiente
+
+* Integrar el GLB de Opportunity (hoy el visor usa el modelo procedural; `opportunity.glb` no está en el repositorio y se ve el 404 del intento de carga).
+* Fotos reales de las muestras lunares, del yeso y de la arcilla. Hoy hay ilustraciones o tarjetas sin foto.
+* Copia local de Draco (descarga pendiente de autorización).
+* Verificar la autoría y la licencia del video y del modelo Eagle.
+* `moon_prologue`, `moon_reward`, `mars_reward` y `return_station` siguen ⏳. La cinemática de órbita y descenso lunar (Bloque 2) no está hecha.
+
+Pruebas: `luna-mision` (6), `instrumentos-lunares` (3), `regreso-laboratorio` (3), `marte-mision` (5), `huellas-mision` (3) y `diplomas-creditos` (2), todas en `tests/js/`. El ayudante `completeGroup` de `navegador-simulado.mjs` completa los grupos con evidencia válida.
