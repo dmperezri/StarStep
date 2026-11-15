@@ -1,0 +1,291 @@
+:root{--night:#0E1233;--panel:#1A1F4D;--raised:#262C66;--border:#1A1340;--cream:#FFF8E7;--soft:#B9BEE6;--mint:#8FF0D8;--violet:#ABA1F5;--purple:#6E62CE;--moon:#FFE066;--mars:#D9593A}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body.star-page{background:var(--night);color:var(--cream);font-family:'Courier New',monospace}[hidden]{display:none!important}button,input,textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--moon);outline-offset:3px}
+.stage{position:relative;height:100svh;min-height:440px;overflow:hidden;background:var(--night)}.stage>canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}.curtain{position:absolute;inset:0;z-index:7;pointer-events:none;background:#06091d;opacity:0;transition:opacity .36s steps(8)}.curtain.is-dark{opacity:1}.hud{position:absolute;z-index:4;top:13px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--cream);font-size:clamp(.63rem,1.2vw,.81rem);text-shadow:2px 2px var(--night)}.hud-actions{display:flex;gap:7px}.hud-button{padding:6px 8px;cursor:pointer;border:2px solid var(--night);background:var(--cream);color:var(--night);font-size:.72rem;font-weight:bold}.hud-link{color:var(--cream);text-decoration:none}.hud-link:hover{color:var(--mint)}
+.logo{position:absolute;z-index:2;top:9%;left:50%;transform:translateX(-50%);width:min(94%,750px);text-align:center;pointer-events:none}.logo h1{margin:0;color:var(--moon);font-size:clamp(2.4rem,8.2vw,6rem);letter-spacing:.05em;line-height:1.15;text-shadow:3px 3px 0 var(--night),6px 6px 0 var(--purple)}.logo h1 span{color:var(--mint)}.logo small{display:inline-block;margin-top:7px;padding:4px 8px;background:var(--night);color:var(--cream);font-size:clamp(.55rem,1.1vw,.78rem)}
+.pixel-panel{background:var(--panel);border:4px solid var(--cream);box-shadow:0 0 0 4px var(--border),7px 7px 0 #06091d,inset 0 0 0 3px var(--raised);padding:20px}.pixel-panel h1,.pixel-panel h2{margin:0 0 17px;text-align:center}.pixel-button{display:inline-block;background:var(--panel);border:3px solid var(--cream);color:var(--cream);text-decoration:none;text-align:center;cursor:pointer;padding:11px 13px;font-size:.8rem;font-weight:bold;box-shadow:3px 3px var(--border)}.pixel-button:hover{background:var(--purple)}.pixel-button.mint{background:var(--mint);border-color:var(--border);color:var(--night)}.pixel-button.mint:hover{background:var(--moon)}.pixel-button.ghost{background:transparent;border:2px solid var(--border);color:var(--border);box-shadow:none}.pixel-button.small{font-size:.7rem;padding:6px 9px}
+.speech-panel{position:absolute;z-index:3;bottom:8%;left:50%;transform:translateX(-50%);width:min(710px,94%);padding:17px 20px;background:var(--cream);color:var(--night);border:4px solid var(--border);box-shadow:6px 6px 0 var(--purple)}.speech-panel strong{color:#4F45A6;font-size:.8rem}.speech-panel p{min-height:48px;margin:10px 0;font-weight:bold;line-height:1.55}.speech-actions{display:flex;align-items:center;gap:11px;justify-content:flex-end}.menu{position:absolute;z-index:3;top:44%;left:8%;width:min(265px,80%);display:flex;flex-direction:column;gap:9px}.menu h2{font-size:.95rem;color:var(--mint)}.modal{position:absolute;z-index:6;top:50%;left:50%;transform:translate(-50%,-50%);width:min(450px,92%);max-height:85%;overflow:auto}.modal p{line-height:1.6;font-size:.85rem}.chapter-label{position:absolute;z-index:2;bottom:8px;left:12px;padding:4px 10px;background:var(--night);color:var(--moon);font-size:.7rem}
+.avatar-modal{position:absolute;z-index:3;left:50%;top:51%;transform:translate(-50%,-50%);width:min(585px,94%);max-height:86%;overflow:auto}.avatar-modal h1{font-size:1.4rem}.subtitle{color:var(--soft);font-size:.8rem;text-align:center}.avatar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0}.avatar-card{background:var(--raised);color:var(--cream);border:3px solid var(--border);padding:7px;display:flex;align-items:center;flex-direction:column;gap:7px;font-weight:bold;cursor:pointer;font-size:.72rem}.avatar-card canvas{image-rendering:pixelated;width:min(100%,94px);aspect-ratio:1}.avatar-card.selected{border-color:var(--mint);box-shadow:3px 3px var(--mint)}#avatarForm{display:flex;flex-direction:column;gap:10px}#avatarForm label,.eyebrow{color:var(--mint);font-size:.75rem;font-weight:bold;letter-spacing:1px}#avatarForm input{padding:11px;background:var(--night);border:2px solid var(--soft);color:var(--cream)}.hint{color:var(--soft);font-size:.74rem;line-height:1.55;margin:4px 0 12px}
+.countdown{position:absolute;z-index:3;top:18%;left:50%;transform:translateX(-50%);font-size:clamp(3rem,11vw,7rem);color:var(--moon);text-shadow:4px 4px var(--night)}.launch-message{position:absolute;z-index:3;bottom:17%;left:50%;transform:translateX(-50%);background:var(--night);border:2px solid var(--soft);padding:10px 14px;min-width:260px;text-align:center;font-size:.79rem}.launch-controls{position:absolute;z-index:3;bottom:7%;left:50%;transform:translateX(-50%);display:flex;justify-content:center;gap:10px;width:92%}
+.diary{width:min(1100px,96%);margin:auto;padding-bottom:38px}.diary-top{padding:21px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.72rem;color:var(--mint)}.diary-top a{color:var(--cream);text-decoration:none}.diary-cover{background:var(--panel);border:4px solid var(--border);padding:clamp(16px,4vw,39px);box-shadow:7px 7px #080a27}.diary-cover h1{font-size:clamp(1.5rem,4vw,2.6rem)}.diary-cover>p{color:var(--soft);line-height:1.7}.book-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:23px;margin-top:22px}.book-page{min-width:0;background:var(--raised);border:4px solid var(--border);padding:22px}.book-page h2{color:var(--moon);font-size:1rem}.identity{display:flex;align-items:center;gap:17px;flex-wrap:wrap}.identity strong{font-size:1rem}.identity p{font-size:.7rem;color:var(--mint)}.photo-slot{width:110px;height:110px;background:var(--night);border:3px solid var(--border);overflow:hidden}.photo-slot>*{width:100%;height:100%;object-fit:cover}.photo-slot canvas{image-rendering:pixelated}.text-btn{display:block;border:0;padding:8px 0;background:transparent;color:var(--soft);cursor:pointer;text-decoration:underline}.book-page textarea{width:100%;min-height:155px;margin:12px 0;background:var(--night);color:var(--cream);border:3px solid var(--border);padding:12px;resize:vertical}.collection{display:grid;gap:10px;color:var(--soft)}.collectible{background:var(--night);border-left:5px solid var(--moon);padding:12px}.collectible strong{color:var(--moon)}.collectible p{font-size:.77rem;line-height:1.6}.badges{color:var(--soft)}.achievement{display:inline-block;background:#284C40;color:var(--mint);border:2px solid var(--mint);padding:10px;font-weight:bold}#notice{color:var(--mint);font-size:.8rem}
+@media(max-width:800px){.book-grid{grid-template-columns:1fr}.menu{left:5%}.avatar-modal{max-height:83%}}@media(max-width:520px){.hud{font-size:.6rem}.hud-actions{gap:3px}.hud-button{font-size:.58rem;padding:5px}.logo{top:12%}.logo h1{font-size:2.7rem}.speech-panel{bottom:6%;padding:12px}.menu{left:50%;top:49%;transform:translate(-50%,-25%);width:min(295px,88%)}.avatar-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.book-page{padding:15px}.identity{align-items:flex-start}.launch-message{min-width:0;width:88%}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* V3 · Visor holográfico, HUD y Acto I */
+.hud-button[aria-pressed="true"]{background:var(--mint)}.act-card{position:absolute;z-index:5;top:48%;left:50%;transform:translate(-50%,-50%);text-align:center;border-color:var(--moon);width:min(440px,92%)}.act-card span{color:var(--moon);font-weight:bold}.act-card h1{font-size:clamp(1.1rem,4vw,2rem);margin:12px 0}.station-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.station-list button{font-size:.69rem}
+.visor-modal{position:fixed;inset:0;z-index:9999;background:#06091de8;display:grid;place-items:center;padding:12px}.visor-panel{width:min(1120px,100%);max-height:95dvh;overflow:auto;background:var(--panel);color:var(--cream);border:4px solid var(--mint);box-shadow:8px 8px 0 #06091d;font-family:'Courier New',monospace}.visor-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;background:var(--raised)}.visor-head strong{color:var(--mint)}.visor-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.8fr);min-height:400px}.visor-canvas{height:min(65vh,480px);min-height:320px;overflow:hidden;image-rendering:auto}.visor-canvas canvas{display:block;width:100%;height:100%;image-rendering:auto}.visor-side{padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}.visor-side p{line-height:1.5;font-size:.82rem}.visor-side a{color:var(--mint);font-weight:bold}.evidence{width:100%;background:var(--night);padding:10px;border-left:4px solid var(--mint)}.evidence b{font-size:.77rem}.evidence.observed{border-color:#3FD0E0}.evidence.interpreted{border-color:#B79CFF}.evidence.narrative{border-color:#FFD23F}.evidence.observed b{color:#3FD0E0}.evidence.interpreted b{color:#B79CFF}.evidence.narrative b{color:#FFD23F}.moon-page .visor-modal{font-family:monospace}.moon-page .visor-modal button{font-family:monospace;cursor:pointer}.moon-page nav.navegacion button{padding:8px;border:2px solid #FFE066;background:#1A1F4D;color:#FFF8E7;cursor:pointer}
+@media(max-width:720px){.visor-body{grid-template-columns:1fr}.visor-canvas{height:270px;min-height:270px}.visor-panel{max-height:90dvh}.visor-side{padding:12px}.act-card{top:44%}}
+
+/* V4 pantallas Marte, Huellas, certificado y ruta siguiente */
+.mars-panel{position:absolute;z-index:5;left:50%;top:48%;transform:translate(-50%,-50%);width:min(560px,90vw);text-align:center}.mars-panel h1{color:#F7B08E}.mars-panel .station-list{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin:18px 0}.mars-panel .station-list+ a{margin-top:8px}
+.page-shell{padding:20px;width:min(1000px,95%);margin:0 auto}.puzzle-window{margin:7vh auto;padding:30px;max-width:800px}.matching-game{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:25px 0}.match-column{display:flex;flex-direction:column;gap:13px}.match-column button{min-height:69px}.match-column button.selected{border-color:#8FF0D8}.match-column button.matched{background:#245B48;border-color:#5BE39A}#matchFeedback{color:#FFE066;min-height:28px}.certificate{margin:25px auto;padding:25px;background:#FFF8E7;color:#0E1233;border:8px double #6E62CE;text-align:center}.certificate h1{font-size:2rem}.next-act{color:#8FF0D8;font-weight:bold;text-decoration:none;padding:10px}.visor-modal[hidden]{display:none!important}
+@media print{.diary-cover,.diary-top,.pixel-button,.hud{display:none!important}.certificate{display:block!important;min-height:80vh;margin:0}}
+@media(max-width:550px){.matching-game{gap:7px}.match-column button{font-size:.65rem}}
+
+/* StarStep visual system integration: 16:9, never stretch the pixel world. */
+.stage>canvas#world{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.hud{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
+.hud-actions{flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.hud-button{white-space:nowrap;min-height:34px}
+.logo{top:clamp(76px,12vh,135px);width:min(92%,900px)}
+.logo h1{font-size:clamp(2.3rem,7vw,5.5rem);overflow-wrap:normal;white-space:nowrap}
+.speech-panel{width:min(735px,calc(100% - 36px));bottom:clamp(18px,5vh,64px);max-height:42vh;overflow-y:auto;padding:clamp(12px,2vw,20px)}
+.speech-actions{flex-wrap:wrap}.speech-actions .pixel-button{min-width:110px}
+.science-wrap{width:min(1180px,96%);margin:0 auto;padding:16px 0 70px}
+.science-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 30px}
+.science-hero{background:#1A1F4D;border:3px solid #ABA1F5;padding:22px 28px}
+.science-hero h1{font-size:clamp(1.7rem,4vw,2.9rem);color:#8FF0D8}
+.science-hero p{line-height:1.55}
+.science-section{margin:36px 0}.science-section h2{color:#FFE066;font-size:1.2rem}
+.science-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+.science-card{background:#262C66;border:3px solid #ABA1F5;padding:12px 12px 18px;display:flex;flex-direction:column;gap:9px}
+.science-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E1233;border:2px solid #1A1340}
+.science-card h3{font-size:1.03rem;margin:5px 0;color:#8FF0D8}
+.science-card p{font-size:.84rem;line-height:1.5;margin:0;flex:1}
+.science-card small{color:#B9BEE6}.science-card a{color:#FFE066}
+@media(max-width:700px){.logo{top:clamp(75px,15vh,115px)}.logo h1{font-size:clamp(1.7rem,8.4vw,3.6rem)}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:44vh}.chapter-label{display:none}}
+@media(max-height:570px){.logo{top:60px}.logo h1{font-size:2.4rem}.speech-panel{bottom:6px;max-height:50vh}.menu{top:30%}}
+
+
+
+/* ==================================================
+   STARSTEP - CORRECCIÓN VISUAL DE LA PORTADA
+   ================================================== */
+
+/* Escenario a pantalla completa */
+.home-page .stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+}
+
+/* Eliminar franjas oscuras sin deformar el escenario */
+.home-page .stage > canvas#world {
+    object-fit: cover;
+    object-position: center bottom;
+}
+
+/* Barra superior HUD */
+.home-page .hud {
+    top: 12px;
+    left: clamp(10px, 2vw, 24px);
+    right: clamp(10px, 2vw, 24px);
+    max-width: none;
+    flex-wrap: wrap;
+}
+
+.home-page .hud strong {
+    line-height: 1.3;
+}
+
+/* Corregir legibilidad de los botones superiores */
+.home-page .hud-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    text-shadow: none;
+    line-height: 1.25;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: clamp(.68rem, 1vw, .82rem);
+}
+
+.home-page .hud-button:hover {
+    background: var(--moon);
+}
+
+/* Título principal */
+.home-page .logo {
+    top: clamp(64px, 12vh, 120px);
+    width: calc(100% - 24px);
+}
+
+.home-page .logo h1 {
+    font-size: clamp(1.7rem, 7vw, 5.5rem);
+    line-height: 1.1;
+}
+
+.home-page .logo small {
+    line-height: 1.4;
+    max-width: 100%;
+}
+
+/* Menú principal */
+.home-page .menu {
+    top: auto;
+    bottom: clamp(34px, 7vh, 75px);
+    left: clamp(18px, 6vw, 100px);
+    transform: none;
+    width: min(290px, 40%);
+    max-height: calc(100% - clamp(180px, 29vh, 250px));
+    overflow-y: auto;
+    padding: clamp(10px, 2vh, 20px);
+    gap: 7px;
+}
+
+.home-page .menu h2 {
+    margin: 0 0 5px;
+}
+
+.home-page .menu .pixel-button {
+    flex-shrink: 0;
+}
+
+/* Cuadro de diálogo */
+.home-page .speech-panel {
+    bottom: clamp(34px, 7vh, 75px);
+}
+
+/* ==================================================
+   ADAPTACIÓN A DISPOSITIVOS MÓVILES
+   ================================================== */
+
+@media (max-width: 700px) {
+
+    .home-page .hud {
+        justify-content: center;
+        row-gap: 5px;
+    }
+
+    .home-page .hud strong {
+        flex-basis: 100%;
+        text-align: center;
+    }
+
+    .home-page .hud-actions {
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .home-page .hud-button {
+        padding: 5px 7px;
+        min-height: 34px;
+    }
+
+    .home-page .logo {
+        top: clamp(96px, 16vh, 145px);
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(1.75rem, 10vw, 3.8rem);
+    }
+
+    .home-page .menu {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 18px;
+        width: min(300px, calc(100% - 32px));
+        max-height: calc(100% - 220px);
+    }
+
+    .home-page .speech-panel {
+        bottom: 18px;
+        max-height: 48vh;
+    }
+}
+
+/* ==================================================
+   PANTALLAS HORIZONTALES DE POCA ALTURA
+   ================================================== */
+
+@media (max-height: 500px) and (min-width: 701px) {
+
+    .home-page .logo {
+        top: 58px;
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(2rem, 6vh, 3.4rem);
+    }
+
+    .home-page .menu {
+        top: 135px;
+        bottom: auto;
+        width: min(390px, 46%);
+        max-height: calc(100% - 160px);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+    }
+
+    .home-page .menu h2 {
+        grid-column: 1 / -1;
+    }
+
+    .home-page .menu .pixel-button {
+        padding: 7px 10px;
+        font-size: .72rem;
+    }
+
+    .home-page .speech-panel {
+        bottom: 28px;
+        max-height: 46vh;
+    }
+}
+
+/* Pantallas pequeñas de poca altura */
+@media (max-width: 700px) and (max-height: 450px) {
+
+    .home-page .logo {
+        top: 92px;
+    }
+
+    .home-page .logo h1 {
+        font-size: 1.7rem;
+    }
+
+    .home-page .menu {
+        max-height: calc(100% - 160px);
+        bottom: 10px;
+    }
+
+    .home-page .speech-panel {
+        bottom: 10px;
+        max-height: 45vh;
+    }
+}
+
+/* ==================================================
+   STARFLOW - AVISOS DEL CONTROLADOR DEL FLUJO
+   ================================================== */
+.flow-notice {
+    position: fixed;
+    left: 50%;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 10000;
+    width: min(92vw, 560px);
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--moon);
+    box-shadow: 0 0 0 3px var(--border), 5px 5px 0 #06091d;
+    font: inherit;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+}
+
+
+/* Ajustes visuales de Acto II, aislados para no afectar Luna/despegue/visor 3D. */
+body.mars-page .stage{isolation:isolate;background:#26152c;}
+body.mars-page .hud{z-index:9;top:16px;left:clamp(14px,2vw,30px);right:clamp(14px,2vw,30px);align-items:flex-start;}
+body.mars-page .hud-link{display:inline-flex;align-items:center;min-height:38px;padding:8px 11px;background:#1a1f4dea;border:2px solid #aba1f5;color:#fff8e7;font-weight:bold;line-height:1.25;}
+body.mars-page .hud-actions{gap:8px;}
+body.mars-page .hud-button{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;min-height:38px;border:2px solid #aba1f5;background:#fff8e7;color:#1a1f4d;text-shadow:none;text-decoration:none;font-weight:bold;line-height:1.2;}
+body.mars-page .hud-button:hover,body.mars-page .hud-button[aria-pressed="true"]{background:#8ff0d8;}
+body.mars-page .mars-panel{width:min(600px,calc(100vw - 32px));top:50%;padding:clamp(20px,3vw,33px);background:#1a1f4df5;border:4px solid #fff8e7;box-shadow:0 0 0 5px #453b83,8px 8px 0 #0e1233;text-shadow:none;}
+body.mars-page .mars-panel h1{font-size:clamp(20px,3vw,32px);line-height:1.28;color:#ffaf83;margin:0 0 13px;}
+body.mars-page .mars-panel p{font-size:clamp(12px,1.25vw,15px);line-height:1.7;margin:10px auto;color:#fff8e7;max-width:45ch;}
+body.mars-page .mars-panel .station-list{gap:12px;margin:21px 0;}
+body.mars-page .mars-panel .station-list button{font-size:clamp(11px,1vw,13px);padding:12px 16px;min-height:44px;line-height:1.3;}
+body.mars-page .mars-panel>a.pixel-button{display:inline-block;margin-top:6px;font-size:clamp(11px,1vw,13px);line-height:1.35;}
+@media(max-width:620px){
+ body.mars-page .hud{top:9px;gap:8px;}
+ body.mars-page .hud-link,body.mars-page .hud-button{min-height:32px;padding:6px 8px;font-size:10px;}
+ body.mars-page .mars-panel{top:54%;padding:20px 13px;max-height:70dvh;overflow-y:auto;}
+ body.mars-page .mars-panel .station-list{margin:12px 0;}
+}
+
+/* Estado lunar: información visible, sin afectar la navegación ni el render Three.js. */
+.moon-progress-guide{max-width:860px;margin:12px auto;padding:11px 15px;background:#171b45;color:#fff8e7;border:2px solid #8ff0d8;line-height:1.55;text-align:center;font-size:clamp(12px,1.3vw,16px)}
+.moon-page a.next-act[aria-disabled="true"]{opacity:.7}

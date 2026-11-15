@@ -1,0 +1,135 @@
+/* StarStep · Reproductor de cinemáticas (cinematica.js). Paleta oficial. */
+.cine {
+    --cine-night: #0E1233;
+    --cine-panel: #1A1F4D;
+    --cine-raised: #262C66;
+    --cine-border: #1A1340;
+    --cine-cream: #FFF8E7;
+    --cine-soft: #B9BEE6;
+    --cine-mint: #8FF0D8;
+    --cine-violet: #ABA1F5;
+    --cine-purple: #6E62CE;
+    --cine-gold: #FFE066;
+
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    justify-items: center;
+    gap: 10px;
+    padding: 16px;
+    background: var(--cine-night);
+    color: var(--cine-cream);
+    font-family: "Courier New", monospace;
+}
+.cine[hidden], .cine [hidden] { display: none !important; }
+.cine:focus { outline: none; }
+
+/* Marco con la relación de aspecto original (1024×576 = 16:9). */
+.cine-frame {
+    position: relative;
+    align-self: center;
+    width: min(100%, calc((100dvh - 150px) * 16 / 9));
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border: 4px solid var(--cine-violet);
+    box-shadow: 0 0 0 4px var(--cine-border), 8px 8px 0 var(--cine-border);
+    overflow: hidden;
+}
+.cine-frame:fullscreen { width: 100vw; height: 100vh; border: 0; box-shadow: none; }
+.cine-video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+/* Subtítulos propios: cubren la franja incrustada solo mientras hay una frase. */
+.cine-caption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    margin: 0;
+    min-height: 19%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4%;
+    background: var(--cine-night);          /* opaca: tapa por completo el inglés incrustado */
+    border-top: 2px solid var(--cine-purple);
+    color: var(--cine-cream);
+    font: bold clamp(12px, 2.3vw, 24px) / 1.35 "Courier New", monospace;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.cine-start {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 26px !important;
+    font-size: clamp(14px, 2.4vw, 22px) !important;
+    background: var(--cine-mint) !important;
+    color: var(--cine-night) !important;
+    border-color: var(--cine-cream) !important;
+}
+
+.cine-narrative {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    gap: 14px;
+    padding: 6% 8%;
+    background: var(--cine-panel);
+    text-align: center;
+}
+.cine-narrative-count { margin: 0; color: var(--cine-mint); font-weight: bold; letter-spacing: 1px; }
+.cine-narrative-text { margin: 0; font: bold clamp(14px, 2.4vw, 24px) / 1.5 "Courier New", monospace; }
+.cine-narrative .cine-button { justify-self: center; }
+
+.cine-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: min(100%, 1100px);
+}
+.cine-button {
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 2px solid var(--cine-violet);
+    background: var(--cine-raised);
+    color: var(--cine-cream);
+    font: bold 13px "Courier New", monospace;
+    letter-spacing: .5px;
+    box-shadow: 3px 3px 0 var(--cine-border);
+    cursor: pointer;
+}
+.cine-button:hover { background: var(--cine-purple); }
+.cine-button:focus-visible, .cine input:focus-visible { outline: 3px solid var(--cine-gold); outline-offset: 2px; }
+.cine-button[aria-pressed="true"] { background: var(--cine-mint); color: var(--cine-night); }
+.cine-skip, .cine-next { background: var(--cine-gold); color: var(--cine-night); border-color: var(--cine-cream); }
+.cine-time { min-width: 92px; text-align: center; color: var(--cine-soft); font-weight: bold; }
+.cine-progress { flex: 1 1 220px; min-width: 160px; accent-color: var(--cine-mint); height: 28px; }
+.cine-volume { width: 90px; accent-color: var(--cine-violet); height: 28px; }
+.cine-status { min-height: 1.2em; margin: 0; color: var(--cine-soft); text-align: center; font-size: 13px; }
+.cine-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.cine-curtain {
+    position: fixed;
+    inset: 0;
+    background: var(--cine-night);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 420ms ease;
+}
+.cine-curtain[data-state="out"] { opacity: 0; }
+
+@media (max-width: 640px) {
+    .cine { padding: 10px; gap: 8px; }
+    .cine-frame { width: 100%; border-width: 3px; }
+    .cine-button { min-height: 36px; padding: 6px 8px; font-size: 11px; }
+    .cine-volume { display: none; }        /* en móvil el volumen lo da el dispositivo */
+    .cine-time { min-width: 0; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cine-curtain { transition: none; }
+}

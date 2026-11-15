@@ -1,0 +1,181 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>StarStep · Rumbo a la Luna</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vuelo.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/vuelo-motor.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/vuelo.js') }}"></script>
+
+</head>
+
+<body>
+
+<main id="flightMain" hidden>
+
+    <!-- BARRA SUPERIOR -->
+
+    <header>
+
+        <span class="brand">
+            OUTSTRIP · STARSTEP
+        </span>
+
+        <div class="actions">
+
+            <a href="{{ url_for('inicio') }}"
+               data-t="back">
+                VOLVER
+            </a>
+
+            <a href="{{ url_for('bitacora') }}" data-t="journal">BITÁCORA</a>
+            <button data-lang="es"
+                    aria-pressed="true">
+                ES
+            </button>
+
+            <button data-lang="en"
+                    aria-pressed="false">
+                EN
+            </button>
+
+        </div>
+
+    </header>
+
+    <!-- TÍTULO -->
+
+    <h1 data-t="title">
+        RUMBO A LA LUNA
+    </h1>
+
+    <p class="sub" data-t="sub">
+        Mantené para subir, soltá para bajar.
+        Esquivá los asteroides.
+    </p>
+
+    <!-- INFORMACIÓN DEL VUELO -->
+
+    <div class="hud">
+
+        <span>
+            <span data-t="distance">
+                DISTANCIA RESTANTE
+            </span>
+
+            <strong id="distance">
+                384.400 km
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="checkpoint">
+                CHECKPOINT
+            </span>
+
+            <strong id="checkpoint">
+                0%
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="attempt">
+                INTENTO
+            </span>
+
+            <strong id="attempt">
+                1
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="assist">
+                ASISTENCIA
+            </span>
+
+            <strong id="assist">
+                0/3
+            </strong>
+        </span>
+
+    </div>
+
+    <!-- BARRA DE CUATRO TRAMOS -->
+
+    <div class="track" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- ESCENARIO ESPACIAL -->
+
+    <div class="game">
+
+        <canvas
+            id="world" tabindex="0"
+            width="320"
+            height="180"
+            aria-label="Nave y asteroides">
+        </canvas>
+
+        <div class="overlay" id="overlay" hidden>
+
+            <section
+                class="dialog"
+                aria-labelledby="messageTitle">
+
+                <h2 id="messageTitle"></h2>
+
+                <p id="messageText"></p>
+
+                <button class="primary" id="action">
+                </button>
+
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- CONTROLES TÁCTILES -->
+
+    <div class="controls">
+
+        <button
+            class="primary"
+            id="thrust"
+            data-t="thrust">
+
+            ↑ MANTENÉ PARA ASCENDER
+
+        </button>
+
+        <button id="pause" data-t="pause">
+            PAUSA
+        </button>
+
+    </div>
+
+    <p id="hint" role="status"></p>
+
+    <footer data-t="preview">
+        CAPÍTULO 1 · ROCK & ROLL
+    </footer>
+
+</main>
+
+
+
+</body>
+</html>

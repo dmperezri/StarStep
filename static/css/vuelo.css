@@ -1,0 +1,292 @@
+
+
+        /* =========================================
+           PALETA OFICIAL STARSTEP
+           ========================================= */
+
+        :root {
+            --night: #0E1233;
+            --panel: #1A1F4D;
+            --raised: #262C66;
+            --border: #1A1340;
+            --cream: #FFF8E7;
+            --soft: #B9BEE6;
+            --mint: #8FF0D8;
+            --violet: #ABA1F5;
+            --purple: #6E62CE;
+            --moon: #FFE066;
+            --mars: #D9593A;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            background: var(--night);
+            color: var(--cream);
+            font-family: "Courier New", monospace;
+        }
+
+        main {
+            width: min(1080px, 95%);
+            margin: auto;
+            padding: 18px 0 24px;
+        }
+
+        header,
+        .actions,
+        .hud,
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            color: var(--mint);
+            font-size: .8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           BOTONES
+           ========================================= */
+
+        button,
+        a {
+            font: bold .8rem "Courier New", monospace;
+            color: var(--cream);
+            background: var(--raised);
+            border: 2px solid var(--violet);
+            min-height: 42px;
+            padding: 9px 13px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 3px 3px var(--border);
+        }
+
+        button.primary,
+        button[aria-pressed="true"] {
+            background: var(--mint);
+            color: var(--night);
+            border-color: var(--mint);
+        }
+
+        button:not(:disabled):hover,
+        a:hover {
+            border-color: var(--moon);
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid var(--moon);
+            outline-offset: 3px;
+        }
+
+        h1 {
+            font-size: clamp(1.3rem, 4vw, 2.4rem);
+            color: var(--moon);
+            text-shadow: 3px 3px var(--purple);
+            margin: 22px 0 8px;
+        }
+
+        p {
+            line-height: 1.5;
+        }
+
+        .sub,
+        footer,
+        #hint {
+            color: var(--soft);
+            font-size: .8rem;
+        }
+
+        /* =========================================
+           INDICADORES DE MISIÓN
+           ========================================= */
+
+        .hud {
+            background: var(--panel);
+            border: 2px solid var(--purple);
+            padding: 10px;
+            margin: 14px 0 8px;
+            font-size: .75rem;
+        }
+
+        .hud strong {
+            display: block;
+            margin-top: 4px;
+            color: var(--mint);
+            font-size: 1rem;
+        }
+
+        .track {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 9px;
+        }
+
+        .track span {
+            height: 9px;
+            background: var(--raised);
+            border: 1px solid var(--violet);
+        }
+
+        .track span.done {
+            background: var(--mint);
+        }
+
+        .track span.active {
+            background: linear-gradient(
+                90deg,
+                var(--moon) var(--p),
+                var(--raised) var(--p)
+            );
+        }
+
+        /* =========================================
+           ESCENARIO DEL MINIJUEGO
+           ========================================= */
+
+        .game {
+            position: relative;
+            border: 3px solid var(--violet);
+            box-shadow: 6px 6px var(--border);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            image-rendering: pixelated;
+            touch-action: none;
+        }
+
+        /* =========================================
+           VENTANAS DE CONTROL DE MISIÓN
+           ========================================= */
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 8px;
+            overflow: auto;
+            background: #0E1233C9;
+        }
+
+        .dialog {
+            width: min(480px, 100%);
+            background: var(--panel);
+            border: 3px solid var(--violet);
+            padding: clamp(8px, 2vw, 24px);
+            text-align: center;
+            box-shadow: 5px 5px var(--border);
+        }
+
+        .dialog h2 {
+            color: var(--moon);
+            font-size: clamp(1rem, 3vw, 1.45rem);
+            margin: 0;
+        }
+
+        .dialog p {
+            font-size: clamp(.7rem, 1.5vw, .95rem);
+            margin: 8px 0 12px;
+        }
+
+        .dialog button {
+            width: min(280px, 100%);
+        }
+
+        /* =========================================
+           CONTROLES
+           ========================================= */
+
+        .controls {
+            margin-top: 17px;
+        }
+
+        #thrust {
+            flex: 1;
+            min-height: 54px;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #thrust.held {
+            background: var(--moon);
+        }
+
+        footer {
+            text-align: center;
+            margin: 18px 0 0;
+        }
+
+        /* =========================================
+           DISEÑO ADAPTABLE
+           ========================================= */
+
+        @media (max-width: 550px) {
+
+            header {
+                justify-content: center;
+            }
+
+            .brand {
+                text-align: center;
+                width: 100%;
+            }
+
+            .hud {
+                font-size: .65rem;
+            }
+
+            .hud strong {
+                font-size: .85rem;
+            }
+
+            button,
+            a {
+                font-size: .72rem;
+                padding: 6px 9px;
+            }
+
+            .dialog {
+                padding: 7px;
+            }
+
+            .dialog p {
+                line-height: 1.3;
+                margin: 5px 0;
+            }
+
+            .dialog button {
+                min-height: 34px;
+            }
+
+        }
+
+    
+.game canvas:focus-visible { outline: 3px solid var(--moon); outline-offset: 2px; }

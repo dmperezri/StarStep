@@ -1,0 +1,19 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StarStep · Marte</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+<script type="importmap">{"imports":{"three":"/static/vendor/three/build/three.module.js","three/addons/":"/static/vendor/three/examples/jsm/"}}</script>
+<script defer src="{{ url_for('static',filename='js/main.js') }}"></script><script defer src="{{ url_for('static',filename='js/audio.js') }}"></script><script defer src="{{ url_for('static',filename='js/progreso.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo-definicion.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo.js') }}"></script><script defer src="{{ url_for('static',filename='js/planetas.js') }}"></script>
+<script defer src="{{ url_for('static',filename='js/scene.js') }}"></script><script defer src="{{ url_for('static',filename='js/visor-fallback.js') }}"></script><link rel="stylesheet" href="{{ url_for('static',filename='css/mision.css') }}"><script defer src="{{ url_for('static',filename='js/tarjeta-cientifica.js') }}"></script><script defer src="{{ url_for('static',filename='js/enigma-hematita.js') }}"></script><script defer src="{{ url_for('static',filename='js/enigmas-marte.js') }}"></script><script defer src="{{ url_for('static',filename='js/cinematica.js') }}?v=marsmp4-3"></script><script defer src="{{ url_for('static',filename='js/marte-mision.js') }}?v=marsmp4-3"></script><script defer src="{{ url_for('static',filename='js/marte.js') }}"></script><script defer src="{{ url_for('static',filename='js/science-content.js') }}"></script><link rel="stylesheet" href="{{ url_for('static',filename='css/viaje-marte.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/enigma.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/evidencia-visual.css') }}"><script defer src="{{ url_for('static',filename='js/evidencia-visual.js') }}"></script><link rel="stylesheet" href="{{ url_for('static',filename='css/cinematica.css') }}"></head>
+<body class="star-page mars-page"><main class="stage"><canvas id="world" width="480" height="270"></canvas>
+<header class="hud"><a class="hud-link" href="/luna" data-i18n="mars.back">← LUNA</a><div class="hud-actions"><a class="hud-button" href="{{ url_for('archivo_nasa', desde='marte') }}" data-i18n="science.link">ARCHIVO NASA</a><button class="hud-button" data-lang="es">ES</button><button class="hud-button" data-lang="en">EN</button><a class="hud-button" href="/bitacora" data-i18n="journal">BITÁCORA</a></div></header>
+<section class="pixel-panel mars-panel mars-route-home" aria-labelledby="marsHeading">
+  <p class="mars-home-kicker">OUTSTRIP · STARSTEP</p>
+  <h1 id="marsHeading" data-i18n="mars.title">ACTO II · MARTE</h1>
+  <p class="mars-home-subtitle" data-i18n="mars.subtitle">DETECTIVE DE AGUA · OPPORTUNITY</p>
+  <div class="mars-home-progress" aria-live="polite">
+    <div class="mars-home-progress-head"><span id="marsProgressLabel">Ruta científica</span><strong id="marsProgressCount">0 / 6</strong></div>
+    <progress id="marsProgressBar" max="6" value="0" aria-label="Progreso de Marte"></progress>
+    <p id="marsMissionGuide"></p>
+  </div>
+  <div id="marsActions" class="station-list"><button type="button" id="openMarsRoute" class="pixel-button mint">RUTA DE OPPORTUNITY</button></div>
+  <a id="marsNext" class="pixel-button mint" href="/huellas" data-flow-requires="footprints" data-i18n="mars.next" hidden>CONTINUAR A HUELLAS</a>
+</section></main><div id="marsCinematic" class="cine-host" hidden></div></body></html>

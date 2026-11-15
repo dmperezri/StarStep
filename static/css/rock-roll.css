@@ -1,0 +1,398 @@
+:root {
+            --night: #0E1233;
+            --panel: #1A1F4D;
+            --raised: #262C66;
+            --border: #1A1340;
+            --cream: #FFF8E7;
+            --soft: #B9BEE6;
+            --mint: #8FF0D8;
+            --violet: #ABA1F5;
+            --purple: #6E62CE;
+            --moon: #FFE066;
+            --mars: #D9593A;
+            --water: #3FD0E0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            background: var(--night);
+            color: var(--cream);
+            font-family: "Courier New", monospace;
+        }
+
+        #stars {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            pointer-events: none;
+        }
+
+        .presentation {
+            position: relative;
+            min-height: 100svh;
+            width: min(1200px, 94%);
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 20px 0;
+        }
+
+        .brand {
+            color: var(--mint);
+            font-weight: bold;
+            font-size: .8rem;
+            letter-spacing: 2px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        button, .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 14px;
+            background: var(--raised);
+            color: var(--cream);
+            font: bold .8rem "Courier New", monospace;
+            text-decoration: none;
+            border: 2px solid var(--violet);
+            box-shadow: 4px 4px var(--border);
+            cursor: pointer;
+        }
+
+        button:not(:disabled):hover,
+        .button:hover {
+            background: var(--purple);
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid var(--moon);
+            outline-offset: 4px;
+        }
+
+        button:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        button.active,
+        button.primary {
+            background: var(--mint);
+            color: var(--night);
+        }
+
+        button.primary:not(:disabled):hover {
+            background: var(--moon);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 25px 0;
+            gap: 22px;
+        }
+
+        .eyebrow {
+            color: var(--violet);
+            font-weight: bold;
+            font-size: .85rem;
+            letter-spacing: 5px;
+        }
+
+        /* PLANETAS */
+
+        .worlds {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: min(780px, 100%);
+            gap: 20px;
+        }
+
+        .planet {
+            width: clamp(75px, 17vw, 185px);
+            flex-shrink: 0;
+            animation: float 5s steps(20) infinite;
+        }
+
+        .planet svg {
+            display: block;
+            width: 100%;
+            filter: drop-shadow(5px 5px 0 #080A20);
+        }
+
+        .planet span {
+            display: block;
+            margin-top: 16px;
+            font-size: clamp(.6rem, 1.2vw, .9rem);
+            font-weight: bold;
+        }
+
+        .moon {
+            color: var(--moon);
+        }
+
+        .mars {
+            color: var(--water);
+            animation-delay: -2s;
+        }
+
+        .connection {
+            flex: 1;
+            min-width: 20px;
+            height: 2px;
+            border-top: 3px dashed var(--purple);
+            opacity: .7;
+        }
+
+        /* TÍTULO DEL CAPÍTULO */
+
+        .chapter-title {
+            margin: 0;
+            color: var(--moon);
+            font-size: clamp(2.1rem, 7vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow:
+                3px 3px 0 var(--border),
+                6px 6px 0 var(--purple);
+        }
+
+        .subtitle {
+            color: var(--cream);
+            line-height: 1.6;
+            letter-spacing: 2px;
+        }
+
+        .reveal {
+            animation: reveal .8s steps(12) both;
+        }
+
+        /* ACTOS */
+
+        .acts {
+            width: min(760px, 100%);
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .act {
+            background: var(--panel);
+            border: 2px solid var(--purple);
+            padding: clamp(10px, 2vw, 22px);
+            box-shadow: 5px 5px var(--border);
+        }
+
+        .act strong {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .act span {
+            display: block;
+            font-size: .8rem;
+            font-weight: bold;
+        }
+
+        .act:nth-child(1) {
+            color: var(--moon);
+            border-color: var(--moon);
+        }
+
+        .act:nth-child(2) {
+            color: var(--water);
+            border-color: var(--water);
+        }
+
+        .act:nth-child(3) {
+            color: var(--violet);
+            border-color: var(--violet);
+        }
+
+        /* LITO */
+
+        .lito {
+            width: 110px;
+            animation: float 3s steps(15) infinite;
+        }
+
+        .lito svg {
+            display: block;
+            width: 100%;
+        }
+
+        .briefing {
+            width: min(740px, 100%);
+            background: var(--cream);
+            color: var(--night);
+            border: 3px solid var(--border);
+            padding: 20px;
+            text-align: left;
+            box-shadow: 6px 6px var(--purple);
+        }
+
+        .briefing strong {
+            color: #4F45A6;
+            font-size: .8rem;
+        }
+
+        .briefing p {
+            margin: 14px 0 5px;
+            font-size: clamp(.85rem, 1.4vw, 1rem);
+            line-height: 1.7;
+            font-weight: bold;
+        }
+
+        /* CUENTA REGRESIVA */
+
+        .countdown {
+            font-size: clamp(5rem, 20vw, 12rem);
+            font-weight: 900;
+            color: var(--moon);
+            text-shadow:
+                5px 5px var(--border),
+                9px 9px var(--purple);
+        }
+
+        .mission-button {
+            width: min(340px, 100%);
+            min-height: 50px;
+        }
+
+        /* PIE DE PÁGINA Y PROGRESO */
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--soft);
+            font-size: .72rem;
+        }
+
+        #progress {
+            width: min(350px, 90%);
+            height: 8px;
+            margin: 14px auto;
+            display: block;
+            appearance: none;
+            border: 0;
+            background: var(--panel);
+        }
+
+        #progress::-webkit-progress-bar {
+            background: var(--panel);
+        }
+
+        #progress::-webkit-progress-value {
+            background: var(--mint);
+        }
+
+        #progress::-moz-progress-bar {
+            background: var(--mint);
+        }
+
+        .finished {
+            background: var(--panel);
+            border: 2px solid var(--mint);
+            padding: 24px;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body.paused * {
+            animation-play-state: paused !important;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                justify-content: center;
+            }
+
+            .brand {
+                width: 100%;
+                text-align: center;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .acts {
+                gap: 6px;
+            }
+
+            .act span {
+                font-size: .65rem;
+            }
+
+            .worlds {
+                gap: 8px;
+            }
+
+            .chapter-title {
+                letter-spacing: 0;
+            }
+
+            .briefing {
+                padding: 15px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+/* Avisos de StarFlow en esta interfaz independiente. */
+.flow-notice { position:fixed; z-index:100; bottom:16px; left:50%; transform:translateX(-50%); width:min(92vw,560px); margin:0; padding:12px; background:var(--panel); color:var(--cream); border:3px solid var(--moon); text-align:center; cursor:pointer; }

@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>StarStep | Selección de capítulos</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/capitulos.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/capitulos.js') }}"></script>
+
+</head>
+
+<body>
+
+<canvas id="stars"
+        width="480"
+        height="270"
+        aria-hidden="true">
+</canvas>
+
+<main class="page">
+
+    <header>
+
+        <span class="brand">
+            OUTSTRIP · STARSTEP
+        </span>
+
+        <div class="language">
+            <a class="station-back" href="{{ url_for('inicio') }}" data-i18n="back">← VOLVER</a>
+
+            <button type="button"
+                    class="active"
+                    data-lang="es"
+                    aria-pressed="true">
+                ES
+            </button>
+
+            <button type="button"
+                    data-lang="en"
+                    aria-pressed="false">
+                EN
+            </button>
+
+        </div>
+
+    </header>
+
+    <section class="heading">
+
+        <h1 data-text="title">
+            ELEGÍ TU AVENTURA
+        </h1>
+
+        <p data-text="subtitle">
+            El universo está lleno de historias por descubrir.
+        </p>
+
+    </section>
+
+    <section class="chapter-grid">
+
+        <!-- CAPÍTULO 1 -->
+
+        <article class="chapter available">
+
+            <svg class="chapter-art"
+                 viewBox="0 0 340 155"
+                 role="img"
+                 aria-label="La Luna y Marte"
+                 shape-rendering="crispEdges">
+
+                <rect width="340"
+                      height="155"
+                      fill="#0E1233"/>
+
+                <!-- Luna -->
+
+                <path
+                    d="M47 20H85V28H101V44H113V84H102V101H84V112H45V103H28V85H17V46H28V30H47Z"
+                    fill="#C3C7D6"/>
+
+                <path
+                    d="M66 20H85V28H101V44H113V84H102V101H84V112H66V87H79V51H66Z"
+                    fill="#868CA4"/>
+
+                <path
+                    d="M34 48H51V61H34ZM72 85H91V97H72ZM76 29H89V40H76Z"
+                    fill="#575C74"/>
+
+                <!-- Marte -->
+
+                <path
+                    d="M246 17H284V25H303V42H315V82H303V101H284V113H245V104H227V86H215V43H227V26H246Z"
+                    fill="#D9593A"/>
+
+                <path
+                    d="M272 17H284V25H303V42H315V82H303V101H284V113H264V88H282V53H272Z"
+                    fill="#A63A26"/>
+
+                <path
+                    d="M236 44H255V52H236ZM279 78H300V88H279ZM241 91H254V100H241Z"
+                    fill="#7A2818"/>
+
+                <!-- Ruta espacial -->
+
+                <path
+                    d="M112 108Q170 150 226 108"
+                    stroke="#ABA1F5"
+                    stroke-width="2"
+                    stroke-dasharray="4 6"
+                    fill="none"/>
+
+                <!-- Nave -->
+
+                <path
+                    d="M137 59H178L194 70L178 81H137Z"
+                    fill="#E4DFFF"/>
+
+                <path
+                    d="M178 59L194 70L178 81Z"
+                    fill="#8FF0D8"/>
+
+                <rect x="159"
+                      y="64"
+                      width="10"
+                      height="12"
+                      fill="#262C66"/>
+
+                <path
+                    d="M135 63L116 70L135 77Z"
+                    fill="#FFC93C"/>
+
+                <path
+                    d="M137 59L131 51H148V59ZM137 81L131 89H148V81Z"
+                    fill="#6E62CE"/>
+
+                <!-- Estrellas -->
+
+                <g fill="#FFF8E7">
+
+                    <rect x="130" y="20" width="2" height="2"/>
+                    <rect x="180" y="30" width="2" height="2"/>
+                    <rect x="116" y="120" width="2" height="2"/>
+                    <rect x="205" y="128" width="2" height="2"/>
+
+                </g>
+
+                <text x="65"
+                      y="135"
+                      fill="#FFE066"
+                      font-size="11"
+                      font-family="monospace"
+                      text-anchor="middle">
+                    APOLLO 11
+                </text>
+
+                <text x="265"
+                      y="135"
+                      fill="#3FD0E0"
+                      font-size="11"
+                      font-family="monospace"
+                      text-anchor="middle">
+                    OPPORTUNITY
+                </text>
+
+            </svg>
+
+            <span class="chapter-number"
+                  data-text="chapter1">
+                CAPÍTULO 01
+            </span>
+
+            <h2>ROCK &amp; ROLL</h2>
+
+            <span class="status" data-text="available">
+                ● DISPONIBLE
+            </span>
+
+            <p data-text="description">
+                Dos mundos, dos historias.
+                Explorá la Luna y Marte y descubrí
+                sus secretos científicos.
+            </p>
+
+            <div class="acts">
+
+                <span class="act moon"
+                      data-text="moon">
+                    I · LUNA
+                </span>
+
+                <span class="act mars"
+                      data-text="mars">
+                    II · MARTE
+                </span>
+
+                <span class="act traces"
+                      data-text="traces">
+                    III · HUELLAS
+                </span>
+
+            </div>
+
+            <button type="button"
+                    class="chapter-button"
+                    id="startChapter" disabled
+                    data-text="start">
+                INICIAR CAPÍTULO
+            </button>
+
+        </article>
+
+        <!-- CAPÍTULO 2 -->
+
+        <article class="chapter locked">
+
+            <div class="locked-art">
+
+                <svg class="lock-icon"
+                     viewBox="0 0 40 48"
+                     aria-hidden="true">
+
+                    <path
+                        d="M10 20V12H14V7H26V12H30V20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="5"/>
+
+                    <rect x="4" y="20"
+                          width="32" height="25"
+                          fill="currentColor"/>
+
+                    <rect x="17" y="28"
+                          width="6" height="10"
+                          fill="#0E1233"/>
+
+                </svg>
+
+            </div>
+
+            <span class="chapter-number"
+                  data-text="chapter2">
+                CAPÍTULO 02
+            </span>
+
+            <h2 data-text="coming">
+                PRÓXIMAMENTE
+            </h2>
+
+            <p data-text="lockedDescription">
+                Una nueva aventura te espera.
+            </p>
+
+            <button type="button"
+                    class="chapter-button"
+                    data-text="locked"
+                    disabled>
+                BLOQUEADO
+            </button>
+
+        </article>
+
+        <!-- CAPÍTULO 3 -->
+
+        <article class="chapter locked">
+
+            <div class="locked-art">
+
+                <svg class="lock-icon"
+                     viewBox="0 0 40 48"
+                     aria-hidden="true">
+
+                    <path
+                        d="M10 20V12H14V7H26V12H30V20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="5"/>
+
+                    <rect x="4" y="20"
+                          width="32" height="25"
+                          fill="currentColor"/>
+
+                    <rect x="17" y="28"
+                          width="6" height="10"
+                          fill="#0E1233"/>
+
+                </svg>
+
+            </div>
+
+            <span class="chapter-number"
+                  data-text="chapter3">
+                CAPÍTULO 03
+            </span>
+
+            <h2 data-text="coming">
+                PRÓXIMAMENTE
+            </h2>
+
+            <p data-text="lockedDescription">
+                Una nueva aventura te espera.
+            </p>
+
+            <button type="button"
+                    class="chapter-button"
+                    data-text="locked"
+                    disabled>
+                BLOQUEADO
+            </button>
+
+        </article>
+
+    </section>
+
+    <p class="notice"
+       id="chapterNotice" role="status"
+       hidden>
+    </p>
+
+    
+
+</main>
+
+
+
+</body>
+</html>

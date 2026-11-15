@@ -1,0 +1,77 @@
+/* StarStep · Componentes de misión: tarjetas científicas, HUD táctil y minijuegos. Paleta oficial. */
+.sci-card, .mg { position: fixed; inset: 0; z-index: 45; display: grid; place-items: center; padding: 16px; background: rgba(14, 18, 51, .9); color: #FFF8E7; font-family: "Courier New", monospace; }
+.sci-card[hidden], .mg[hidden], .sci-card [hidden], .mg [hidden] { display: none !important; }
+.sci-panel, .mg-panel { position: relative; width: min(720px, 100%); max-height: calc(100dvh - 32px); overflow: auto; padding: 20px; background: #1A1F4D; border: 4px solid #ABA1F5; box-shadow: 0 0 0 4px #1A1340, 8px 8px 0 #1A1340; }
+.sci-head { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; }
+.sci-icon { width: 56px; height: 56px; image-rendering: pixelated; background: #262C66; border: 2px solid #4F45A6; }
+.sci-kind { margin: 0; color: #B9BEE6; font-size: 12px; letter-spacing: 1px; }
+.sci-title { margin: 2px 0 0; font-size: clamp(18px, 3vw, 26px); }
+.sci-photo { margin: 14px 0 0; padding: 8px; background: #FFF8E7; color: #1A1340; }
+.sci-photo img { display: block; width: 100%; max-height: 260px; object-fit: cover; }
+.sci-photo figcaption { margin-top: 6px; font: bold 12px/1.4 "Courier New", monospace; }
+.sci-block { margin: 10px 0; padding: 10px; background: #262C66; }
+.sci-block p { margin: 6px 0 0; line-height: 1.5; }
+.sci-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; color: #0E1233; font: bold 12px "Courier New", monospace; background: #B9BEE6; }
+.sci-block.observed .sci-tag { background: #3FD0E0; }
+.sci-block.interpreted .sci-tag { background: #B79CFF; }
+.sci-block.narrative .sci-tag { background: #FFD23F; }
+.sci-source { margin: 8px 0 0; font-size: 13px; } .sci-source a { color: #8FF0D8; }
+.sci-status { min-height: 1.2em; color: #FFE066; font-weight: bold; }
+.sci-actions, .mg-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.sci-inspect, .sci-confirm, .sci-close, .mg-btn { min-height: 42px; padding: 9px 16px; border: 2px solid #FFF8E7; font: bold 14px "Courier New", monospace; cursor: pointer; box-shadow: 3px 3px 0 #1A1340; background: #262C66; color: #FFF8E7; }
+.sci-inspect { background: #3FD0E0; color: #0E1233; }
+.sci-confirm, .mg-btn.primary { background: #FFE066; color: #0E1233; }
+.sci-confirm:disabled { background: #8FF0D8; cursor: default; }
+.sci-close { min-height: 34px; padding: 5px 10px; font-size: 12px; align-self: start; }
+.sci-inspect:focus-visible, .sci-confirm:focus-visible, .sci-close:focus-visible, .mg-btn:focus-visible, .mg-option:focus-visible { outline: 3px solid #FFE066; outline-offset: 2px; }
+.mg-btn:disabled { opacity: .55; cursor: default; }
+
+/* Minijuegos (mapas, acoplamiento, laboratorio, tormenta, método). */
+.mg-panel { width: min(860px, 100%); }
+.mg-kicker { margin: 0; color: #B9BEE6; font-size: 12px; letter-spacing: 1px; }
+.mg-title { margin: 4px 0 8px; font-size: clamp(18px, 3vw, 26px); }
+.mg-text { margin: 6px 0; line-height: 1.5; }
+.mg-canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; background: #0E1233; border: 3px solid #4F45A6; touch-action: none; }
+.mg-hud { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0; font-weight: bold; color: #8FF0D8; }
+.mg-hud span { padding: 4px 8px; background: #262C66; }
+.mg-feedback { min-height: 1.4em; margin: 8px 0; color: #FFE066; font-weight: bold; line-height: 1.45; }
+.mg-pad { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+.mg-pad .mg-btn { min-width: 52px; }
+.mg-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0; }
+.mg-option { padding: 10px; text-align: left; background: #262C66; color: #FFF8E7; border: 2px solid #4F45A6; font: 13px/1.4 "Courier New", monospace; cursor: pointer; min-height: 52px; }
+.mg-option[aria-pressed="true"] { border-color: #3FD0E0; box-shadow: 0 0 0 2px #3FD0E0; }
+.mg-option.good { border-color: #8FF0D8; } .mg-option.bad { border-color: #D9593A; }
+.mg-option .mg-btn { display: block; width: 100%; max-width: 100%; margin: 6px 0 0; white-space: normal; box-sizing: border-box; font-size: 13px; }
+.mg-meter { height: 14px; background: #262C66; border: 2px solid #4F45A6; } .mg-meter > i { display: block; height: 100%; background: #8FF0D8; }
+
+/* HUD táctil de la exploración lunar. */
+.moon-hud { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin: 10px auto; max-width: 960px; }
+.moon-hud .mg-btn { min-width: 56px; }
+.moon-o2 { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #171b45; border: 2px solid #8FF0D8; font-weight: bold; }
+.moon-o2.warn { border-color: #FFE066; color: #FFE066; } .moon-o2.crit { border-color: #D9593A; color: #F7B08E; }
+.moon-o2 .mg-meter { width: 120px; }
+.moon-sim-note { max-width: 860px; margin: 6px auto; color: #B9BEE6; font-size: 12px; text-align: center; }
+@media (max-width: 640px) { .sci-panel, .mg-panel { padding: 14px; } .sci-head { grid-template-columns: 44px 1fr; } .sci-close { grid-column: 1 / -1; justify-self: end; } }
+#creditsDialog h3.mg-kicker { margin: 18px 0 4px; }
+
+/* Instruments: keep confirmation beside movement controls, not below the photo. */
+.mg[data-instrument-map] .mg-panel{padding:12px 16px;box-sizing:border-box}
+.mg[data-instrument-map] .mg-text{font-size:13px;margin:4px 0}
+.mg[data-instrument-map] .mg-canvas{max-width:min(100%,68dvh);margin-inline:auto;background:#71778f}
+.mg[data-instrument-map] .evidence-photo img{max-height:28dvh;object-fit:contain}
+.mg[data-instrument-map] .mg-pad{gap:5px;margin-top:5px}
+.mg[data-instrument-map] .mg-pad .mg-btn{min-width:38px;min-height:36px;padding:6px 10px}
+.mg[data-instrument-map] .mg-hud{margin:5px 0;font-size:12px}
+.mg[data-instrument-map] .mg-hud [data-valid="true"]{color:#8ff0d8}
+.mg[data-instrument-map] .mg-hud [data-valid="false"]{color:#ffe066}
+.mg[data-instrument-map] .mg-feedback{font-size:12px;margin:5px 0;min-height:0}
+@media(max-width:680px){.mg[data-instrument-map] .evidence-scene-photo{display:flex;flex-direction:column}.mg[data-instrument-map] .evidence-scene-photo .evidence-photo{order:2;width:100%;display:flex;gap:6px;align-items:center}.mg[data-instrument-map] .evidence-photo img{width:80px;max-height:64px}.mg[data-instrument-map] .mg-canvas{max-width:100%}.mg[data-instrument-map] .mg-panel{padding:10px}.mg[data-instrument-map] .mg-pad .mg-btn.primary{flex-basis:100%}}
+
+/* Rock & Roll prototype: pixel-console finish, without changing layout or controls. */
+.mg .mg-canvas { border:3px solid #6E62CE; box-shadow: inset 0 0 0 1px #1A1340; }
+.mg .mg-hud span { border-bottom:2px solid #4F45A6; }
+.mg .mg-btn:not(:disabled), .mg .mg-option:not(:disabled) { transition: background .12s,border-color .12s; }
+.mg .mg-btn:not(:disabled):hover, .mg .mg-option:not(:disabled):hover { border-color:#FFE066; }
+.mg .mg-panel > button.mg-btn:first-child { float:right; width:auto; min-height:34px; padding:5px 10px; margin-left:10px; font-size:12px; }
+.mg .mg-title { overflow-wrap:anywhere; }
+@media (prefers-reduced-motion:reduce) { .mg .mg-btn,.mg .mg-option { transition:none!important; } }
