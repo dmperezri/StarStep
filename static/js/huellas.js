@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const language=StarI18n.lang;const button=(label,id,answer)=>{const b=document.createElement('button');b.type='button';b.className='pixel-button';b.textContent=label;b.dataset.id=id;if(solved.has(id)){b.disabled=true;b.classList.add('matched');}
    b.addEventListener('click',()=>{if(solved.has(id))return;if(!answer){selected=id;draw();return;}if(!selected){feedback.textContent=StarI18n.t('puzzle.pick');return;}
     if(selected!==id){feedback.textContent=StarI18n.t('puzzle.bad');selected=null;window.StarSound?.effect('button');draw();return;}
-    solved.add(id);selected=null;feedback.textContent=StarI18n.t('puzzle.good');window.StarSound?.effect('success');draw();if(solved.size===pairs.length){StarProgress.completeAct('huellas');finish.hidden=false;feedback.textContent=StarI18n.t('puzzle.complete');}
+    solved.add(id);selected=null;feedback.textContent=StarI18n.t('puzzle.good');window.StarSound?.effect('success');window.StarFlow?.recordObjective('footprints.pair.'+id,{source:'matching_game'});draw();if(solved.size===pairs.length){finish.hidden=!window.StarFlow?.isStageCompleted('footprints');feedback.textContent=StarI18n.t('puzzle.complete');}
    });if(selected===id&&!answer)b.classList.add('selected');return b;};
   for(const pair of pairs)left.append(button(pair[language][0],pair.id,false));for(const pair of [...pairs].reverse())right.append(button(pair[language][1],pair.id,true));root.append(left,right);
  }

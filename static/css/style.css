@@ -42,3 +42,225 @@
 .science-card small{color:#B9BEE6}.science-card a{color:#FFE066}
 @media(max-width:700px){.logo{top:clamp(75px,15vh,115px)}.logo h1{font-size:clamp(1.7rem,8.4vw,3.6rem)}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:44vh}.chapter-label{display:none}}
 @media(max-height:570px){.logo{top:60px}.logo h1{font-size:2.4rem}.speech-panel{bottom:6px;max-height:50vh}.menu{top:30%}}
+
+
+
+/* ==================================================
+   STARSTEP - CORRECCIÓN VISUAL DE LA PORTADA
+   ================================================== */
+
+/* Escenario a pantalla completa */
+.home-page .stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+}
+
+/* Eliminar franjas oscuras sin deformar el escenario */
+.home-page .stage > canvas#world {
+    object-fit: cover;
+    object-position: center bottom;
+}
+
+/* Barra superior HUD */
+.home-page .hud {
+    top: 12px;
+    left: clamp(10px, 2vw, 24px);
+    right: clamp(10px, 2vw, 24px);
+    max-width: none;
+    flex-wrap: wrap;
+}
+
+.home-page .hud strong {
+    line-height: 1.3;
+}
+
+/* Corregir legibilidad de los botones superiores */
+.home-page .hud-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    text-shadow: none;
+    line-height: 1.25;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: clamp(.68rem, 1vw, .82rem);
+}
+
+.home-page .hud-button:hover {
+    background: var(--moon);
+}
+
+/* Título principal */
+.home-page .logo {
+    top: clamp(64px, 12vh, 120px);
+    width: calc(100% - 24px);
+}
+
+.home-page .logo h1 {
+    font-size: clamp(1.7rem, 7vw, 5.5rem);
+    line-height: 1.1;
+}
+
+.home-page .logo small {
+    line-height: 1.4;
+    max-width: 100%;
+}
+
+/* Menú principal */
+.home-page .menu {
+    top: auto;
+    bottom: clamp(34px, 7vh, 75px);
+    left: clamp(18px, 6vw, 100px);
+    transform: none;
+    width: min(290px, 40%);
+    max-height: calc(100% - clamp(180px, 29vh, 250px));
+    overflow-y: auto;
+    padding: clamp(10px, 2vh, 20px);
+    gap: 7px;
+}
+
+.home-page .menu h2 {
+    margin: 0 0 5px;
+}
+
+.home-page .menu .pixel-button {
+    flex-shrink: 0;
+}
+
+/* Cuadro de diálogo */
+.home-page .speech-panel {
+    bottom: clamp(34px, 7vh, 75px);
+}
+
+/* ==================================================
+   ADAPTACIÓN A DISPOSITIVOS MÓVILES
+   ================================================== */
+
+@media (max-width: 700px) {
+
+    .home-page .hud {
+        justify-content: center;
+        row-gap: 5px;
+    }
+
+    .home-page .hud strong {
+        flex-basis: 100%;
+        text-align: center;
+    }
+
+    .home-page .hud-actions {
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .home-page .hud-button {
+        padding: 5px 7px;
+        min-height: 34px;
+    }
+
+    .home-page .logo {
+        top: clamp(96px, 16vh, 145px);
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(1.75rem, 10vw, 3.8rem);
+    }
+
+    .home-page .menu {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 18px;
+        width: min(300px, calc(100% - 32px));
+        max-height: calc(100% - 220px);
+    }
+
+    .home-page .speech-panel {
+        bottom: 18px;
+        max-height: 48vh;
+    }
+}
+
+/* ==================================================
+   PANTALLAS HORIZONTALES DE POCA ALTURA
+   ================================================== */
+
+@media (max-height: 500px) and (min-width: 701px) {
+
+    .home-page .logo {
+        top: 58px;
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(2rem, 6vh, 3.4rem);
+    }
+
+    .home-page .menu {
+        top: 135px;
+        bottom: auto;
+        width: min(390px, 46%);
+        max-height: calc(100% - 160px);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+    }
+
+    .home-page .menu h2 {
+        grid-column: 1 / -1;
+    }
+
+    .home-page .menu .pixel-button {
+        padding: 7px 10px;
+        font-size: .72rem;
+    }
+
+    .home-page .speech-panel {
+        bottom: 28px;
+        max-height: 46vh;
+    }
+}
+
+/* Pantallas pequeñas de poca altura */
+@media (max-width: 700px) and (max-height: 450px) {
+
+    .home-page .logo {
+        top: 92px;
+    }
+
+    .home-page .logo h1 {
+        font-size: 1.7rem;
+    }
+
+    .home-page .menu {
+        max-height: calc(100% - 160px);
+        bottom: 10px;
+    }
+
+    .home-page .speech-panel {
+        bottom: 10px;
+        max-height: 45vh;
+    }
+}
+
+/* ==================================================
+   STARFLOW - AVISOS DEL CONTROLADOR DEL FLUJO
+   ================================================== */
+.flow-notice {
+    position: fixed;
+    left: 50%;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 10000;
+    width: min(92vw, 560px);
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--moon);
+    box-shadow: 0 0 0 3px var(--border), 5px 5px 0 #06091d;
+    font: inherit;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+}

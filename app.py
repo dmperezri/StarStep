@@ -14,6 +14,7 @@ import json
 import re
 import sqlite3
 from pathlib import Path
+from contextlib import contextmanager
 
 from flask import Flask, jsonify, render_template, request
 
@@ -49,10 +50,20 @@ import models  # noqa: E402, F401
 # BASE DE DATOS LOCAL DEL FRONTEND
 # ============================================================
 
+
+@contextmanager
 def connect():
+    """Administrar la transacción y cerrar la conexión SQLite."""
+
     connection = sqlite3.connect(LOCAL_DB_FILE)
     connection.row_factory = sqlite3.Row
-    return connection
+
+    try:
+        with connection:
+            yield connection
+    finally:
+        connection.close()
+
 
 
 def ensure_db():

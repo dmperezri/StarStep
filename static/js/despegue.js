@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   else if(phase==='launch'){
    progress=smooth(sec/4.5);StarArt.launchScene(ctx,t,progress*.53);$('travelCaption').textContent=(StarI18n.lang==='es'?'ASCENSO · DE LA TIERRA AL ESPACIO':'ASCENT · FROM EARTH TO SPACE');
-   if(sec>=4.5){phase='travel';start=now;StarSound.effect('travel');$('countdown').hidden=true;}
+   if(sec>=4.5){phase='travel';start=now;StarSound.effect('travel');$('countdown').hidden=true;window.StarFlow?.recordObjective('launch.liftoff',{source:'launch_sequence'});}
   }
   else if(phase==='travel'){
    progress=smooth(sec/4);StarArt.spaceScene(ctx,t,progress);$('travelCaption').textContent=(StarI18n.lang==='es'?'RUMBO A LA LUNA • 384,400 km':'TO THE MOON · 384,400 km');
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   else if(phase==='descent'){
    if(sec<.5){curtain(true);}else{curtain(false);}
    progress=smooth(Math.max(0,sec-.45)/3.2);StarArt.descentScene(ctx,t,progress);$('travelCaption').textContent=(StarI18n.lang==='es'?'ALUNIZAJE · MARE TRANQUILLITATIS':'LANDING · MARE TRANQUILLITATIS');
-   if(sec>=3.9){phase='arrived';start=now;StarSound.effect('arrival');}
+   if(sec>=3.9){phase='arrived';start=now;StarSound.effect('arrival');window.StarFlow?.recordObjective('moon_landing.touchdown',{source:'descent_sequence'});}
   }
   else if(phase==='arrived'){
    StarArt.descentScene(ctx,t,1);$('actCard').hidden=false;$('enterMoon').hidden=false;$('travelCaption').textContent=StarI18n.lang==='es'?'LITO: ¡LO LOGRAMOS!':'LITO: WE MADE IT!';

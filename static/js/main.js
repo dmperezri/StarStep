@@ -7,6 +7,8 @@ window.StarI18n=(()=>{
  };
 
  Object.assign(dict.es,{
+"welcome.speaker": "CONTROL DE MISIÓN",
+"welcome.message": "¡Comenzá la transmisión para escuchar tu bienvenida!",
  "brand.tagline": "«Un pequeño paso que dar, un universo por explorar.»",
  "chapter": "CAPÍTULO 1 · ROCK & ROLL",
  "skip": "SALTAR",
@@ -79,6 +81,9 @@ window.StarI18n=(()=>{
  "science.mars": "OPPORTUNITY · MARTE",
  "science.spirit": "SPIRIT · REFERENCIA PARA UN CAPÍTULO FUTURO",
  "science.back": "VOLVER A LA BITÁCORA",
+ "science.back.menu": "VOLVER AL MENÚ",
+ "science.back.journal": "VOLVER A LA BITÁCORA",
+ "science.back.mars": "VOLVER A MARTE",
  "science.observe": "OBSERVADO",
  "science.infer": "INTERPRETADO",
  "science.story": "NARRATIVA",
@@ -87,6 +92,8 @@ window.StarI18n=(()=>{
  "viewer.close": "CERRAR"
 });
  Object.assign(dict.en,{
+    "welcome.speaker": "MISSION CONTROL",
+"welcome.message": "Start the transmission to hear your welcome message!",
  "brand.tagline": "«One small step to take, a universe to explore.»",
  "chapter": "CHAPTER 1 · ROCK & ROLL",
  "skip": "SKIP",
@@ -159,6 +166,9 @@ window.StarI18n=(()=>{
  "science.mars": "OPPORTUNITY · MARS",
  "science.spirit": "SPIRIT · REFERENCE FOR A FUTURE CHAPTER",
  "science.back": "BACK TO JOURNAL",
+ "science.back.menu": "BACK TO MENU",
+ "science.back.journal": "BACK TO JOURNAL",
+ "science.back.mars": "BACK TO MARS",
  "science.observe": "OBSERVED",
  "science.infer": "INTERPRETED",
  "science.story": "STORY",
@@ -166,6 +176,100 @@ window.StarI18n=(()=>{
  "viewer.store": "SAVE DISCOVERY",
  "viewer.close": "CLOSE"
 });
+ /* StarFlow: mensajes del controlador del flujo (Fase 1). */
+ Object.assign(dict.es,{
+ "flow.notice.blocked": "Esa misión todavía está bloqueada. Te llevamos a tu último punto de control.",
+ "flow.notice.locked": "Completá los objetivos de la misión actual para continuar.",
+ "flow.notice.locateFirst": "Primero localizá el artefacto con la mecánica de la misión.",
+ "flow.notice.notRegistered": "La bitácora solo muestra descubrimientos ya registrados.",
+ "flow.viewer.pending": "Inspección científica: tocá cada punto menta para registrar el hallazgo.",
+ "flow.viewer.progress": "Inspección científica: {n}/{total} componentes revisados.",
+ "flow.viewer.registered": "★ DESCUBRIMIENTO REGISTRADO EN TU BITÁCORA",
+ "flow.viewer.already": "Ya estaba en tu colección.",
+ "flow.viewer.consult": "Modo consulta: la bitácora no registra descubrimientos nuevos.",
+ "flow.diary.noStations": "Todavía no hay estaciones descubiertas.",
+ "start.continue": "CONTINUAR AVENTURA",
+ "start.review": "CONSULTAR PROGRESO",
+ "newgame.button": "NUEVA PARTIDA",
+ "alias.error.empty": "Escribí el nombre del cadete: no puede quedar vacío ni tener solo espacios.",
+ "alias.error.length": "El nombre del cadete debe tener entre 2 y 18 caracteres, sin contar los espacios del principio y del final.",
+ "alias.error.chars": "Usá solo letras (con tildes o ñ), números, espacios, guiones o guiones bajos.",
+ "newgame.title": "¿EMPEZAR UNA PARTIDA NUEVA?",
+ "newgame.body": "Se borrarán de este navegador el nombre del cadete, el avatar, los descubrimientos, las insignias, las notas y la foto de la bitácora. El idioma y el audio se conservan. No se puede deshacer.",
+ "newgame.cancel": "CANCELAR",
+ "newgame.confirm": "SÍ, EMPEZAR DE NUEVO",
+ "flow.notice.resetFailed": "No se pudo borrar la partida en este navegador. Revisá los permisos de almacenamiento del sitio.",
+ "diary.badgeMars": "★ DETECTIVE DE AGUA EN MARTE",
+ "diary.badgeFootprints": "★ GUARDIÁN DE HUELLAS",
+ "diary.badgeProvisional": "PROVISIONAL",
+ "diary.print": "DESCARGAR CERTIFICADO PROVISIONAL PNG",
+ "cert.provisional.title": "CERTIFICADO DE RECORRIDO PROVISIONAL",
+ "cert.provisional.subtitle": "VERSIÓN DE PRUEBA · NO ES EL CERTIFICADO OFICIAL",
+ "cert.provisional.award": "Reconocemos a",
+ "cert.provisional.for": "por completar el recorrido provisional del Capítulo 1 · Rock & Roll",
+ "cert.provisional.note": "Faltan mecánicas obligatorias del capítulo oficial",
+ "cert.provisional.file": "StarStep-Certificado-Provisional",
+ "viewer.inspectComponent": "INSPECCIONAR · {name}",
+ "component.eagle.structure": "Estructura",
+ "component.eagle.legs": "Patas",
+ "component.eagle.ladder": "Escalera",
+ "component.easep.antenna": "Antena",
+ "component.easep.solar_panel": "Panel solar",
+ "component.easep.seismometer": "Sismómetro",
+ "component.reflector.prisms": "Prismas",
+ "component.reflector.support": "Soporte",
+ "component.opportunity.pancam": "Pancam",
+ "component.opportunity.solar_panels": "Paneles solares",
+ "component.opportunity.wheels": "Ruedas",
+ "component.blueberries.hematite": "Hematita"
+ });
+ /* StarFlow: mensajes del controlador del flujo (Fase 1). */
+ Object.assign(dict.en,{
+ "flow.notice.blocked": "That mission is still locked. We took you back to your last checkpoint.",
+ "flow.notice.locked": "Complete the current mission objectives to continue.",
+ "flow.notice.locateFirst": "First locate the artifact using the mission mechanic.",
+ "flow.notice.notRegistered": "The journal only shows discoveries you have already registered.",
+ "flow.viewer.pending": "Scientific inspection: tap every mint point to register the finding.",
+ "flow.viewer.progress": "Scientific inspection: {n}/{total} components reviewed.",
+ "flow.viewer.registered": "★ DISCOVERY REGISTERED IN YOUR JOURNAL",
+ "flow.viewer.already": "Already in your collection.",
+ "flow.viewer.consult": "Review mode: the journal does not register new discoveries.",
+ "flow.diary.noStations": "No stations discovered yet.",
+ "start.continue": "CONTINUE ADVENTURE",
+ "start.review": "VIEW PROGRESS",
+ "newgame.button": "NEW GAME",
+ "alias.error.empty": "Enter the cadet name: it cannot be empty or contain only spaces.",
+ "alias.error.length": "The cadet name must have 2 to 18 characters, not counting leading or trailing spaces.",
+ "alias.error.chars": "Use only letters (accents and ñ allowed), numbers, spaces, hyphens or underscores.",
+ "newgame.title": "START A NEW GAME?",
+ "newgame.body": "This will delete the cadet name, avatar, discoveries, badges, notes and journal photo from this browser. Language and audio settings are kept. This cannot be undone.",
+ "newgame.cancel": "CANCEL",
+ "newgame.confirm": "YES, START OVER",
+ "flow.notice.resetFailed": "The game could not be deleted in this browser. Check the site's storage permissions.",
+ "diary.badgeMars": "★ MARS WATER DETECTIVE",
+ "diary.badgeFootprints": "★ FOOTPRINT GUARDIAN",
+ "diary.badgeProvisional": "PROVISIONAL",
+ "diary.print": "DOWNLOAD PROVISIONAL PNG CERTIFICATE",
+ "cert.provisional.title": "PROVISIONAL RUN CERTIFICATE",
+ "cert.provisional.subtitle": "TEST VERSION · NOT THE OFFICIAL CERTIFICATE",
+ "cert.provisional.award": "We recognize",
+ "cert.provisional.for": "for completing the provisional run of Chapter 1 · Rock & Roll",
+ "cert.provisional.note": "Required mechanics of the official chapter are still missing",
+ "cert.provisional.file": "StarStep-Provisional-Certificate",
+ "viewer.inspectComponent": "INSPECT · {name}",
+ "component.eagle.structure": "Structure",
+ "component.eagle.legs": "Legs",
+ "component.eagle.ladder": "Ladder",
+ "component.easep.antenna": "Antenna",
+ "component.easep.solar_panel": "Solar panel",
+ "component.easep.seismometer": "Seismometer",
+ "component.reflector.prisms": "Prisms",
+ "component.reflector.support": "Support",
+ "component.opportunity.pancam": "Pancam",
+ "component.opportunity.solar_panels": "Solar panels",
+ "component.opportunity.wheels": "Wheels",
+ "component.blueberries.hematite": "Hematite"
+ });
  let lang=localStorage.getItem('starstep_lang')==='en'?'en':'es';
  function t(key,vars={}){let value=dict[lang][key]??dict.es[key]??key;if(typeof value==='string')for(const [k,v] of Object.entries(vars))value=value.replaceAll('{'+k+'}',String(v));return value;}
  function apply(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n);if(typeof v==='string')el.textContent=v;});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const v=t(el.dataset.i18nPlaceholder);if(typeof v==='string')el.placeholder=v;});document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));document.dispatchEvent(new CustomEvent('starstep:language',{detail:{lang}}));}
@@ -181,14 +285,155 @@ document.addEventListener('DOMContentLoaded',()=>{
  const $=id=>document.getElementById(id);let step=-1,typingTimer=null,transition=false;
  function typeText(text){clearInterval(typingTimer);const node=$('speechText');node.textContent='';let i=0;typingTimer=setInterval(()=>{i=Math.min(text.length,i+2);node.textContent=text.slice(0,i);if(i%6===0)StarSound.effect('type');if(i>=text.length)clearInterval(typingTimer);},23);}
  function showStep(){const lines=StarI18n.t('speech'),line=lines[step];$('speaker').textContent=line[0];typeText(line[1]);$('start').textContent=step===2?StarI18n.t('menu'):StarI18n.t('continue');StarSound.effect('radio');StarSound.speak(line[1],{lito:step===2,onStart:()=>{window.litoState='talking';},onEnd:()=>{window.litoState='idle';}});}
- function openMenu(){clearInterval(typingTimer);StarSound.stopVoice();$('welcome').hidden=true;$('menu').hidden=false;StarSound.effect('success');}
- $('start').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();step++;if(step<3)showStep();else openMenu();});
- $('skip').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();openMenu();});
+ function showWelcome() {
+    clearInterval(typingTimer);
+    StarSound.stopVoice();
+
+    step = -1;
+    window.litoState = 'idle';
+
+    $('menu').hidden = true;
+    $('help').hidden = true;
+    $('welcome').hidden = false;
+
+    $('speaker').textContent =
+        StarI18n.t('welcome.speaker');
+
+    $('speechText').textContent =
+        StarI18n.t('welcome.message');
+
+    $('start').textContent =
+        StarI18n.t('transmit');
+
+    $('skip').textContent =
+        StarI18n.t('skip');
+}
+
+// Regreso interno desde una misión: muestra el menú sin repetir la bienvenida.
+ // No registra objetivos ni toca el progreso; solo cambia la vista.
+ let returnedToMenu = false;
+ function showReturnMenu() {
+  clearInterval(typingTimer);
+  StarSound.stopVoice();
+  step = 3;
+  returnedToMenu = true;
+  window.litoState = 'idle';
+  $('welcome').hidden = true;
+  $('help').hidden = true;
+  $('menu').hidden = false;
+ }
+
+ function openMenu() {
+  clearInterval(typingTimer);
+  StarSound.stopVoice();
+  $('welcome').hidden = true;
+  $('menu').hidden = false;
+  StarSound.effect('success');
+ }
+ $('start').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();step++;if(step<3)showStep();else{window.StarFlow?.recordObjective('lito_welcome.heard',{source:'transmission'});openMenu();}});
+ $('skip').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();window.StarFlow?.recordObjective('lito_welcome.heard',{source:'welcome_skip'});openMenu();});
  $('how').addEventListener('click',()=>{$('help').hidden=false;$('closeHelp').focus();StarSound.effect('button');});
  $('closeHelp').addEventListener('click',()=>{$('help').hidden=true;$('how').focus();});
  $('music').addEventListener('click',()=>{StarSound.setMusic(!StarSound.musicOn);$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';});
  $('voice').addEventListener('click',()=>{StarSound.setVoice(!StarSound.voiceOn);$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';});
- document.addEventListener('starstep:language',()=>{if($('music'))$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';if($('voice'))$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';if(step>=0&&step<3){clearInterval(typingTimer);StarSound.stopVoice();showStep();}});
+
+let previousLanguage = StarI18n.lang;
+
+document.addEventListener('starstep:language', () => {
+
+    const languageChanged =
+        previousLanguage !== StarI18n.lang;
+
+    previousLanguage = StarI18n.lang;
+
+    // Actualizar botones de audio
+    $('music').textContent = StarSound.musicOn
+        ? StarI18n.t('music.on')
+        : StarI18n.lang === 'en'
+            ? '♪ MUSIC OFF'
+            : '♪ MÚSICA OFF';
+
+    $('voice').textContent = StarSound.voiceOn
+        ? StarI18n.t('voice.on')
+        : StarI18n.lang === 'en'
+            ? 'VOICE OFF'
+            : 'VOZ OFF';
+
+    // Mostrar nuevamente la bienvenida
+    // si se cambia el idioma desde el menú.
+    if ($('welcome').hidden) {
+        if (languageChanged && !returnedToMenu) {
+            showWelcome();
+        }
+        return;
+    }
+
+    // Traducir el mensaje inicial.
+    if (step === -1) {
+        showWelcome();
+        return;
+    }
+
+    // Traducir el diálogo y reproducir
+    // la narración en el idioma seleccionado.
+    if (step >= 0 && step < 3) {
+        clearInterval(typingTimer);
+        StarSound.stopVoice();
+        showStep();
+    }
+});
+
+// Botón principal del menú: INICIAR, CONTINUAR o CONSULTAR PROGRESO.
+// Solo lee StarFlow: no completa objetivos, no desbloquea etapas ni registra artefactos.
+function updateAdventureButton() {
+    const button = $('adventureButton');
+    const entry = window.StarFlow?.getEntryPoint?.();
+    if (!button || !entry) return;
+    const key = entry.status === 'new' ? 'start'
+        : entry.status === 'in_progress' ? 'start.continue'
+        : 'start.review';
+    button.dataset.i18n = key;
+    button.textContent = StarI18n.t(key);
+    button.href = entry.page;
+}
+updateAdventureButton();
+document.addEventListener('starflow:change', updateAdventureButton);
+
+// NUEVA PARTIDA: para otro jugador en el mismo navegador o para empezar de cero.
+// Solo aparece si hay algo que borrar; pide confirmación y luego recarga la portada,
+// donde el controlador crea un jugador invitado nuevo y la bienvenida vuelve a ser obligatoria.
+function updateNewGameButton() {
+    const entry = window.StarFlow?.getEntryPoint?.();
+    const hasData = (entry && entry.status !== 'new') || window.StarProgress?.hasPersonalData?.() === true;
+    $('newGame').hidden = !(hasData && window.StarProgress?.resetPlayerData);
+}
+function closeNewGame() {
+    $('newGameDialog').hidden = true;
+    $('newGame').focus();
+}
+updateNewGameButton();
+document.addEventListener('starflow:change', updateNewGameButton);
+$('newGame').addEventListener('click', () => {
+    $('help').hidden = true;
+    $('newGameDialog').hidden = false;
+    $('newGameCancel').focus(); // la opción segura queda seleccionada
+    StarSound.effect('button');
+});
+$('newGameCancel').addEventListener('click', closeNewGame);
+$('newGameDialog').addEventListener('keydown', event => { if (event.key === 'Escape') closeNewGame(); });
+$('newGameConfirm').addEventListener('click', () => {
+    const result = window.StarProgress.resetPlayerData();
+    if (!result.ok) { closeNewGame(); window.StarFlow?.notify?.('resetFailed'); return; }
+    clearInterval(typingTimer);
+    StarSound.stopAll();
+    location.replace('/');
+});
+
+// Apertura inicial: bienvenida en el idioma guardado.
+// Regreso desde una misión (misma sesión, bienvenida ya completada): menú.
+if (window.StarFlow?.getHomeMode?.() === 'menu') showReturnMenu();
+else showWelcome();
+
  document.querySelectorAll('a[href]').forEach(a=>a.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.button!==0)return;ev.preventDefault();if(transition)return;transition=true;StarSound.effect('travel');StarSound.stopAll();document.querySelector('.curtain').classList.add('is-dark');setTimeout(()=>location.assign(a.href),430);}));
  function render(ms){StarArt.earthScene(ctx,ms/1000,{litoState:window.litoState||'idle'});requestAnimationFrame(render);}requestAnimationFrame(render);
  window.addEventListener('pagehide',()=>{clearInterval(typingTimer);StarSound.stopAll();});
