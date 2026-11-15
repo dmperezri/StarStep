@@ -119,12 +119,12 @@
       near: "{name} · E para inspeccionar.", firstCont: "Primero la muestra de contingencia: está junto a Eagle.", tank: "Tanque de oxígeno: +30 s.", tankUsed: "Tanque vacío.",
       safe: "Punto seguro guardado.", empty: "¡Sin oxígeno! Volvemos al último punto seguro. Lo registrado se conserva.", warn: "Oxígeno bajo: buscá un tanque o un punto seguro.",
       sim: "Simulación: Apollo 11 no usó rover. O₂ de juego.",
-      intro: "¡Vamos! Buscá las muestras, Eagle y la placa.", allDone: "¡Exploración completa! Instalemos los instrumentos.", locked: "Esto se habilita más adelante en la misión." },
+      intro: "Aunque se llame mar, no era un mar de agua. Los mares de la Luna son llanuras de lava solidificada. ¡Guarda esa pista!", allDone: "¡Exploración completa! Instalemos los instrumentos.", locked: "Esto se habilita más adelante en la misión." },
     en: { o2: "O₂", box: "Box", left: "◀", right: "▶", action: "ACTION", pause: "PAUSE", resume: "RESUME", save: "Save to the box", saveMemorial: "Save to logbook",
       near: "{name} · E to inspect.", firstCont: "Contingency sample first: it is next to Eagle.", tank: "Oxygen tank: +30 s.", tankUsed: "Empty tank.",
       safe: "Safe point saved.", empty: "Out of oxygen! Back to the last safe point. What you registered is kept.", warn: "Low oxygen: find a tank or a safe point.",
       sim: "Simulation: Apollo 11 used no rover. Game O₂.",
-      intro: "Let’s go! Find the samples, Eagle and the plaque.", allDone: "Exploration complete! Let’s install the instruments.", locked: "This unlocks later in the mission." }
+      intro: "Although called a sea, it was not a sea of water. Lunar seas are plains of solidified lava. Remember that clue!", allDone: "Exploration complete! Let’s install the instruments.", locked: "This unlocks later in the mission." }
   };
   const lang = () => (window.StarI18n?.lang === "en" ? "en" : "es");
   const t = (k, v) => { let s = T[lang()][k] ?? k; for (const [a, b] of Object.entries(v || {})) s = s.replace("{" + a + "}", b); return s; };

@@ -9,7 +9,9 @@
   const ready = () => Boolean(name() && window.StarFlow?.isActComplete?.("marte"));
   function download() {
     if (!ready()) return false;
-    const player = window.StarProgress.player();
+    const award=window.StarProgress.getAward?.("marte");
+
+    const player=award||window.StarProgress.player();
     const cv = document.createElement("canvas"); cv.width = 1600; cv.height = 1132;
     const c = cv.getContext("2d");
     const box = (x, y, w, h, col) => { c.fillStyle = col; c.fillRect(x, y, w, h); };
@@ -23,11 +25,11 @@
     txt(en() ? "Awarded to" : "Se otorga a", 430, 30, "#414379");
     const portrait = document.createElement("canvas"); portrait.width = portrait.height = 48;
     if (window.StarArt?.portrait) { window.StarArt.portrait(portrait, player.avatar || "astronauta"); c.imageSmoothingEnabled = false; c.drawImage(portrait, 722, 462, 156, 156); }
-    txt(name().slice(0, 24), 708, 72);
+    txt(String(player.alias||"").slice(0,24),708,72);
     box(360, 741, 880, 4, "#401829");
     txt(en() ? "For reading the water clues left on Mars with Opportunity" : "Por leer las pistas del agua que Opportunity encontró en Marte", 822, 32);
     txt(en() ? "An educational recognition from StarStep" : "Reconocimiento educativo de StarStep", 879, 24, "#258f86");
-    const date = new Intl.DateTimeFormat(en() ? "en-US" : "es-NI", { day: "2-digit", month: "long", year: "numeric" }).format(new Date());
+    const date = new Intl.DateTimeFormat(en() ? "en-US" : "es-NI", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(award?.issuedAt || Date.now()));
     txt(`LITO · OUTSTRIP · ${date}`, 1007, 26, "#414379");
     const a = document.createElement("a"); a.download = "StarStep-Diploma-Marte-" + name().replace(/[^a-z0-9_-]/gi, "_") + ".png"; a.href = cv.toDataURL("image/png"); a.click();
     return true;

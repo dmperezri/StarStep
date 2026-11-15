@@ -2,6 +2,23 @@
 <!doctype html>
 <html lang="es">
   <head>
+
+<!-- STARSTEP: ocultar estacion antes del primer render -->
+<style>
+body.home-page.is-entering {
+    background:#0E1233;
+}
+body.home-page.is-entering #world,
+body.home-page.is-entering .hud,
+body.home-page.is-entering .logo,
+body.home-page.is-entering .menu,
+body.home-page.is-entering .chapter-label {
+    visibility:hidden !important;
+    opacity:0 !important;
+    transition:none !important;
+}
+</style>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -389,7 +406,7 @@
             aria-hidden="true"
           ></canvas>
 
-          
+
     <video id="historyVideo"
            class="intro-canvas"
            preload="metadata"
@@ -428,7 +445,7 @@
     </div>
 
     <div id="introCaption" class="intro-caption">
-    
+
             <h2 id="introSceneTitle">La curiosidad humana</h2>
             <p id="introSceneText" aria-live="polite"></p>
 

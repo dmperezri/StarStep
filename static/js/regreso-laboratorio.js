@@ -76,7 +76,7 @@
   let dock = null;
   function openDock() {
     if (stage() !== "moon_return") return false;
-    const root = el("section", "mg"); root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
+    const root = el("section", "mg ss-docking"); root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
     const panel = el("div", "mg-panel"); const close = el("button", "mg-btn", t("close")); close.type = "button";
     const kicker = el("p", "mg-kicker", t("kicker")); const title = el("h2", "mg-title", t("dockTitle")); const text = el("p", "mg-text", t("dockText"));
     const canvas = el("canvas", "mg-canvas"); canvas.width = 480; canvas.height = 220;
@@ -93,6 +93,18 @@
       const c = canvas.getContext?.("2d"); if (!c) return;
       c.fillStyle = "#0E1233"; c.fillRect(0, 0, 480, 220); c.fillStyle = "#FFF8E7"; for (let i = 0; i < 40; i++) c.fillRect((i * 83) % 480, (i * 37) % 160, 1, 1);
       for(let y=160;y<220;y+=2){const half=Math.sqrt(Math.max(0,180*180-(y-340)**2));c.fillStyle="#C3C7D6";c.fillRect(240-half,y,half*2,2);}c.fillStyle="#868CA4";c.fillRect(200,208,30,7);
+      // Tierra visible durante el acoplamiento.
+      if (window.StarPlanets?.draw) {
+        const reduced = window.matchMedia?.(
+          "(prefers-reduced-motion: reduce)"
+        )?.matches;
+
+        window.StarPlanets.draw(
+          c, "earth", 135, 65, 43,
+          reduced ? 0 : performance.now()/1600
+        );
+      }
+
       c.fillStyle = "#E4DFFF"; c.fillRect(380, 92, 80, 26); c.fillStyle = "#868CA4"; c.fillRect(370, 98, 12, 14);   // Columbia
       const x = 380 - s.distance - 34, y = 92 + s.offset;
       c.fillStyle = "#C3C7D6"; c.fillRect(x, y, 30, 24); c.fillStyle = "#3FD0E0"; c.fillRect(x + 20, y + 6, 6, 6); c.fillStyle = "#FFE066"; c.fillRect(x - 6, y + 10, 6, 4);
@@ -133,7 +145,7 @@
   let lab = null;
   function openLab() {
     if (stage() !== "moon_lab") return false;
-    const root = el("section", "mg"); root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
+    const root = el("section", "mg ss-laboratory"); root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
     const panel = el("div", "mg-panel"); const close = el("button", "mg-btn", t("close")); close.type = "button";
     const title = el("h2", "mg-title", t("labTitle")); const text = el("p", "mg-text", t("labText"));
     const s1 = el("p", "mg-text", t("step1")); const canvas = el("canvas", "mg-canvas"); canvas.width = 480; canvas.height = 240;
@@ -186,7 +198,12 @@
           feedback.textContent = Q.explain[i];
           if (i !== Q.answer) { b.classList.add("bad"); return; }
           b.classList.add("good");
+          const previousStage = F().getCurrentStage();
           const r = F().recordObjective("moon_lab.analysis", { source: "lab_minigame" });
+
+          if (r.ok && previousStage === "moon_lab") {
+            window.StarMarsDeparture?.start(Q.explain[i]);
+          }
           if (r.ok || r.code === "ALREADY_RECORDED") feedback.textContent = Q.explain[i] + " " + t("labDone");
           window.StarSound?.effect?.("success");
         });

@@ -64,6 +64,13 @@
   const t = (k, v) => { let s = T[lang()][k] ?? k; for (const [a, b] of Object.entries(v || {})) s = s.replace("{" + a + "}", b); return s; };
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
   const F = () => window.StarFlow;
+
+  function narrate(text) {
+    if (window.StarSound?.voiceOn && text) {
+      window.StarSound.init?.();
+      window.StarSound.speak?.(text, { lito: true });
+    }
+  }
   const S = { phase: null, pos: { x: 0, y: 3 }, angle: 0, easepPos: null, feedback: "", laser: 0, locked: false, finished: false };
   let ui = null;
 
@@ -92,7 +99,7 @@
     const feedback = el("p", "mg-feedback"); feedback.setAttribute("aria-live", "polite");
     const parts = el("div", "mg-actions");
     const actions = el("div", "mg-actions"); const go = el("button", "mg-btn primary"); go.type = "button"; go.addEventListener("click", confirm); actions.append(go);
-    const note = el("p", "moon-sim-note"); note.hidden = true;
+    const note = el("p", "moon-sim-note"); note.hidden = false;
     const frame = el("div", "evidence-scene-photo");frame.append(canvas);
     const refEasep = window.StarEvidenceVisual?.figure("easep"), refLrrr = window.StarEvidenceVisual?.figure("reflector");
     for (const photo of [refEasep,refLrrr]) if(photo){photo.hidden=true;frame.append(photo);}
@@ -119,7 +126,7 @@
   function draw() {
     const c = ui?.canvas?.getContext?.("2d"); if (!c) return;
     const X = m => 240 + m * 12, Y = m => 60 + m * 12;
-    c.fillStyle = "#71778f"; c.fillRect(0, 0, 480, 300);
+    c.fillStyle = "#6D7288"; c.fillRect(0, 0, 480, 300);
     for(let i=0;i<100;i++){const x=(i*97)%480,y=(i*53)%300;c.fillStyle=i%4===0?"#C3C7D6":"#575C74";c.fillRect(x,y,i%5+1,2);}
     for(let i=0;i<9;i++){const x=18+(i*83)%440,y=16+(i*59)%260;for(let dy=-4;dy<=4;dy++){const w=Math.floor(12*Math.sqrt(Math.max(0,1-dy*dy/17)));c.fillStyle=dy<0?"#9A9FB5":"#575C74";c.fillRect(x-w,y+dy,w*2+1,1);}}
     c.fillStyle="rgba(228,223,255,.22)";for(let x=0;x<=480;x+=60)for(let y=0;y<300;y+=4)c.fillRect(x,y,1,2);for(let y=0;y<=300;y+=60)for(let x=0;x<480;x+=4)c.fillRect(x,y,2,1);
@@ -198,12 +205,19 @@
   }
   function finishPhase() {
     // Si el reflector sigue pendiente, la misma pantalla continúa con él.
+    const success = S.feedback;
     const next = phaseNow();
     if (next && next !== S.phase) {
       S.phase = next; S.locked = false; S.laser = 0; S.angle = 0; S.feedback = "";
       S.pos = clamp({ x: easepPosition().x, y: easepPosition().y - 2 });
       ui.parts.replaceChildren(); render(); draw();
-    } else { S.finished = true; render(); draw(); }
+      narrate(success + " " + ui.text.textContent);
+    } else {
+      S.finished = true;
+      render();
+      draw();
+      narrate(success);
+    }
   }
 
   function confirm() {
@@ -212,17 +226,21 @@
     if (S.locked || phaseNow() !== S.phase) return;
     if (S.phase === "easep") {
       const r = Core.checkEasep(S.pos);
-      if (!r.ok) { S.feedback = t("tooFar"); render(); return; }
+      if (!r.ok) { S.feedback = t("tooFar"); render(); narrate(S.feedback); return; }
       const loc = f.locateArtifact("easep", { mechanic: "easep_install_minigame" });
       if (!loc.ok) { S.feedback = loc.code; render(); return; }
       f.recordObjective("moon_install_easep.install", { source: "easep_install_minigame" });
       f.beginInspection("easep", { context: "mission", viewer: "fallback" });
       S.pos = Core.easepTarget(); S.easepPos = { ...S.pos }; S.locked = true;
       S.feedback = ""; render(); draw(); showParts("easep", t("easepDone"));
+
+      narrate(t("inspect") + " " +
+        ["part_antenna", "part_solar_panel", "part_seismometer"]
+          .map(k => t(k)).join(", "));
       return;
     }
     const r = Core.checkReflector(S.pos, S.angle, easepPosition());
-    if (!r.position || !r.orientation) { S.feedback = [!r.position ? t("badPos") : "", !r.orientation ? t("badAngle") : ""].filter(Boolean).join(" "); render(); return; }
+    if (!r.position || !r.orientation) { S.feedback = [!r.position ? t("badPos") : "", !r.orientation ? t("badAngle") : ""].filter(Boolean).join(" "); render(); narrate(S.feedback); return; }
     const loc = f.locateArtifact("reflector", { mechanic: "reflector_install_minigame" });
     if (!loc.ok) { S.feedback = loc.code; render(); return; }
     f.recordObjective("moon_install_reflector.install", { source: "reflector_install_minigame" });
@@ -230,6 +248,10 @@
     f.beginInspection("reflector", { context: "mission", viewer: "fallback" });
     S.pos = Core.target(easepPosition(), Core.LRRR.distance, Core.LRRR.bearing); S.angle = Core.LRRR.earthAngle; S.locked = true;
     S.laser = 1; draw(); S.feedback = ""; render(); showParts("reflector", t("lrrrDone"));
+
+    narrate(t("inspect") + " " +
+      ["part_prisms", "part_support"]
+        .map(k => t(k)).join(", "));
   }
 
   function open() {
@@ -251,10 +273,19 @@
       }
     }
     render(); draw();
+
+    narrate(S.locked ? t("inspect") : ui.text.textContent);
+
     try { ui.go.focus?.({ preventScroll: true }); } catch { /* sin foco */ }
     return true;
   }
-  function hide() { if (ui) ui.root.hidden = true; refreshLauncher(); }
+  function hide() {
+    if (ui && !ui.root.hidden) {
+      ui.root.hidden = true;
+      window.StarSound?.stopVoice?.();
+    }
+    refreshLauncher();
+  }
 
   // Botón en /luna, visible cuando StarFlow está en una etapa de instrumentos.
   let launcher = null;

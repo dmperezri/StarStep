@@ -4,7 +4,10 @@ document.addEventListener('DOMContentLoaded',()=>{
  button.hidden=!(window.StarProgress?.canFinish() && String(window.StarProgress?.player?.()?.alias||'').trim());
  button.addEventListener('click',()=>{
   if(!StarProgress.canFinish() || !String(StarProgress.player()?.alias||'').trim())return;
-  const lang=StarI18n.lang,es=lang==='es',player=StarProgress.player();
+  const award=StarProgress.getAward?.("chapter");
+
+  const lang=StarI18n.lang,es=lang==='es',
+    player=award||StarProgress.player();
   // Recorrido provisional ≠ capítulo oficial: el oficial exige también las etapas previstas.
   const official=window.StarFlow?.getChapterStatus()==='official_complete';const name=String(player.alias||'CADETE').slice(0,18);
   const cv=document.createElement('canvas');cv.width=1600;cv.height=1132;const c=cv.getContext('2d');c.fillStyle='#FFF8E7';c.fillRect(0,0,1600,1132);
@@ -24,7 +27,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   write(es?'Detective de rocas de la Luna y Marte':'Rock Detective of the Moon and Mars',800,763,24,'#258f86');
   for(const [x,label,tone] of [[254,es?'Acto I · Luna':'Act I · Moon','#A6A7BB'],[1346,es?'Acto II · Marte':'Act II · Mars','#D9593A']]){c.fillStyle='#1A1340';c.beginPath();c.arc(x,523,71,0,Math.PI*2);c.fill();c.fillStyle=tone;c.beginPath();c.arc(x,523,61,0,Math.PI*2);c.fill();write(label,x,645,24);}
   write('✦ LITO ✦',800,875,40,'#6E62CE','monospace');
-  const date=new Intl.DateTimeFormat(es?'es-NI':'en-US',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const date=new Intl.DateTimeFormat(es?'es-NI':'en-US',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(award?.issuedAt || Date.now()));
   write(date,280,970,30);write('LITO · '+(es?'Guía de misión':'Mission guide'),800,970,26);write('Equipo OUTSTRIP',1310,970,30);
   rect(145,992,280,3,'#1A1340');rect(630,992,340,3,'#1A1340');rect(1140,992,340,3,'#1A1340');
   write('NASA Space Apps Challenge 2026 · Managua',800,1050,22,'#7775a2', 'Arial',false);

@@ -38,7 +38,7 @@ test("archivo: el origen se valida contra la lista de rutas permitidas", () => {
   assert.equal(archive.resolveReturn("").origin, "menu", "acceso directo por URL → menú");
   assert.equal(archive.resolveReturn(undefined).origin, "menu");
   for (const bad of ["?desde=https://ejemplo.com", "?desde=//ejemplo.com", "?desde=/bitacora", "?desde=javascript:alert(1)",
-    "?desde=__proto__", "?desde=constructor", "?desde=toString", "?desde=BITACORA", "?desde=", "?desde=luna", "?otro=bitacora"]) {
+    "?desde=__proto__", "?desde=constructor", "?desde=toString", "?desde=BITACORA", "?desde=", "?otro=bitacora"]) {
     const r = archive.resolveReturn(bad);
     assert.equal(r.origin, "menu", bad);
     assert.equal(r.href, "/", bad);
@@ -186,4 +186,12 @@ test("plantillas: cada enlace al archivo declara su procedencia", () => {
   const html = template("archivo-nasa.html");
   assert.match(html, /id="archiveBack" href="\/" data-i18n="science.back.menu">VOLVER AL MENÚ</, "sin JavaScript: menú por defecto");
   assert.doesNotMatch(html, /progreso\.js|flujo\.js|flujo-definicion\.js/);
+});
+
+test("archivo NASA: regreso contextual a Luna", () => {
+    assert.deepEqual(archive.resolveReturn("?desde=luna"), {
+        origin: "luna",
+        href: "/luna",
+        i18n: "science.back.luna"
+    });
 });

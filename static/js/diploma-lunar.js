@@ -1,7 +1,11 @@
 "use strict";
 /* Diploma lunar independiente; no concede logros, solo representa los ya obtenidos. */
 window.StarLunarDiploma=Object.freeze({download(){
-  const player=window.StarProgress?.player?.()||{};
+  const award=window.StarProgress?.getAward?.("luna");
+
+  const player=award
+    ||window.StarProgress?.player?.()
+    ||{};
   const name=String(player.alias||'').trim();
   if(!name || !window.StarFlow?.isActComplete?.('luna'))return false;
   const english=window.StarI18n?.lang==='en';
@@ -23,7 +27,7 @@ window.StarLunarDiploma=Object.freeze({download(){
   box(360,741,880,4,'#1a1340');
   txt(english?'For completing the Apollo 11 lunar mission':'Por completar la misión lunar Apollo 11',822,34);
   txt(english?'An educational recognition from StarStep':'Reconocimiento educativo de StarStep',879,24,'#258f86');
-  const date=new Intl.DateTimeFormat(english?'en-US':'es-NI',{day:'2-digit',month:'long',year:'numeric'}).format(new Date());
+  const date=new Intl.DateTimeFormat(english?'en-US':'es-NI',{day:'2-digit',month:'long',year:'numeric'}).format(new Date(award?.issuedAt || Date.now()));
   txt(`LITO · OUTSTRIP · ${date}`,1007,26,'#414379');
   const a=document.createElement('a');a.download='StarStep-Diploma-Lunar-'+name.replace(/[^a-z0-9_-]/gi,'_')+'.png';a.href=cv.toDataURL('image/png');a.click();return true;
 }});

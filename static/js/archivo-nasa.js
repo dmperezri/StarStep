@@ -19,7 +19,8 @@
   const RETURN_ROUTES = Object.freeze({
     menu: Object.freeze({ href: "/", i18n: "science.back.menu" }),
     bitacora: Object.freeze({ href: "/bitacora", i18n: "science.back.journal" }),
-    marte: Object.freeze({ href: "/marte", i18n: "science.back.mars" })
+    marte: Object.freeze({ href: "/marte", i18n: "science.back.mars" }),
+    luna: Object.freeze({ href: "/luna", i18n: "science.back.luna" })
   });
   const DEFAULT_ORIGIN = "menu";
   const own = key => typeof key === "string" && Object.prototype.hasOwnProperty.call(RETURN_ROUTES, key);

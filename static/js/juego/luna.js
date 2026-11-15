@@ -1,4 +1,3 @@
-
 import { Motor } from "./motor.js";
 import { Rover } from "./rover.js";
 import { Camara } from "./camara.js";
@@ -107,11 +106,41 @@ function dibujarEspacio(ctx) {
         );
     });
 
-    // Small pixel Earth at upper right.
-    const ex=canvas.width-105, ey=60;
-    for(let y=-16;y<=16;y+=2){const w=Math.floor(Math.sqrt(17*17-y*y)/2)*2;ctx.fillStyle="#346eae";ctx.fillRect(ex-w,ey+y,w*2,2);}
-    ctx.fillStyle="#71a58b";ctx.fillRect(ex-10,ey-6,9,6);ctx.fillRect(ex+2,ey+1,10,8);ctx.fillStyle="#c3c7d6";ctx.fillRect(ex-8,ey-11,10,3);
 
+// Tierra animada de StarStep.
+
+    const ex = Math.round(canvas.width * 0.58);
+    const ey = 78;
+    const radius = 37;
+
+    const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const time = reduced
+        ? 0
+        : performance.now() / 1000 * 0.45;
+
+    if (window.StarPlanets) {
+
+        window.StarPlanets.draw(
+            ctx,
+            "earth",
+            ex,
+            ey,
+            radius,
+            time,
+            { lighting: "day" }
+        );
+
+    } else {
+
+        ctx.fillStyle = "#226FC0";
+        ctx.beginPath();
+        ctx.arc(ex, ey, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+    }
 }
 
 function dibujarMontanas(ctx, factor, color, altura) {
@@ -215,7 +244,7 @@ function render(ctx) {
 
     ctx.restore();
 
-    dibujarHUD(ctx);
+
 }
 
 motor.start(update, render);

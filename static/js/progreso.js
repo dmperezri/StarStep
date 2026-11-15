@@ -22,7 +22,38 @@ window.StarProgress = (() => {
      alguno heredado (inventario, actos o perfil), la migración de flujo.js reconstruiría
      la partida anterior. PREFERENCE_KEYS son del dispositivo y se conservan. SESSION_KEYS
      viven en sessionStorage (solo la pestaña actual) y no son progreso. */
-  const PLAYER_KEYS=Object.freeze([FLOW,FLOW_BACKUP,INVENTORY,completedKey,PROFILE,NOTES,PHOTO]);
+  const AWARDS='starstep_awards';
+
+  const PLAYER_KEYS=Object.freeze([
+    FLOW,FLOW_BACKUP,INVENTORY,completedKey,
+    PROFILE,NOTES,PHOTO,AWARDS
+  ]);
+
+  function getAward(kind){
+    const all=read(AWARDS,{});
+
+    return all && typeof all==="object"
+      ? all[kind] || null
+      : null;
+  }
+
+  function saveAward(kind){
+    if(getAward(kind)) return;
+
+    const profile=player();
+
+    if(!String(profile.alias||"").trim()) return;
+
+    const all=read(AWARDS,{}) || {};
+
+    all[kind]={
+      alias:profile.alias,
+      avatar:profile.avatar||"astronauta",
+      issuedAt:new Date().toISOString()
+    };
+
+    write(AWARDS,all);
+  }
   const PREFERENCE_KEYS=Object.freeze(['starstep_lang','starstep_audio',CINEMATICS]);
   const SESSION_KEYS=Object.freeze([SESSION,NEW_GAME_WELCOME]);
   let resetting=false;
@@ -66,6 +97,16 @@ window.StarProgress = (() => {
       commitAct(act){
         if(!ACTS.includes(act))return false;const all=new Set(completed());if(all.has(act))return false;all.add(act);
         try{write(completedKey,[...all]);}catch(e){console.warn('No se pudo guardar el acto',e);return false;}
+        try {
+          if(act==="luna" || act==="marte")
+            saveAward(act);
+
+          if(ACTS.every(id=>all.has(id)))
+            saveAward("chapter");
+        } catch(error) {
+          console.warn("No se pudo registrar el diploma",error);
+        }
+
         document.dispatchEvent(new CustomEvent('starstep:completed',{detail:{act}}));return true;
       }
     };
@@ -148,6 +189,6 @@ window.StarProgress = (() => {
     if(event.key===null||(event.key===FLOW&&event.newValue===null)){resetting=true;location.replace('/');}
   });
 
-  return {catalog,list,unlock,player,setPlayer,getNotes,setNotes,completed,completeAct,canFinish,connectFlow,loadFlow,saveFlow,backupFlow,
+  return {catalog,list,unlock,player,setPlayer,getNotes,setNotes,completed,completeAct,canFinish,connectFlow,loadFlow,saveFlow,backupFlow,getAward,
     PLAYER_KEYS,PREFERENCE_KEYS,SESSION_KEYS,hasPersonalData,resetPlayerData,markNewGameWelcome,takeNewGameWelcome,hasSeenCinematic,markCinematicSeen};
 })();

@@ -299,6 +299,17 @@
     left.setAttribute("aria-label",L("Mover a la izquierda","Move left")); right.setAttribute("aria-label",L("Mover a la derecha","Move right"));
     const inv = mk(t("investigate"), investigate, "primary");
     ui.panel.append(mission,hud,meter,canvas,pad,feedback,el("p","mars-game-note",L("Flechas o botones · Al detenerte, la batería se recarga sola.","Arrow keys or buttons · Stop to recharge automatically.")));
+    const historicalRoute =
+      window.StarEvidenceVisual?.figure("route");
+
+    if (historicalRoute) {
+      historicalRoute.classList.add("ss-route-reference");
+
+      const map = el("div", "ss-route-map");
+      ui.panel.insertBefore(map, canvas);
+      map.append(canvas, historicalRoute);
+    }
+
     function stopHold(){if(holdTimer)clearInterval(holdTimer);holdTimer=0;held=0;}
     function cleanup(){stopHold();if(rechargeTimer)clearInterval(rechargeTimer);rechargeTimer=0;}
     const hide=ui.hide; ui.hide=()=>{cleanup();hide();};

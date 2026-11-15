@@ -10,7 +10,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   {id:'lander',es:['Plataforma de aterrizaje de Opportunity','Aterrizaje con bolsas de aire en el cráter Eagle'],en:['Opportunity landing platform','Airbag landing at Eagle Crater']},
   {id:'opportunity',es:['Rover Opportunity','Pruebas minerales de ambientes con agua antigua'],en:['Opportunity rover','Mineral evidence of ancient water-related environments']}
  ];
- let selected=null;const solved=new Set();
+ let selected=null;
+
+ const previous =
+   window.StarFlow?.getObjectives?.("footprints")
+     ?.objectives || [];
+
+ const solved=new Set(
+   previous
+     .filter(o=>o.done && o.id.startsWith("footprints.pair."))
+     .map(o=>o.id.slice("footprints.pair.".length))
+ );
  function draw(){root.replaceChildren();const left=document.createElement('div'),right=document.createElement('div');left.className=right.className='match-column';
   const language=StarI18n.lang;
   // Solo se asocian piezas conseguidas en las misiones (huellas-mision.js); las demás, bloqueadas.

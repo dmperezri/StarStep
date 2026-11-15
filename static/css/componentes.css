@@ -459,3 +459,305 @@ button:disabled {
         transform: none !important;
     }
 }
+
+/* =====================================================
+   MODULO 10 - EXPLORACION LUNAR
+   ===================================================== */
+
+.moon-page {
+    background: var(--night);
+    color: var(--cream);
+    font-family: var(--font-game);
+}
+
+.moon-page .contenedor {
+    width: min(1280px, 96%);
+    margin: 12px auto;
+}
+
+/* CABECERA */
+
+.moon-page header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 2px solid var(--purple);
+}
+
+.moon-page header .ss-logo {
+    width: 115px;
+    height: auto;
+}
+
+.moon-page header h1 {
+    color: var(--moon);
+    letter-spacing: .04em;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+}
+
+.moon-page header h2 {
+    color: var(--soft);
+}
+
+/* ESCENARIO LUNAR */
+
+.moon-page .moon-evidence-frame {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 165px;
+    gap: 10px;
+    align-items: start;
+}
+
+.moon-page .moon-evidence-frame #gameCanvas {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    border: 3px solid var(--violet);
+    background: var(--night);
+    image-rendering: pixelated;
+}
+
+/* FOTOGRAFIA HISTORICA INDEPENDIENTE */
+
+.moon-page .moon-evidence-frame #moonEvidenceHost {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    padding: 0;
+    min-width: 0;
+}
+
+.moon-page #moonEvidenceHost .evidence-photo {
+    transform: none;
+    padding: 6px;
+    margin: 0;
+    background: var(--cream);
+    color: var(--night);
+    border: 3px solid var(--violet);
+    box-shadow: 3px 3px 0 var(--border);
+}
+
+.moon-page #moonEvidenceHost .evidence-photo img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
+.moon-page #moonEvidenceHost figcaption {
+    font-size: .7rem;
+    line-height: 1.4;
+}
+
+.moon-page #moonEvidenceHost .evidence-dismiss {
+    min-width: 34px;
+    min-height: 34px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 2px solid var(--violet);
+}
+
+/* HUD DE EXPLORACION */
+
+.moon-page #moonHud {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px;
+    margin: 0;
+    background: var(--panel);
+    border: 2px solid var(--purple);
+    box-shadow: 3px 3px 0 var(--border);
+}
+
+.moon-page #moonHud .moon-o2 {
+    min-height: 44px;
+    background: var(--night);
+    font-size: .8rem;
+}
+
+.moon-page #moonHud .mg-meter {
+    width: 105px;
+    height: 10px;
+    border-color: var(--purple);
+}
+
+.moon-page #moonHud .mg-meter > i {
+    background: var(--mint);
+}
+
+.moon-page #moonHud .moon-o2.warn .mg-meter > i {
+    background: var(--moon);
+}
+
+.moon-page #moonHud .moon-o2.crit .mg-meter > i {
+    background: var(--error);
+}
+
+.moon-page #moonHud .mg-btn {
+    min-height: 44px;
+    min-width: 56px;
+    background: var(--raised);
+    border: 2px solid var(--violet);
+    color: var(--cream);
+    font-family: var(--font-game);
+    touch-action: none;
+}
+
+.moon-page #moonHud .mg-btn.primary {
+    background: var(--mint);
+    color: var(--night);
+    border-color: var(--border);
+}
+
+.moon-page #moonHud .mg-btn[aria-pressed="true"] {
+    background: var(--moon);
+    color: var(--night);
+}
+
+.moon-page #moonHud .mg-btn:active {
+    background: var(--purple);
+    transform: translate(1px, 1px);
+}
+
+.moon-page .moon-sim-note {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin: 0;
+    color: var(--soft);
+    font-size: .68rem;
+    text-align: center;
+}
+
+/* DIALOGOS DE LITO */
+
+.moon-page .dialogo {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    min-height: 60px;
+    background: var(--panel);
+    border: 3px solid var(--violet);
+}
+
+.moon-page .moon-lito-name {
+    padding: 8px;
+    color: var(--moon);
+    background: var(--night);
+    border: 2px solid var(--purple);
+}
+
+.moon-page .dialogo p {
+    color: var(--cream);
+    font-family: Arial, sans-serif;
+    font-size: clamp(.8rem, 1.5vw, 1rem);
+    line-height: 1.5;
+}
+
+.moon-page .moon-progress-guide {
+    background: var(--night);
+    border: 2px solid var(--purple);
+    color: var(--soft);
+    padding: 8px;
+    font-size: .75rem;
+}
+
+/* NAVEGACION */
+
+.moon-page nav.navegacion a,
+.moon-page nav.navegacion button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--raised);
+    border: 2px solid var(--violet);
+    text-decoration: none;
+}
+
+.moon-page nav.navegacion a:hover,
+.moon-page nav.navegacion button:hover {
+    border-color: var(--mint);
+    background: var(--purple-dark);
+}
+
+/* CELULARES Y TABLETAS */
+
+@media (max-width: 760px) {
+
+    .moon-page .moon-evidence-frame {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .moon-page .moon-evidence-frame #moonEvidenceHost {
+        grid-column: 1;
+        grid-row: 4;
+    }
+
+    .moon-page #moonEvidenceHost:has(.evidence-photo[hidden]) {
+        display: none;
+    }
+
+    .moon-page #moonEvidenceHost .evidence-photo:not([hidden]) {
+        display: grid;
+        grid-template-columns: 75px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        padding-right: 45px;
+    }
+
+    .moon-page #moonEvidenceHost .evidence-photo img {
+        height: 75px;
+    }
+
+    .moon-page #moonHud {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    .moon-page #moonHud .mg-meter {
+        width: 60px;
+    }
+
+    .moon-page #moonHud .mg-btn {
+        flex: 1 1 20%;
+        min-width: 0;
+        font-size: .72rem;
+        padding: 8px 5px;
+    }
+
+    .moon-page .dialogo {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .moon-page .navegacion {
+        gap: 6px;
+    }
+
+    .moon-page nav.navegacion a,
+    .moon-page nav.navegacion button {
+        font-size: .65rem;
+        padding: 7px 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .moon-page #moonHud .mg-btn {
+        transition: none;
+        transform: none;
+    }
+}

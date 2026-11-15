@@ -1,3 +1,96 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>StarStep · Luna</title><link rel="stylesheet" href="{{ url_for('static',filename='css/juego.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"><script type="importmap">{"imports":{"three":"/static/vendor/three/build/three.module.js","three/addons/":"/static/vendor/three/examples/jsm/"}}</script><script defer src="{{ url_for('static',filename='js/main.js') }}"></script><script defer src="{{ url_for('static',filename='js/audio.js') }}"></script><script defer src="{{ url_for('static',filename='js/progreso.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo-definicion.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo.js') }}"></script><script defer src="{{ url_for('static',filename='js/science-content.js') }}"></script><script defer src="{{ url_for('static',filename='js/luna-estado.js') }}"></script><link rel="stylesheet" href="{{ url_for('static',filename='css/mision.css') }}"><script defer src="{{ url_for('static',filename='js/tarjeta-cientifica.js') }}"></script><script defer src="{{ url_for('static',filename='js/luna-mision.js') }}"></script><script defer src="{{ url_for('static',filename='js/instrumentos-lunares.js') }}"></script><script defer src="{{ url_for('static',filename='js/regreso-laboratorio.js') }}"></script><link rel="stylesheet" href="{{ url_for('static',filename='css/evidencia-visual.css') }}"><script defer src="{{ url_for('static',filename='js/evidencia-visual.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/componentes.css') }}">
-</head><body class="moon-page"><main class="contenedor"><header><p>OUTSTRIP · STARSTEP</p><h1 data-i18n="moon.title">ACTO I · LUNA</h1><h2 data-i18n="moon.subtitle">Misión 1: Detective de lava</h2></header><div class="moon-evidence-frame"><canvas id="gameCanvas" width="960" height="540"></canvas><aside id="moonEvidenceHost" aria-label="Fotografía histórica"></aside></div><section class="dialogo"><strong class="moon-lito-name">LITO</strong><p id="mensaje" data-i18n="moon.lito">Hay una señal más adelante.</p></section><section class="controles"><p data-i18n="moon.controls">A / D o flechas: mover · E: inspeccionar</p></section><p id="moonProgressGuide" class="moon-progress-guide" role="status" aria-live="polite"></p><nav class="navegacion"><button type="button" class="hud-button" data-lang="es">ES</button><button type="button" class="hud-button" data-lang="en">EN</button><a href="{{ url_for('inicio') }}" data-i18n="moon.earth">TIERRA</a><a href="{{ url_for('bitacora') }}" data-i18n="journal">📖 BITÁCORA</a><button type="button" id="inspectEagle" data-i18n="moon.inspect">VISOR DE EAGLE 3D</button><a href="/marte?viaje=luna&amp;cine=3" class="next-act" data-flow-requires="mars_transition" data-i18n="moon.next">ACTO II: MARTE</a></nav></main><script defer src="{{ url_for('static',filename='js/visor-fallback.js') }}"></script><script type="module" src="{{ url_for('static',filename='js/juego/luna.js') }}"></script><script>document.getElementById('inspectEagle').addEventListener('click',()=>{window.openStarArtifact('eagle',{context:'mission'});});</script><script>document.addEventListener('starstep:inspect',e=>window.openStarArtifact(e.detail.id,{context:e.detail.context==='mission'?'mission':'journal'}));</script></body></html>
+
+<script defer src="{{ url_for('static',filename='js/scene.js') }}"></script>
+<script defer src="{{ url_for('static',filename='js/creditos.js') }}"></script>
+<script defer src="{{ url_for('static',filename='js/luna-hud.js') }}"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/luna-hud.css') }}">
+<script defer src="{{ url_for('static', filename='js/planetas.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/salida-marte.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salida-marte.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/acabado-final.css') }}">
+<script defer src="{{ url_for('static', filename='js/acabado-final.js') }}"></script>
+</head><body class="moon-page"><main class="contenedor">
+<header class="ss-lunar-header">
+
+    <div class="ss-lunar-brand">
+
+<img class="ss-logo"
+     src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+     alt="StarStep">
+
+
+        <h1 data-i18n="moon.title">ACTO I · LUNA</h1>
+
+        <progress id="lunarActProgress"
+                  max="1" value="0"
+                  aria-label="Progreso del Acto I"></progress>
+    </div>
+
+    <div class="ss-lunar-toolbar">
+
+        <span id="lunarCadet"
+              class="ss-lunar-control">Invitado</span>
+
+<a href="{{ url_for('bitacora') }}" data-i18n="journal">📖 BITÁCORA</a>
+<button type="button" class="hud-button" data-lang="es">ES</button>
+<button type="button" class="hud-button" data-lang="en">EN</button>
+
+        <a href="{{ url_for('archivo_nasa', desde='luna') }}"
+           class="ss-lunar-control"
+           id="lunarSources">Fuentes NASA</a>
+
+        <button type="button"
+                id="lunarVoice">Voz</button>
+
+        <button type="button"
+                id="lunarMusic">Sonido</button>
+
+        <details class="ss-lunar-menu">
+
+            <summary aria-label="Menu">☰</summary>
+
+<nav class="navegacion"><a href="{{ url_for('inicio') }}" data-i18n="moon.earth">TIERRA</a><button type="button" id="inspectEagle" data-i18n="moon.inspect">VISOR DE EAGLE 3D</button><a href="/marte?viaje=luna&amp;cine=3" class="next-act" data-flow-requires="mars_transition" data-i18n="moon.next">ACTO II: MARTE</a></nav>
+
+        </details>
+
+    </div>
+
+</header>
+<div class="moon-evidence-frame"><canvas id="gameCanvas" width="960" height="540"></canvas><aside id="moonEvidenceHost" aria-label="Fotografía histórica"></aside>
+<section class="dialogo ss-lunar-dialog">
+
+    <canvas id="lunarLitoPortrait"
+            width="80" height="80"
+            aria-hidden="true"></canvas>
+
+    <div class="ss-lunar-message">
+
+        <strong class="moon-lito-name">LITO</strong>
+
+        <p id="mensaje" data-i18n="moon.lito">
+            Hay una señal más adelante.
+        </p>
+
+    </div>
+
+</section>
+</div><section class="controles"><p data-i18n="moon.controls">A / D o flechas: mover · E: inspeccionar</p></section><p id="moonProgressGuide" class="moon-progress-guide" role="status" aria-live="polite"></p>
+<footer class="ss-lunar-footer">
+
+    <span>StarStep · OUTSTRIP</span>
+
+    <span>NASA Space Apps Challenge 2026 · Managua</span>
+
+    <span>NASA NSSDCA · NASA Science</span>
+
+    <span id="lunarDisclaimer">
+        Sitio educativo independiente; no oficial de NASA.
+    </span>
+
+    <button type="button"
+            id="creditsButton">Créditos</button>
+
+</footer>
+</main><script defer src="{{ url_for('static',filename='js/visor-fallback.js') }}"></script><script type="module" src="{{ url_for('static',filename='js/juego/luna.js') }}"></script><script>document.getElementById('inspectEagle').addEventListener('click',()=>{window.openStarArtifact('eagle',{context:'mission'});});</script><script>document.addEventListener('starstep:inspect',e=>window.openStarArtifact(e.detail.id,{context:e.detail.context==='mission'?'mission':'journal'}));</script></body></html>

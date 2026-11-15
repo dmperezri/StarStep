@@ -1,0 +1,442 @@
+
+/* STARSTEP - ACABADO GLOBAL */
+
+:root {
+    --ss-console: #1A1F4D;
+    --ss-frame: #ABA1F5;
+    --ss-ink: #FFF8E7;
+}
+
+/* Contenedores narrativos y minijuegos */
+
+.ss-docking .mg-panel,
+.ss-laboratory .mg-panel,
+.mg[data-mars-route] .mg-panel,
+.mg[data-mars-landing] .mg-panel,
+.mg[data-mars-storm] .mg-panel {
+    box-sizing: border-box;
+    width: min(1100px, 100%);
+    max-height: calc(100dvh - 24px);
+    background: #101332;
+    border: 2px solid var(--ss-frame);
+    padding: clamp(12px, 2vw, 20px);
+}
+
+.ss-docking .mg-title,
+.ss-laboratory .mg-title {
+    color: #FFE066;
+}
+
+.ss-docking .mg-canvas,
+.ss-laboratory .mg-canvas {
+    background: #0E1233;
+    image-rendering: pixelated;
+    border-color: #ABA1F5;
+}
+
+.ss-docking .evidence-scene-photo {
+    grid-template-columns: minmax(0,1fr) 190px;
+    align-items: center;
+}
+
+.ss-docking .evidence-photo img {
+    max-height: 150px;
+    object-fit: contain;
+}
+
+.ss-laboratory .mg-panel > .evidence-photo {
+    width: min(210px,35%);
+    float: right;
+    margin: 8px 0 10px 12px;
+}
+
+.ss-laboratory .mg-panel > .evidence-photo img {
+    max-height: 135px;
+    object-fit: contain;
+}
+
+.ss-laboratory .mg-canvas {
+    clear: both;
+    max-width: 700px;
+    margin: 8px auto;
+}
+
+/* Lito */
+
+.ss-final-lito {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 9px 0;
+    padding: 8px;
+    color: #FFF8E7;
+    background: #1A1F4D;
+    border: 2px solid #ABA1F5;
+    box-shadow: 3px 3px #1A1340;
+}
+
+.ss-final-lito canvas {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+    flex: 0 0 48px;
+}
+
+.ss-final-lito div {
+    flex: 1;
+    min-width: 0;
+}
+
+.ss-final-lito strong {
+    display: block;
+    color: #FFE066;
+    font: bold 13px monospace;
+    margin-bottom: 4px;
+}
+
+.ss-final-lito span {
+    font: 13px/1.5 Arial,sans-serif;
+    color: #B9BEE6;
+}
+
+.ss-final-lito button {
+    flex: 0 0 44px;
+    min-height: 44px;
+    color: #FFE066;
+    background: #262C66;
+    border: 1px solid #ABA1F5;
+    cursor: pointer;
+}
+
+/* Marte */
+
+.ss-mars-logo {
+    display: block;
+    width: 145px;
+    height: auto;
+    margin: 0 auto 14px;
+}
+
+.mars-page .mars-route-home {
+    border-color: #F7B08E;
+}
+
+.mars-page .mg-title,
+.mars-page .enigma-result-title {
+    color: #F7B08E;
+}
+
+.ss-route-map {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 145px;
+    align-items: center;
+    gap: 12px;
+}
+
+.ss-route-map .ss-route-reference {
+    min-width: 0;
+    margin: 0;
+}
+
+.ss-route-reference img {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+}
+
+.ss-route-reference figcaption {
+    font-size: 10px;
+}
+
+.mars-page .mg-meter {
+    background: #262C66;
+    border-color: #ABA1F5;
+}
+
+.mars-page .mg-hud span {
+    background: #1A1F4D;
+    color: #8FF0D8;
+    padding: 7px 10px;
+    border: 1px solid #6E62CE;
+}
+
+.mars-page .mg-option.mars-recommended {
+    border-color: #FFE066;
+}
+
+.mars-page .mg-option[aria-pressed="true"] {
+    background: #4F45A6;
+    border-color: #3FD0E0;
+}
+
+/* Enigmas */
+
+body .enigma-panel {
+    border: 2px solid #ABA1F5;
+    background: #101332;
+}
+
+body .enigma-grid {
+    gap: 10px;
+}
+
+body .enigma-result .enigma-block {
+    padding: 12px;
+    line-height: 1.5;
+}
+
+/* Huellas */
+
+.ss-huellas-page .puzzle-window {
+    width: min(1100px,100%);
+    background: #1A1F4D;
+    border: 2px solid #ABA1F5;
+}
+
+.ss-huellas-page .puzzle-window h1 {
+    color: #FFE066;
+}
+
+.ss-huellas-page .match-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ss-huellas-page .match-column .pixel-button {
+    min-height: 54px;
+    font: bold 14px/1.4 Arial,sans-serif;
+    padding: 10px;
+}
+
+.ss-huellas-page .match-column .selected {
+    outline: 3px solid #FFE066;
+    outline-offset: 2px;
+}
+
+.ss-huellas-page .match-column .matched {
+    background: #8FF0D8;
+    color: #0E1233;
+}
+
+.mirror-header {
+    border-bottom: 2px solid #ABA1F5;
+}
+
+.mirror-header strong:nth-child(2) {
+    color: #FFE066;
+}
+
+.mirror-header strong:nth-child(3) {
+    color: #3FD0E0;
+}
+
+/* Librito y archivo cientifico */
+
+.diary-redesign .diary-tab {
+    min-height: 44px;
+}
+
+.diary-redesign .mission-page {
+    min-width: 0;
+}
+
+.diary-redesign .mission-mini-card {
+    overflow-wrap: anywhere;
+}
+
+.diary-redesign .mission-mini-card.locked {
+    opacity: .75;
+}
+
+.science-page .science-wrap {
+    width: min(1240px,94%);
+    margin: 20px auto;
+}
+
+.science-page .science-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(min(240px,100%),1fr));
+    gap: 16px;
+}
+
+.science-page .science-card {
+    background: #1A1F4D;
+    border: 2px solid #ABA1F5;
+    padding: 12px;
+    box-shadow: 4px 4px #1A1340;
+}
+
+.science-page .science-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+    background: #0E1233;
+}
+
+.science-page .science-card h3 {
+    color: #FFE066;
+}
+
+.science-page .science-card p {
+    line-height: 1.5;
+}
+
+.science-page .science-card small {
+    color: #B9BEE6;
+}
+
+/* Visor 3D */
+
+.visor-modal .visor-panel {
+    max-width: 1150px;
+    border: 2px solid #ABA1F5;
+    background: #1A1F4D;
+}
+
+.visor-modal .visor-canvas {
+    background: #0E1233;
+    min-height: 300px;
+}
+
+.visor-modal .visor-side {
+    min-width: 0;
+}
+
+.visor-modal .evidence {
+    padding: 10px;
+    line-height: 1.5;
+    background: #262C66;
+}
+
+/* Fotografias ampliables */
+
+.evidence-photo img,
+.science-card img,
+.sci-photo img {
+    cursor: zoom-in;
+}
+
+.ss-final-photo-viewer {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    box-sizing: border-box;
+    width: min(900px,94vw);
+    max-height: 92dvh;
+    overflow: auto;
+    padding: 12px;
+    border: 3px solid #ABA1F5;
+    background: #1A1F4D;
+    color: #FFF8E7;
+}
+
+.ss-final-photo-viewer::backdrop {
+    background: rgba(6,9,29,.94);
+}
+
+.ss-final-photo-viewer header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ss-final-photo-viewer img {
+    display: block;
+    width: 100%;
+    max-height: 68dvh;
+    object-fit: contain;
+    background: #0E1233;
+}
+
+.ss-final-photo-viewer button {
+    min-width: 44px;
+    min-height: 44px;
+    background: #262C66;
+    border: 2px solid #ABA1F5;
+    color: #FFF8E7;
+    cursor: pointer;
+}
+
+.ss-final-photo-viewer p {
+    font: 13px/1.5 Arial,sans-serif;
+    color: #B9BEE6;
+}
+
+/* Creditos */
+
+#creditsDialog .mg-panel {
+    background: #101332;
+    border-color: #ABA1F5;
+}
+
+#creditsDialog .mg-kicker {
+    color: #8FF0D8;
+}
+
+#creditsDialog .mg-text {
+    color: #FFF8E7;
+    line-height: 1.6;
+}
+
+/* Accesibilidad global */
+
+.mg .mg-btn,
+.mg .mg-option,
+.enigma button,
+.diary-redesign button {
+    min-height: 44px;
+}
+
+.mg .mg-btn:focus-visible,
+.enigma button:focus-visible {
+    outline: 3px solid #FFE066;
+    outline-offset: 3px;
+}
+
+@media(max-width:760px) {
+
+    .ss-route-map,
+    .ss-docking .evidence-scene-photo {
+        grid-template-columns: minmax(0,1fr);
+    }
+
+    .ss-route-reference {
+        display: grid;
+        grid-template-columns: 85px minmax(0,1fr);
+        gap: 8px;
+    }
+
+    .ss-laboratory .mg-panel > .evidence-photo {
+        float: none;
+        width: 100%;
+        margin: 6px 0;
+    }
+
+    .ss-laboratory .mg-panel > .evidence-photo img {
+        max-height: 110px;
+    }
+
+    .ss-huellas-page .match-column .pixel-button {
+        font-size: 12px;
+    }
+
+    .visor-modal .visor-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .visor-modal .visor-canvas {
+        min-height: 260px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    .ss-final-lito *,
+    .mg .mg-btn,
+    .mg .mg-option {
+        transition: none !important;
+    }
+}
