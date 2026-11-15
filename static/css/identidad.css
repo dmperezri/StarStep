@@ -1,0 +1,1174 @@
+
+/* =====================================================
+   STARSTEP — IDENTIDAD VISUAL
+   OUTSTRIP · Two Worlds, Two Stories
+   ===================================================== */
+
+:root {
+
+    /* Interfaz general */
+    --night: #0E1233;
+    --panel: #1A1F4D;
+    --raised: #262C66;
+    --border: #1A1340;
+    --cream: #FFF8E7;
+    --soft: #B9BEE6;
+
+    /* LITO explorador */
+    --crystal-light: #E4DFFF;
+    --violet: #ABA1F5;
+    --purple: #6E62CE;
+    --purple-dark: #4F45A6;
+    --mint: #8FF0D8;
+
+    /* Luna */
+    --lunar-dust: #C3C7D6;
+    --lunar-basalt: #868CA4;
+    --lunar-dark: #575C74;
+    --lunar-shadow: #3E4256;
+    --moon: #FFE066;
+    --lunar-gold: #FFC93C;
+
+    /* Marte */
+    --martian-dust: #F7B08E;
+    --mars: #D9593A;
+    --martian-oxide: #A63A26;
+    --martian-shadow: #7A2818;
+    --water: #3FD0E0;
+    --blueberry: #4F86D9;
+
+    /* Evidencias científicas */
+    --evidence-observed: #3FD0E0;
+    --evidence-interpreted: #B79CFF;
+    --evidence-narrative: #FFD23F;
+
+    /* Estados */
+    --success: #5BE39A;
+    --error: #FF6681;
+
+    --font-game: "Courier New", monospace;
+}
+
+
+/* =====================================================
+   ESCENARIO PRINCIPAL
+   ===================================================== */
+
+.home-page {
+
+    font-family: var(--font-game);
+    background: var(--night);
+
+}
+
+.home-page .stage {
+
+    isolation: isolate;
+
+}
+
+.home-page .stage > canvas#world {
+
+    image-rendering: pixelated;
+    object-fit: cover;
+    object-position: center bottom;
+
+}
+
+
+/* =====================================================
+   LOGOTIPO
+   ===================================================== */
+
+.home-page .logo {
+
+    top: clamp(72px, 10vh, 110px);
+    width: min(84%, 620px, 70vh);
+    text-align: center;
+
+}
+
+.home-page .logo h1 {
+
+    margin: 0;
+    line-height: 0;
+
+}
+
+.home-page .brand-image {
+
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-inline: auto;
+    object-fit: contain;
+    filter: drop-shadow(4px 4px 0 var(--border));
+
+}
+
+.home-page .logo small {
+
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 14px;
+
+    background: var(--night);
+    color: var(--cream);
+
+    border: 2px solid var(--border);
+
+    font-size: clamp(.65rem, 1vw, .85rem);
+    line-height: 1.5;
+
+}
+
+
+/* =====================================================
+   BARRA SUPERIOR — HUD
+   ===================================================== */
+
+.home-page .hud {
+
+    top: 18px;
+    left: clamp(12px, 2vw, 28px);
+    right: clamp(12px, 2vw, 28px);
+
+}
+
+.home-page .hud strong {
+
+    padding: 10px 13px;
+
+    background: var(--night);
+    border: 2px solid var(--violet);
+
+    color: var(--cream);
+    text-shadow: none;
+    letter-spacing: 1px;
+
+    box-shadow: 3px 3px 0 var(--border);
+
+}
+
+.home-page .hud-actions {
+
+    gap: 8px;
+
+}
+
+.home-page .hud-button {
+
+    min-height: 40px;
+    padding: 9px 13px;
+
+    background: var(--panel);
+    border: 2px solid var(--violet);
+
+    color: var(--cream);
+    font-weight: bold;
+
+    box-shadow: 3px 3px 0 var(--border);
+
+    transition:
+        background-color .15s,
+        color .15s,
+        transform .15s;
+
+}
+
+.home-page .hud-button[aria-pressed="true"] {
+
+    background: var(--mint);
+    color: var(--night);
+    border-color: var(--mint);
+
+}
+
+.home-page .hud-button:hover {
+
+    background: var(--purple-dark);
+    color: var(--cream);
+
+}
+
+.home-page .hud-button[aria-pressed="true"]:hover {
+
+    background: var(--mint);
+    color: var(--night);
+
+}
+
+
+/* =====================================================
+   MENÚ PRINCIPAL
+   ===================================================== */
+
+.home-page .menu {
+
+    top: auto;
+    bottom: clamp(34px, 6vh, 65px);
+    left: clamp(20px, 5vw, 85px);
+
+    width: min(310px, 36%);
+    max-height: calc(100% - 240px);
+
+    padding: 16px;
+
+    gap: 8px;
+
+    background: var(--panel);
+    border: 3px solid var(--violet);
+
+    box-shadow:
+        0 0 0 3px var(--border),
+        7px 7px 0 var(--border),
+        inset 0 0 0 3px var(--raised);
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--violet) var(--night);
+
+}
+
+.home-page .menu h2 {
+
+    margin: 0 0 7px;
+    padding: 12px 5px;
+
+    color: var(--mint);
+    background: var(--night);
+
+    border-bottom: 2px solid var(--purple);
+
+    font-size: .85rem;
+    letter-spacing: 1.5px;
+
+}
+
+
+/* =====================================================
+   BOTONES PIXEL ART
+   ===================================================== */
+
+.home-page .pixel-button {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding: 10px 13px;
+
+    background: var(--raised);
+
+    color: var(--cream);
+    border: 2px solid var(--violet);
+
+    box-shadow: 3px 3px 0 var(--border);
+
+    font-family: var(--font-game);
+    font-size: .82rem;
+    font-weight: bold;
+
+    line-height: 1.3;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color .15s,
+        color .15s,
+        transform .15s,
+        box-shadow .15s;
+
+}
+
+.home-page .menu .pixel-button {
+
+    width: 100%;
+    position: relative;
+
+}
+
+.home-page .pixel-button:hover {
+
+    background: var(--purple-dark);
+    border-color: var(--mint);
+
+    transform: translateY(-2px);
+
+    box-shadow: 3px 5px 0 var(--border);
+
+}
+
+.home-page .pixel-button:active {
+
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--border);
+
+}
+
+.home-page .pixel-button.mint {
+
+    background: var(--mint);
+    color: var(--night);
+
+    border-color: var(--border);
+
+    box-shadow:
+        inset 0 3px 0 #C5FFEF,
+        3px 3px 0 var(--border);
+
+}
+
+.home-page .pixel-button.mint:hover {
+
+    background: #B9FFEC;
+    color: var(--night);
+
+}
+
+.home-page .pixel-button.ghost {
+
+    background: transparent;
+    color: var(--border);
+    border-color: var(--border);
+
+}
+
+.home-page .pixel-button.ghost:hover {
+
+    background: var(--crystal-light);
+
+}
+
+.home-page .pixel-button:focus-visible,
+.home-page .hud-button:focus-visible {
+
+    outline: 3px solid var(--moon);
+    outline-offset: 4px;
+
+}
+
+.home-page #adventureButton {
+
+    min-height: 48px;
+
+}
+
+
+/* =====================================================
+   DIÁLOGOS DE LITO
+   ===================================================== */
+
+.home-page .speech-panel {
+
+    width: min(720px, calc(100% - 40px));
+
+    bottom: clamp(34px, 7vh, 75px);
+
+    padding: 20px 24px;
+
+    background: var(--cream);
+    color: var(--night);
+
+    border: 3px solid var(--border);
+
+    box-shadow:
+        0 0 0 2px var(--violet),
+        7px 7px 0 var(--purple-dark);
+
+    max-height: 42vh;
+    overflow-y: auto;
+
+}
+
+.home-page .speech-panel strong {
+
+    display: inline-block;
+    padding: 7px 10px;
+
+    background: var(--panel);
+    color: var(--mint);
+
+    font-size: .75rem;
+    letter-spacing: .8px;
+
+}
+
+.home-page .speech-panel p {
+
+    margin: 15px 0;
+    min-height: 45px;
+
+    font-size: clamp(.82rem, 1.1vw, 1rem);
+    font-weight: bold;
+    line-height: 1.65;
+
+}
+
+.home-page .speech-actions {
+
+    gap: 12px;
+
+}
+
+
+/* =====================================================
+   VENTANAS MODALES
+   ===================================================== */
+
+.home-page .modal {
+
+    background: var(--panel);
+    border: 3px solid var(--violet);
+
+    box-shadow:
+        0 0 0 3px var(--border),
+        0 0 0 100vmax #0E1233B3,
+        7px 7px 0 var(--border);
+
+    padding: 25px;
+
+}
+
+.home-page .modal h2 {
+
+    color: var(--mint);
+    line-height: 1.4;
+
+}
+
+.home-page .modal p {
+
+    color: var(--cream);
+    line-height: 1.7;
+
+}
+
+
+/* =====================================================
+   INDICADOR DE CAPÍTULO
+   ===================================================== */
+
+.home-page .chapter-label {
+
+    bottom: 12px;
+    left: 15px;
+
+    padding: 7px 12px;
+
+    color: var(--moon);
+    background: var(--night);
+
+    border: 2px solid var(--purple);
+
+    font-size: .69rem;
+    font-weight: bold;
+
+}
+
+
+/* =====================================================
+   TABLETAS Y CELULARES
+   ===================================================== */
+
+@media (max-width: 700px) {
+
+    .home-page .stage {
+
+        min-height: 720px;
+
+    }
+
+    .home-page .hud {
+
+        top: 10px;
+        left: 10px;
+        right: 10px;
+
+        justify-content: center;
+
+    }
+
+    .home-page .hud strong {
+
+        padding: 6px 10px;
+        font-size: .65rem;
+
+    }
+
+    .home-page .hud-actions {
+
+        gap: 5px;
+
+    }
+
+    .home-page .hud-button {
+
+        min-height: 40px;
+        padding: 6px 8px;
+        font-size: .65rem;
+
+    }
+
+    .home-page .logo {
+
+        top: 120px;
+        width: min(86%, 420px);
+
+    }
+
+    .home-page .logo small {
+
+        font-size: .65rem;
+        padding: 6px 8px;
+
+    }
+
+    .home-page .menu {
+
+        top: auto;
+        bottom: 24px;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        width: min(330px, calc(100% - 36px));
+        max-height: 42%;
+
+        padding: 12px;
+
+    }
+
+    .home-page .menu .pixel-button {
+
+        font-size: .76rem;
+        min-height: 44px;
+
+    }
+
+    .home-page .speech-panel {
+
+        bottom: 24px;
+        padding: 15px;
+
+        max-height: 42%;
+
+    }
+
+    .home-page .speech-actions .pixel-button {
+
+        flex: 1;
+
+    }
+
+}
+
+
+/* =====================================================
+   PANTALLAS HORIZONTALES DE POCA ALTURA
+   ===================================================== */
+
+@media (max-height: 570px) and (min-width: 701px) {
+
+    .home-page .logo {
+
+        top: 65px;
+        width: min(42vw, 45vh, 420px);
+
+    }
+
+    .home-page .logo small {
+
+        margin-top: 6px;
+        font-size: .62rem;
+
+    }
+
+    .home-page .menu {
+
+        top: auto;
+        bottom: 30px;
+
+        width: min(340px, 43%);
+        max-height: 55%;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-content: start;
+
+        padding: 10px;
+
+    }
+
+    .home-page .menu h2,
+    .home-page #adventureButton {
+
+        grid-column: 1 / -1;
+
+    }
+
+    .home-page .menu .pixel-button {
+
+        font-size: .69rem;
+        min-height: 36px;
+
+    }
+
+    .home-page .speech-panel {
+
+        bottom: 20px;
+        max-height: 40%;
+
+        padding: 12px 16px;
+
+    }
+
+}
+
+
+/* =====================================================
+   ACCESIBILIDAD
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-page .pixel-button,
+    .home-page .hud-button {
+
+        transition: none;
+
+    }
+
+    .home-page .pixel-button:hover,
+    .home-page .pixel-button:active {
+
+        transform: none;
+
+    }
+
+}
+
+
+/* =====================================================
+   SECUENCIA DE ENTRADA (intro-secuencia.js)
+   OUTSTRIP → idioma → introducción histórica
+   ===================================================== */
+
+/* Mientras se decide el modo de entrada y durante toda la presentación, el escenario
+   terrestre, el HUD, el logotipo, el menú y los diálogos no se ven (clase en el HTML
+   desde el primer renderizado). Se revelan con un fundido al entrar al menú. */
+.home-page .stage > canvas#world,
+.home-page .hud,
+.home-page .logo,
+.home-page .menu,
+.home-page .chapter-label {
+
+    transition: opacity var(--intro-fade-ms, 420ms) ease, visibility 0s;
+
+}
+
+.home-page.is-entering .stage > canvas#world,
+.home-page.is-entering .hud,
+.home-page.is-entering .logo,
+.home-page.is-entering .menu,
+.home-page.is-entering .chapter-label,
+.home-page.is-entering .modal {
+
+    opacity: 0;
+    visibility: hidden;
+
+}
+
+/* Contenedor de presentación permanente a pantalla completa. */
+.home-page .intro-sequence {
+
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+
+    background: var(--night);
+
+}
+
+/* Al entrar al menú el contenedor se vuelve transparente: solo queda el telón. */
+.home-page .intro-sequence[data-reveal="true"] {
+
+    background: transparent;
+    pointer-events: none;
+
+}
+
+/* Telón de transición: fundido a azul noche (#0E1233) entre etapas. */
+.home-page .intro-fade {
+
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    background: #0E1233;
+    opacity: 1;
+    pointer-events: auto;
+
+    transition: opacity var(--intro-fade-ms, 420ms) ease;
+
+}
+
+.home-page .intro-fade[data-state="out"] {
+
+    opacity: 0;
+    pointer-events: none;
+
+}
+
+.home-page .intro-screen {
+
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    padding: 24px 16px;
+    overflow: auto;
+
+    color: var(--cream);
+    text-align: center;
+
+    background: radial-gradient(ellipse at 50% 42%, var(--panel) 0%, var(--night) 55%, #06091D 100%);
+
+}
+
+/* Campo de estrellas en CSS (sin imágenes externas). */
+.home-page .intro-splash::before,
+.home-page .intro-language::before,
+.home-page .intro-lito::before {
+
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background-image:
+        radial-gradient(circle, var(--cream) 1px, transparent 1.6px),
+        radial-gradient(circle, var(--mint) 1px, transparent 1.6px),
+        radial-gradient(circle, var(--violet) 1.2px, transparent 1.8px);
+    background-size: 97px 89px, 151px 137px, 211px 173px;
+    background-position: 0 0, 43px 61px, 120px 20px;
+
+    opacity: .75;
+    animation: introTwinkle 2.4s steps(4) infinite alternate;
+
+}
+
+.home-page .intro-screen > * {
+
+    position: relative;
+
+}
+
+/* ---------- 1. OUTSTRIP ---------- */
+
+.home-page .intro-splash {
+
+    gap: 10px;
+
+}
+
+.home-page .intro-flash {
+
+    position: absolute;
+    width: min(70vmin, 520px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+
+    background: radial-gradient(circle, rgba(255, 248, 231, .95) 0%, rgba(143, 240, 216, .4) 22%, transparent 62%);
+
+    animation: introFlash 3.2s ease-out both;
+    pointer-events: none;
+
+}
+
+.home-page .intro-splash-brand {
+
+    margin: 0;
+
+    font-size: clamp(2.4rem, 11vw, 6.2rem);
+    font-weight: bold;
+    letter-spacing: .18em;
+    padding-left: .18em;
+
+    color: var(--cream);
+    text-shadow:
+        4px 4px 0 var(--purple-dark),
+        0 0 26px rgba(143, 240, 216, .55);
+
+    animation: introBrand 3.2s steps(10) both;
+
+}
+
+.home-page .intro-splash-tagline {
+
+    margin: 0;
+
+    font-size: clamp(.7rem, 2.6vw, 1.05rem);
+    letter-spacing: .32em;
+    padding-left: .32em;
+
+    color: var(--mint);
+    text-shadow: 2px 2px 0 var(--border);
+
+}
+
+/* ---------- 2. Idioma ---------- */
+
+.home-page .intro-language-logo {
+
+    width: min(520px, 82vw, 62vh);
+    height: auto;
+    filter: drop-shadow(4px 4px 0 var(--border));
+
+}
+
+.home-page .intro-language h2 {
+
+    margin: 0;
+
+    font-size: clamp(1rem, 3.6vw, 1.5rem);
+    letter-spacing: .12em;
+    color: var(--moon);
+    text-shadow: 3px 3px 0 var(--border);
+
+}
+
+.home-page .intro-language-alt {
+
+    margin: -8px 0 0;
+
+    font-size: clamp(.72rem, 2.2vw, .9rem);
+    letter-spacing: .12em;
+    color: var(--soft);
+
+}
+
+.home-page .intro-language-options {
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+
+}
+
+.home-page .intro-language-options .pixel-button {
+
+    min-width: 180px;
+    min-height: 48px;
+    padding: 14px 20px;
+    font-size: .95rem;
+    letter-spacing: .1em;
+
+}
+
+.home-page .intro-language-options .pixel-button[aria-pressed="true"] {
+
+    outline: 3px solid var(--moon);
+    outline-offset: 3px;
+
+}
+
+/* ---------- 3. Introducción histórica ---------- */
+
+.home-page .intro-history {
+
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 16px 18px;
+
+    background: #06091D;
+
+}
+
+/* Columna: barra, escena y subtítulo; la escena cede alto para que el texto y
+   SIGUIENTE siempre queden a la vista. */
+.home-page .intro-history-bar,
+.home-page .intro-canvas,
+.home-page .intro-caption {
+
+    width: min(960px, 100%, calc((100svh - 300px) * 16 / 9));
+
+}
+
+.home-page .intro-history-bar {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    min-width: min(100%, 320px);
+
+}
+
+.home-page .intro-count {
+
+    color: var(--mint);
+    font-weight: bold;
+    letter-spacing: .15em;
+    font-size: .8rem;
+
+}
+
+.home-page .intro-canvas {
+
+    display: block;
+    flex: none;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    min-width: min(100%, 320px);
+
+    image-rendering: pixelated;
+    background: var(--night);
+
+    border: 3px solid var(--violet);
+    box-shadow:
+        0 0 0 3px var(--border),
+        7px 7px 0 var(--border);
+
+}
+
+.home-page .intro-caption {
+
+    min-width: min(100%, 320px);
+    padding: 14px 18px;
+
+    text-align: left;
+
+    background: var(--panel);
+    border: 3px solid var(--violet);
+    box-shadow:
+        0 0 0 3px var(--border),
+        7px 7px 0 var(--border),
+        inset 0 0 0 3px var(--raised);
+
+}
+
+.home-page .intro-caption h2 {
+
+    margin: 0 0 6px;
+
+    font-size: clamp(.95rem, 2.6vw, 1.25rem);
+    letter-spacing: .06em;
+    color: var(--moon);
+
+}
+
+.home-page .intro-caption p {
+
+    margin: 0 0 12px;
+    min-height: 3.1em;
+
+    font-size: clamp(.82rem, 2.2vw, 1rem);
+    line-height: 1.55;
+
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes introFlash {
+    0% { opacity: 0; transform: scale(.2); }
+    22% { opacity: 1; transform: scale(1); }
+    48% { opacity: .25; transform: scale(1.35); }
+    100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes introBrand {
+    0%, 14% { opacity: 0; letter-spacing: .5em; }
+    32% { opacity: 1; letter-spacing: .18em; }
+    100% { opacity: 1; letter-spacing: .18em; }
+}
+
+@keyframes introTwinkle {
+    from { opacity: .55; }
+    to { opacity: .9; }
+}
+
+/* ---------- Móvil y pantallas bajas ---------- */
+
+@media (max-width: 700px) {
+
+    .home-page .intro-history {
+
+        padding: 10px 12px 14px;
+        gap: 10px;
+
+    }
+
+    .home-page .intro-history-bar,
+    .home-page .intro-canvas,
+    .home-page .intro-caption {
+
+        width: 100%;
+        min-width: 0;
+
+    }
+
+    .home-page .intro-caption {
+
+        padding: 12px;
+
+    }
+
+    .home-page .intro-caption .speech-actions .pixel-button,
+    .home-page .intro-language-options .pixel-button {
+
+        flex: 1;
+        min-width: 130px;
+        min-height: 44px;
+
+    }
+
+}
+
+/* Pantallas anchas y bajas: escena y subtítulo lado a lado. */
+@media (max-height: 640px) and (min-width: 701px) {
+
+    .home-page .intro-history {
+
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(250px, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        align-items: center;
+        align-content: center;
+        justify-items: stretch;
+        gap: 12px 16px;
+        max-width: 1100px;
+        margin-inline: auto;
+
+    }
+
+    .home-page .intro-history-bar {
+
+        grid-column: 1 / -1;
+        width: 100%;
+
+    }
+
+    .home-page .intro-canvas {
+
+        width: min(100%, calc((100svh - 100px) * 16 / 9));
+        justify-self: center;
+        min-width: 0;
+
+    }
+
+    .home-page .intro-caption {
+
+        width: 100%;
+        min-width: 0;
+
+    }
+
+    .home-page .intro-caption p {
+
+        min-height: 0;
+
+    }
+
+}
+
+/* ---------- 4. Bienvenida de LITO (dentro de la presentación) ---------- */
+
+.home-page .intro-lito {
+
+    gap: 14px;
+    padding: 64px 16px 22px;
+
+}
+
+.home-page .intro-lito-bar {
+
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+
+}
+
+.home-page .intro-lito-canvas {
+
+    width: min(300px, 62vw, 34vh);
+    height: auto;
+    aspect-ratio: 4 / 3;
+
+    image-rendering: pixelated;
+
+}
+
+/* Reutiliza el panel crema de la bienvenida, en el flujo de la pantalla. */
+.home-page .intro-lito .intro-lito-panel {
+
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    transform: none;
+
+    width: min(720px, 100%);
+    max-height: none;
+    overflow: visible;
+
+    text-align: left;
+
+}
+
+@media (max-height: 570px) {
+
+    .home-page .intro-lito {
+
+        padding-top: 56px;
+        gap: 8px;
+
+    }
+
+    .home-page .intro-lito-canvas {
+
+        width: min(220px, 28vh * 4 / 3);
+
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-page .intro-splash,
+    .home-page .intro-flash,
+    .home-page .intro-splash-brand,
+    .home-page .intro-splash::before,
+    .home-page .intro-language::before,
+    .home-page .intro-lito::before {
+
+        animation: none;
+
+    }
+
+    .home-page .intro-fade,
+    .home-page .stage > canvas#world,
+    .home-page .hud,
+    .home-page .logo,
+    .home-page .menu,
+    .home-page .chapter-label {
+
+        transition: none;
+
+    }
+
+    .home-page .intro-flash {
+
+        opacity: .35;
+
+    }
+
+}

@@ -1,0 +1,809 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>StarStep | Selección de capítulos</title>
+
+    <style>
+
+        :root {
+            --night: #0E1233;
+            --panel: #1A1F4D;
+            --raised: #262C66;
+            --border: #1A1340;
+            --cream: #FFF8E7;
+            --soft: #B9BEE6;
+            --mint: #8FF0D8;
+            --violet: #ABA1F5;
+            --purple: #6E62CE;
+            --moon: #FFE066;
+            --mars: #D9593A;
+            --water: #3FD0E0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--night);
+            color: var(--cream);
+            font-family: "Courier New", monospace;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        #stars {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            image-rendering: pixelated;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            width: min(1100px, 94%);
+            margin: auto;
+            padding-bottom: 40px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 24px 0;
+        }
+
+        .brand {
+            font-size: .85rem;
+            font-weight: bold;
+            color: var(--mint);
+            letter-spacing: 2px;
+        }
+
+        button {
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .language {
+            display: flex;
+            gap: 8px;
+        }
+
+        .language button {
+            background: var(--panel);
+            color: var(--cream);
+            border: 2px solid var(--violet);
+            padding: 10px 14px;
+        }
+
+        .language button.active {
+            background: var(--mint);
+            color: var(--night);
+        }
+
+        .heading {
+            text-align: center;
+            margin: 25px 0 35px;
+        }
+
+        .heading h1 {
+            color: var(--moon);
+            font-size: clamp(1.4rem, 4vw, 2.8rem);
+            text-shadow: 4px 4px var(--purple);
+        }
+
+        .heading p {
+            color: var(--soft);
+            line-height: 1.6;
+        }
+
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .chapter {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            padding: 18px;
+            background: var(--panel);
+            border: 3px solid var(--violet);
+            box-shadow: 6px 6px 0 var(--border);
+        }
+
+        .chapter.available {
+            border-color: var(--mint);
+        }
+
+        .chapter-art {
+            width: 100%;
+            display: block;
+            background: var(--night);
+            border: 2px solid var(--purple);
+        }
+
+        .chapter-number {
+            margin-top: 18px;
+            color: var(--soft);
+            font-size: .75rem;
+            letter-spacing: 2px;
+        }
+
+        .chapter h2 {
+            color: var(--moon);
+            font-size: 1.4rem;
+            margin: 12px 0;
+        }
+
+        .chapter p {
+            color: var(--soft);
+            font-size: .85rem;
+            line-height: 1.6;
+        }
+
+        .status {
+            color: var(--mint);
+            font-size: .75rem;
+            font-weight: bold;
+        }
+
+        .acts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin: 15px 0;
+        }
+
+        .act {
+            background: var(--night);
+            border: 1px solid var(--purple);
+            padding: 10px 3px;
+            font-size: .7rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .act.moon {
+            color: var(--moon);
+        }
+
+        .act.mars {
+            color: var(--water);
+        }
+
+        .act.traces {
+            color: var(--violet);
+        }
+
+        .chapter-button {
+            width: 100%;
+            min-height: 48px;
+            margin-top: auto;
+            padding: 12px 8px;
+
+            background: var(--mint);
+            color: var(--night);
+
+            border: 3px solid var(--border);
+            box-shadow: 4px 4px var(--border);
+        }
+
+        .chapter-button:not(:disabled):hover {
+            background: var(--moon);
+            transform: translateY(-2px);
+        }
+
+        button:focus-visible {
+            outline: 3px solid var(--moon);
+            outline-offset: 4px;
+        }
+
+        .locked {
+            border-color: #575C74;
+            text-align: center;
+        }
+
+        .locked h2 {
+            color: var(--soft);
+        }
+
+        .locked-art {
+            min-height: 180px;
+            display: grid;
+            place-items: center;
+            background: var(--night);
+            border: 2px solid #575C74;
+        }
+
+        .lock-icon {
+            width: 64px;
+            color: #868CA4;
+        }
+
+        .locked .status {
+            color: var(--soft);
+        }
+
+        .chapter-button:disabled {
+            background: var(--raised);
+            color: var(--soft);
+            cursor: not-allowed;
+            border-color: #575C74;
+        }
+
+        .notice {
+            padding: 16px;
+            margin: 24px 0;
+            background: var(--panel);
+            border: 2px solid var(--mint);
+            color: var(--mint);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .preview-label {
+            color: var(--soft);
+            text-align: center;
+            font-size: .7rem;
+            margin: 25px 0;
+        }
+
+        @media (max-width: 850px) {
+
+            .chapter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chapter.available {
+                grid-column: 1 / -1;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .chapter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chapter.available {
+                grid-column: auto;
+            }
+
+            header {
+                justify-content: center;
+            }
+
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<canvas id="stars"
+        width="480"
+        height="270"
+        aria-hidden="true">
+</canvas>
+
+<main class="page">
+
+    <header>
+
+        <span class="brand">
+            OUTSTRIP · STARSTEP
+        </span>
+
+        <div class="language">
+
+            <button type="button"
+                    class="active"
+                    data-lang="es"
+                    aria-pressed="true">
+                ES
+            </button>
+
+            <button type="button"
+                    data-lang="en"
+                    aria-pressed="false">
+                EN
+            </button>
+
+        </div>
+
+    </header>
+
+    <section class="heading">
+
+        <h1 data-text="title">
+            ELEGÍ TU AVENTURA
+        </h1>
+
+        <p data-text="subtitle">
+            El universo está lleno de historias por descubrir.
+        </p>
+
+    </section>
+
+    <section class="chapter-grid">
+
+        <!-- CAPÍTULO 1 -->
+
+        <article class="chapter available">
+
+            <svg class="chapter-art"
+                 viewBox="0 0 340 155"
+                 role="img"
+                 aria-label="La Luna y Marte"
+                 shape-rendering="crispEdges">
+
+                <rect width="340"
+                      height="155"
+                      fill="#0E1233"/>
+
+                <!-- Luna -->
+
+                <path
+                    d="M47 20H85V28H101V44H113V84H102V101H84V112H45V103H28V85H17V46H28V30H47Z"
+                    fill="#C3C7D6"/>
+
+                <path
+                    d="M66 20H85V28H101V44H113V84H102V101H84V112H66V87H79V51H66Z"
+                    fill="#868CA4"/>
+
+                <path
+                    d="M34 48H51V61H34ZM72 85H91V97H72ZM76 29H89V40H76Z"
+                    fill="#575C74"/>
+
+                <!-- Marte -->
+
+                <path
+                    d="M246 17H284V25H303V42H315V82H303V101H284V113H245V104H227V86H215V43H227V26H246Z"
+                    fill="#D9593A"/>
+
+                <path
+                    d="M272 17H284V25H303V42H315V82H303V101H284V113H264V88H282V53H272Z"
+                    fill="#A63A26"/>
+
+                <path
+                    d="M236 44H255V52H236ZM279 78H300V88H279ZM241 91H254V100H241Z"
+                    fill="#7A2818"/>
+
+                <!-- Ruta espacial -->
+
+                <path
+                    d="M112 108Q170 150 226 108"
+                    stroke="#ABA1F5"
+                    stroke-width="2"
+                    stroke-dasharray="4 6"
+                    fill="none"/>
+
+                <!-- Nave -->
+
+                <path
+                    d="M137 59H178L194 70L178 81H137Z"
+                    fill="#E4DFFF"/>
+
+                <path
+                    d="M178 59L194 70L178 81Z"
+                    fill="#8FF0D8"/>
+
+                <rect x="159"
+                      y="64"
+                      width="10"
+                      height="12"
+                      fill="#262C66"/>
+
+                <path
+                    d="M135 63L116 70L135 77Z"
+                    fill="#FFC93C"/>
+
+                <path
+                    d="M137 59L131 51H148V59ZM137 81L131 89H148V81Z"
+                    fill="#6E62CE"/>
+
+                <!-- Estrellas -->
+
+                <g fill="#FFF8E7">
+
+                    <rect x="130" y="20" width="2" height="2"/>
+                    <rect x="180" y="30" width="2" height="2"/>
+                    <rect x="116" y="120" width="2" height="2"/>
+                    <rect x="205" y="128" width="2" height="2"/>
+
+                </g>
+
+                <text x="65"
+                      y="135"
+                      fill="#FFE066"
+                      font-size="11"
+                      font-family="monospace"
+                      text-anchor="middle">
+                    APOLLO 11
+                </text>
+
+                <text x="265"
+                      y="135"
+                      fill="#3FD0E0"
+                      font-size="11"
+                      font-family="monospace"
+                      text-anchor="middle">
+                    OPPORTUNITY
+                </text>
+
+            </svg>
+
+            <span class="chapter-number"
+                  data-text="chapter1">
+                CAPÍTULO 01
+            </span>
+
+            <h2>ROCK &amp; ROLL</h2>
+
+            <span class="status" data-text="available">
+                ● DISPONIBLE
+            </span>
+
+            <p data-text="description">
+                Dos mundos, dos historias.
+                Explorá la Luna y Marte y descubrí
+                sus secretos científicos.
+            </p>
+
+            <div class="acts">
+
+                <span class="act moon"
+                      data-text="moon">
+                    I · LUNA
+                </span>
+
+                <span class="act mars"
+                      data-text="mars">
+                    II · MARTE
+                </span>
+
+                <span class="act traces"
+                      data-text="traces">
+                    III · HUELLAS
+                </span>
+
+            </div>
+
+            <button type="button"
+                    class="chapter-button"
+                    id="startChapter"
+                    data-text="start">
+                INICIAR CAPÍTULO
+            </button>
+
+        </article>
+
+        <!-- CAPÍTULO 2 -->
+
+        <article class="chapter locked">
+
+            <div class="locked-art">
+
+                <svg class="lock-icon"
+                     viewBox="0 0 40 48"
+                     aria-hidden="true">
+
+                    <path
+                        d="M10 20V12H14V7H26V12H30V20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="5"/>
+
+                    <rect x="4" y="20"
+                          width="32" height="25"
+                          fill="currentColor"/>
+
+                    <rect x="17" y="28"
+                          width="6" height="10"
+                          fill="#0E1233"/>
+
+                </svg>
+
+            </div>
+
+            <span class="chapter-number"
+                  data-text="chapter2">
+                CAPÍTULO 02
+            </span>
+
+            <h2 data-text="coming">
+                PRÓXIMAMENTE
+            </h2>
+
+            <p data-text="lockedDescription">
+                Una nueva aventura te espera.
+            </p>
+
+            <button type="button"
+                    class="chapter-button"
+                    data-text="locked"
+                    disabled>
+                BLOQUEADO
+            </button>
+
+        </article>
+
+        <!-- CAPÍTULO 3 -->
+
+        <article class="chapter locked">
+
+            <div class="locked-art">
+
+                <svg class="lock-icon"
+                     viewBox="0 0 40 48"
+                     aria-hidden="true">
+
+                    <path
+                        d="M10 20V12H14V7H26V12H30V20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="5"/>
+
+                    <rect x="4" y="20"
+                          width="32" height="25"
+                          fill="currentColor"/>
+
+                    <rect x="17" y="28"
+                          width="6" height="10"
+                          fill="#0E1233"/>
+
+                </svg>
+
+            </div>
+
+            <span class="chapter-number"
+                  data-text="chapter3">
+                CAPÍTULO 03
+            </span>
+
+            <h2 data-text="coming">
+                PRÓXIMAMENTE
+            </h2>
+
+            <p data-text="lockedDescription">
+                Una nueva aventura te espera.
+            </p>
+
+            <button type="button"
+                    class="chapter-button"
+                    data-text="locked"
+                    disabled>
+                BLOQUEADO
+            </button>
+
+        </article>
+
+    </section>
+
+    <p class="notice"
+       id="chapterNotice"
+       role="status"
+       hidden>
+    </p>
+
+    <p class="preview-label"
+       data-text="preview">
+        VISTA DE DESARROLLO · NO MODIFICA TU PARTIDA
+    </p>
+
+</main>
+
+<script>
+
+    "use strict";
+
+    const translations = {
+
+        es: {
+            title: "ELEGÍ TU AVENTURA",
+            subtitle: "El universo está lleno de historias por descubrir.",
+            chapter1: "CAPÍTULO 01",
+            chapter2: "CAPÍTULO 02",
+            chapter3: "CAPÍTULO 03",
+            available: "● DISPONIBLE",
+            description: "Dos mundos, dos historias. Explorá la Luna y Marte y descubrí sus secretos científicos.",
+            moon: "I · LUNA",
+            mars: "II · MARTE",
+            traces: "III · HUELLAS",
+            start: "INICIAR CAPÍTULO",
+            coming: "PRÓXIMAMENTE",
+            locked: "BLOQUEADO",
+            lockedDescription: "Una nueva aventura te espera.",
+            notice: "ROCK & ROLL seleccionado. La conexión con StarFlow se realizará después de integrar la presentación.",
+            preview: "VISTA DE DESARROLLO · NO MODIFICA TU PARTIDA"
+        },
+
+        en: {
+            title: "CHOOSE YOUR ADVENTURE",
+            subtitle: "The universe is full of stories to discover.",
+            chapter1: "CHAPTER 01",
+            chapter2: "CHAPTER 02",
+            chapter3: "CHAPTER 03",
+            available: "● AVAILABLE",
+            description: "Two worlds, two stories. Explore the Moon and Mars and discover their scientific secrets.",
+            moon: "I · MOON",
+            mars: "II · MARS",
+            traces: "III · TRACES",
+            start: "START CHAPTER",
+            coming: "COMING SOON",
+            locked: "LOCKED",
+            lockedDescription: "A new adventure awaits you.",
+            notice: "ROCK & ROLL selected. StarFlow integration will follow the introduction sequence.",
+            preview: "DEVELOPMENT PREVIEW · DOES NOT MODIFY YOUR SAVE"
+        }
+
+    };
+
+    let currentLanguage = "es";
+
+    const notice =
+        document.getElementById("chapterNotice");
+
+    function changeLanguage(lang) {
+
+        if (!translations[lang]) {
+            return;
+        }
+
+        currentLanguage = lang;
+
+        document.documentElement.lang = lang;
+
+        document.querySelectorAll("[data-text]")
+            .forEach(element => {
+
+                const key = element.dataset.text;
+
+                element.textContent =
+                    translations[lang][key];
+
+            });
+
+        document.querySelectorAll("[data-lang]")
+            .forEach(button => {
+
+                const active =
+                    button.dataset.lang === lang;
+
+                button.classList.toggle(
+                    "active", active
+                );
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(active)
+                );
+
+            });
+
+        if (!notice.hidden) {
+
+            notice.textContent =
+                translations[lang].notice;
+
+        }
+
+    }
+
+    document.querySelectorAll("[data-lang]")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                changeLanguage(button.dataset.lang);
+
+            });
+
+        });
+
+    document.getElementById("startChapter")
+    .addEventListener("click", () => {
+
+        window.location.href =
+            "demo-rock-roll.html?lang=" +
+            encodeURIComponent(currentLanguage);
+
+    });
+
+
+    // FONDO ESPACIAL PIXEL ART
+
+    const canvas =
+        document.getElementById("stars");
+
+    const ctx =
+        canvas.getContext("2d");
+
+    const stars = Array.from(
+        { length: 160 },
+        (_, i) => ({
+            x: (i * 131 + 17) % 480,
+            y: (i * 67 + 31) % 270,
+            size: i % 13 === 0 ? 2 : 1
+        })
+    );
+
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    function drawStars(time = 0) {
+
+        ctx.fillStyle = "#0E1233";
+        ctx.fillRect(0, 0, 480, 270);
+
+        stars.forEach((star, i) => {
+
+            ctx.globalAlpha =
+                .45 + .55 *
+                ((Math.sin(time * .001 + i) + 1) / 2);
+
+            ctx.fillStyle =
+                i % 7 === 0
+                    ? "#8FF0D8"
+                    : "#FFF8E7";
+
+            ctx.fillRect(
+                star.x,
+                star.y,
+                star.size,
+                star.size
+            );
+
+        });
+
+        ctx.globalAlpha = 1;
+
+        if (!reducedMotion.matches) {
+
+            requestAnimationFrame(drawStars);
+
+        }
+
+    }
+
+    changeLanguage("es");
+    drawStars();
+
+</script>
+
+</body>
+</html>

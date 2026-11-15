@@ -1,1 +1,403 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>StarStep · Tierra</title><link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"><script defer src="{{ url_for('static',filename='js/audio.js') }}"></script><script defer src="{{ url_for('static',filename='js/progreso.js') }}"></script><script defer src="{{ url_for('static',filename='js/scene.js') }}"></script><script defer src="{{ url_for('static',filename='js/main.js') }}"></script></head><body class="star-page"><main class="stage"><noscript><section style="position:absolute;z-index:100;top:35%;left:10%;padding:25px;background:#0E1233;color:#FFF8E7">StarStep necesita JavaScript activado. <a href="/diagnostico" style="color:#8FF0D8">Diagnóstico</a></section></noscript><canvas id="world" width="480" height="270" aria-label="Estación terrestre pixel art con volcán, lago, observatorio y cohete"></canvas><div class="curtain"></div><header class="hud"><strong>OUTSTRIP · STARSTEP</strong><div class="hud-actions"><button class="hud-button" data-lang="es" aria-pressed="true">ES</button><button class="hud-button" data-lang="en" aria-pressed="false">EN</button><a class="hud-button" data-i18n="journal" href="{{ url_for('bitacora') }}">BITÁCORA</a></div></header><div class="logo"><h1>ST<span>A</span>RSTEP</h1><small>«Un pequeño paso que dar, un universo por explorar.»</small></div><section id="welcome" class="speech-panel"><strong id="speaker">CONTROL DE MISIÓN</strong><p id="speechText" aria-live="polite">¡Comenzá la transmisión para escuchar tu bienvenida!</p><div class="speech-actions"><button class="pixel-button ghost" id="skip">SALTAR</button><button class="pixel-button mint" id="start" data-i18n="transmit">INICIAR TRANSMISIÓN</button></div></section><section class="pixel-panel menu" id="menu" hidden><h2>MENÚ DE MISIÓN</h2><a class="pixel-button mint" data-i18n="start" href="{{ url_for('astronauta') }}">INICIAR AVENTURA</a><a class="pixel-button" data-i18n="choose" href="{{ url_for('astronauta') }}">ELEGIR AVATAR</a><button class="pixel-button" data-i18n="how" id="how">CÓMO JUGAR</button><button class="pixel-button" id="music">♪ MÚSICA ON</button><button class="pixel-button" id="voice">VOZ ON</button></section><section id="help" class="pixel-panel modal" role="dialog" aria-modal="true" aria-label="Cómo jugar" hidden><h2>CÓMO JUGAR / HOW TO PLAY</h2><p>Elegí avatar, escribí un alias y despegá. En la Luna, A/D o flechas mueven el rover; E inspecciona un artefacto. En el visor 3D, tocá las luces menta para descubrir pistas.</p><button id="closeHelp" class="pixel-button mint">ENTENDIDO / GOT IT</button></section><span class="chapter-label">CAPÍTULO 1 · ROCK & ROLL</span></main></body></html>
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>StarStep · Tierra</title>
+
+    <!-- Estilos originales -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <!-- Nueva identidad visual -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/identidad.css') }}"
+    >
+
+    <!-- Scripts del videojuego -->
+    <script defer src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/scene.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/intro-secuencia.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/science-content.js') }}"></script>
+  </head>
+
+  <body class="star-page home-page is-entering">
+
+    <main class="stage">
+
+      <!-- Advertencia si JavaScript está desactivado -->
+      <noscript>
+        <section
+          style="position:absolute;z-index:100;top:35%;left:10%;padding:25px;background:#0E1233;color:#FFF8E7"
+        >
+          StarStep necesita JavaScript activado.
+
+          <a href="/diagnostico" style="color:#8FF0D8">
+            Diagnóstico
+          </a>
+        </section>
+      </noscript>
+
+      <!-- Escenario terrestre -->
+      <canvas
+        id="world"
+        width="480"
+        height="270"
+        aria-label="Estación terrestre pixel art con volcán, lago, observatorio y cohete"
+      ></canvas>
+
+      <div class="curtain"></div>
+
+      <!-- Barra superior -->
+      <header class="hud">
+
+        <strong>OUTSTRIP · STARSTEP</strong>
+
+        <div class="hud-actions">
+
+          <a
+            class="hud-button"
+            href="{{ url_for('archivo_nasa', desde='menu') }}"
+            data-i18n="science.link"
+          >
+            ARCHIVO NASA
+          </a>
+
+          <button
+            class="hud-button"
+            data-lang="es"
+            aria-pressed="true"
+          >
+            ES
+          </button>
+
+          <button
+            class="hud-button"
+            data-lang="en"
+            aria-pressed="false"
+          >
+            EN
+          </button>
+
+          <a
+            class="hud-button"
+            data-i18n="journal"
+            href="{{ url_for('bitacora') }}"
+          >
+            BITÁCORA
+          </a>
+
+        </div>
+
+      </header>
+
+      <!-- Logotipo oficial de StarStep -->
+      <div class="logo">
+
+        <h1>
+          <img
+            class="brand-image"
+            src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+            alt="StarStep"
+            width="1600"
+            height="539"
+            fetchpriority="high"
+          >
+        </h1>
+
+        <small data-i18n="brand.tagline">
+          «Un pequeño paso que dar, un universo por explorar.»
+        </small>
+
+      </div>
+
+      <!-- Menú principal -->
+      <section class="pixel-panel menu" id="menu" hidden>
+
+        <h2 data-i18n="home.title">
+          MENÚ DE MISIÓN
+        </h2>
+
+        <a
+          class="pixel-button mint"
+          id="adventureButton"
+          data-i18n="start"
+          href="{{ url_for('astronauta') }}"
+        >
+          INICIAR AVENTURA
+        </a>
+
+        <button
+          class="pixel-button"
+          id="newGame"
+          data-i18n="newgame.button"
+          type="button"
+          hidden
+        >
+          NUEVA PARTIDA
+        </button>
+
+        <a
+          class="pixel-button"
+          data-i18n="choose"
+          href="{{ url_for('astronauta') }}"
+        >
+          ELEGIR AVATAR
+        </a>
+
+        <button
+          class="pixel-button"
+          data-i18n="how"
+          id="how"
+        >
+          CÓMO JUGAR
+        </button>
+
+        <button
+          class="pixel-button"
+          id="replayIntro"
+          data-i18n="intro.replay"
+          type="button"
+          hidden
+        >
+          VER INTRODUCCIÓN
+        </button>
+
+        <button class="pixel-button" id="music">
+          ♪ MÚSICA ON
+        </button>
+
+        <button class="pixel-button" id="voice">
+          VOZ ON
+        </button>
+
+      </section>
+
+      <!-- Ventana de instrucciones -->
+      <section
+        id="help"
+        class="pixel-panel modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Cómo jugar"
+        hidden
+      >
+
+        <h2 data-i18n="help.title">
+          CÓMO JUGAR / HOW TO PLAY
+        </h2>
+
+        <p data-i18n="help.body">
+          Elegí avatar, escribí un alias y despegá.
+          En la Luna, A/D o flechas mueven el rover;
+          E inspecciona un artefacto.
+          En el visor 3D, tocá las luces menta para descubrir pistas.
+        </p>
+
+        <button
+          id="closeHelp"
+          class="pixel-button mint"
+          data-i18n="help.close"
+        >
+          ENTENDIDO / GOT IT
+        </button>
+
+      </section>
+
+      <!-- Confirmación de nueva partida -->
+      <section
+        id="newGameDialog"
+        class="pixel-panel modal"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="newGameTitle"
+        aria-describedby="newGameBody"
+        hidden
+      >
+
+        <h2
+          id="newGameTitle"
+          data-i18n="newgame.title"
+        >
+          ¿EMPEZAR UNA PARTIDA NUEVA?
+        </h2>
+
+        <p
+          id="newGameBody"
+          data-i18n="newgame.body"
+        >
+          Se borrarán de este navegador el nombre del cadete,
+          el avatar, los descubrimientos, las insignias,
+          las notas y la foto de la bitácora.
+          El idioma y el audio se conservan.
+          No se puede deshacer.
+        </p>
+
+        <div class="speech-actions">
+
+          <button
+            class="pixel-button"
+            id="newGameCancel"
+            type="button"
+            data-i18n="newgame.cancel"
+          >
+            CANCELAR
+          </button>
+
+          <button
+            class="pixel-button mint"
+            id="newGameConfirm"
+            type="button"
+            data-i18n="newgame.confirm"
+          >
+            SÍ, EMPEZAR DE NUEVO
+          </button>
+
+        </div>
+
+      </section>
+
+      <!-- Presentación a pantalla completa: OUTSTRIP → idioma → introducción histórica → LITO.
+           Permanente desde el primer renderizado; intro-secuencia.js la retira al entrar al menú. -->
+      <section id="introSequence" class="intro-sequence" aria-live="off">
+
+        <div
+          id="introSplash"
+          class="intro-screen intro-splash"
+          role="img"
+          aria-label="OUTSTRIP · Two Worlds, Two Stories"
+          hidden
+        >
+          <div class="intro-flash" aria-hidden="true"></div>
+          <p class="intro-splash-brand" aria-hidden="true">OUTSTRIP</p>
+          <p class="intro-splash-tagline" aria-hidden="true">Two Worlds, Two Stories</p>
+        </div>
+
+        <div
+          id="introLanguage"
+          class="intro-screen intro-language"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="introLanguageTitle"
+          hidden
+        >
+          <img
+            class="intro-language-logo"
+            src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+            alt="StarStep"
+            width="1600"
+            height="539"
+          >
+
+          <h2 id="introLanguageTitle">SELECCIONÁ TU IDIOMA</h2>
+          <p id="introLanguageAlt" class="intro-language-alt" lang="en">CHOOSE YOUR LANGUAGE</p>
+
+          <div class="intro-language-options">
+            <button class="pixel-button mint" id="introLangEs" type="button" data-intro-lang="es" lang="es">
+              ESPAÑOL
+            </button>
+            <button class="pixel-button mint" id="introLangEn" type="button" data-intro-lang="en" lang="en">
+              ENGLISH
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="introHistory"
+          class="intro-screen intro-history"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="introSceneTitle"
+          hidden
+        >
+          <div class="intro-history-bar">
+            <span id="introSceneCount" class="intro-count">1 / 5</span>
+            <div class="hud-actions">
+              <button class="hud-button" type="button" data-lang="es">ES</button>
+              <button class="hud-button" type="button" data-lang="en">EN</button>
+              <button class="hud-button" type="button" id="introVoice">VOZ ON</button>
+            </div>
+          </div>
+
+          <canvas
+            id="introCanvas"
+            class="intro-canvas"
+            width="480"
+            height="270"
+            aria-hidden="true"
+          ></canvas>
+
+          <div id="introCaption" class="intro-caption">
+            <h2 id="introSceneTitle">La curiosidad humana</h2>
+            <p id="introSceneText" aria-live="polite"></p>
+
+            <div class="speech-actions">
+              <button class="pixel-button" id="introSkip" type="button" data-i18n="intro.skip" hidden>
+                SALTAR
+              </button>
+              <button class="pixel-button mint" id="introNext" type="button" data-i18n="intro.next">
+                SIGUIENTE
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="introLito"
+          class="intro-screen intro-lito"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="litoSpeaker"
+          hidden
+        >
+          <div class="intro-history-bar intro-lito-bar">
+            <span class="intro-count" aria-hidden="true"></span>
+            <div class="hud-actions">
+              <button class="hud-button" type="button" data-lang="es">ES</button>
+              <button class="hud-button" type="button" data-lang="en">EN</button>
+              <button class="hud-button" type="button" id="litoVoice">VOZ ON</button>
+            </div>
+          </div>
+
+          <canvas
+            id="litoCanvas"
+            class="intro-lito-canvas"
+            width="120"
+            height="90"
+            aria-hidden="true"
+          ></canvas>
+
+          <div class="speech-panel intro-lito-panel">
+            <strong id="litoSpeaker">LITO</strong>
+            <p id="litoText" aria-live="polite"></p>
+            <div class="speech-actions">
+              <button class="pixel-button mint" id="litoReady" type="button" data-i18n="lito.ready">
+                ¡ESTOY LISTO!
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telón de transición: fundido a azul noche entre etapas -->
+        <div id="introFade" class="intro-fade" data-state="in" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- Capítulo actual -->
+      <span class="chapter-label" data-i18n="chapter">
+        CAPÍTULO 1 · ROCK &amp; ROLL
+      </span>
+
+    </main>
+
+  </body>
+</html>

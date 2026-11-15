@@ -18,3 +18,249 @@
 .page-shell{padding:20px;width:min(1000px,95%);margin:0 auto}.puzzle-window{margin:7vh auto;padding:30px;max-width:800px}.matching-game{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:25px 0}.match-column{display:flex;flex-direction:column;gap:13px}.match-column button{min-height:69px}.match-column button.selected{border-color:#8FF0D8}.match-column button.matched{background:#245B48;border-color:#5BE39A}#matchFeedback{color:#FFE066;min-height:28px}.certificate{margin:25px auto;padding:25px;background:#FFF8E7;color:#0E1233;border:8px double #6E62CE;text-align:center}.certificate h1{font-size:2rem}.next-act{color:#8FF0D8;font-weight:bold;text-decoration:none;padding:10px}.visor-modal[hidden]{display:none!important}
 @media print{.diary-cover,.diary-top,.pixel-button,.hud{display:none!important}.certificate{display:block!important;min-height:80vh;margin:0}}
 @media(max-width:550px){.matching-game{gap:7px}.match-column button{font-size:.65rem}}
+
+/* StarStep visual system integration: 16:9, never stretch the pixel world. */
+.stage>canvas#world{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.hud{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
+.hud-actions{flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.hud-button{white-space:nowrap;min-height:34px}
+.logo{top:clamp(76px,12vh,135px);width:min(92%,900px)}
+.logo h1{font-size:clamp(2.3rem,7vw,5.5rem);overflow-wrap:normal;white-space:nowrap}
+.speech-panel{width:min(735px,calc(100% - 36px));bottom:clamp(18px,5vh,64px);max-height:42vh;overflow-y:auto;padding:clamp(12px,2vw,20px)}
+.speech-actions{flex-wrap:wrap}.speech-actions .pixel-button{min-width:110px}
+.science-wrap{width:min(1180px,96%);margin:0 auto;padding:16px 0 70px}
+.science-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 30px}
+.science-hero{background:#1A1F4D;border:3px solid #ABA1F5;padding:22px 28px}
+.science-hero h1{font-size:clamp(1.7rem,4vw,2.9rem);color:#8FF0D8}
+.science-hero p{line-height:1.55}
+.science-section{margin:36px 0}.science-section h2{color:#FFE066;font-size:1.2rem}
+.science-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+.science-card{background:#262C66;border:3px solid #ABA1F5;padding:12px 12px 18px;display:flex;flex-direction:column;gap:9px}
+.science-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E1233;border:2px solid #1A1340}
+.science-card h3{font-size:1.03rem;margin:5px 0;color:#8FF0D8}
+.science-card p{font-size:.84rem;line-height:1.5;margin:0;flex:1}
+.science-card small{color:#B9BEE6}.science-card a{color:#FFE066}
+@media(max-width:700px){.logo{top:clamp(75px,15vh,115px)}.logo h1{font-size:clamp(1.7rem,8.4vw,3.6rem)}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:44vh}.chapter-label{display:none}}
+@media(max-height:570px){.logo{top:60px}.logo h1{font-size:2.4rem}.speech-panel{bottom:6px;max-height:50vh}.menu{top:30%}}
+
+
+
+/* ==================================================
+   STARSTEP - CORRECCIÓN VISUAL DE LA PORTADA
+   ================================================== */
+
+/* Escenario a pantalla completa */
+.home-page .stage {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+}
+
+/* Eliminar franjas oscuras sin deformar el escenario */
+.home-page .stage > canvas#world {
+    object-fit: cover;
+    object-position: center bottom;
+}
+
+/* Barra superior HUD */
+.home-page .hud {
+    top: 12px;
+    left: clamp(10px, 2vw, 24px);
+    right: clamp(10px, 2vw, 24px);
+    max-width: none;
+    flex-wrap: wrap;
+}
+
+.home-page .hud strong {
+    line-height: 1.3;
+}
+
+/* Corregir legibilidad de los botones superiores */
+.home-page .hud-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    text-shadow: none;
+    line-height: 1.25;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: clamp(.68rem, 1vw, .82rem);
+}
+
+.home-page .hud-button:hover {
+    background: var(--moon);
+}
+
+/* Título principal */
+.home-page .logo {
+    top: clamp(64px, 12vh, 120px);
+    width: calc(100% - 24px);
+}
+
+.home-page .logo h1 {
+    font-size: clamp(1.7rem, 7vw, 5.5rem);
+    line-height: 1.1;
+}
+
+.home-page .logo small {
+    line-height: 1.4;
+    max-width: 100%;
+}
+
+/* Menú principal */
+.home-page .menu {
+    top: auto;
+    bottom: clamp(34px, 7vh, 75px);
+    left: clamp(18px, 6vw, 100px);
+    transform: none;
+    width: min(290px, 40%);
+    max-height: calc(100% - clamp(180px, 29vh, 250px));
+    overflow-y: auto;
+    padding: clamp(10px, 2vh, 20px);
+    gap: 7px;
+}
+
+.home-page .menu h2 {
+    margin: 0 0 5px;
+}
+
+.home-page .menu .pixel-button {
+    flex-shrink: 0;
+}
+
+/* Cuadro de diálogo */
+.home-page .speech-panel {
+    bottom: clamp(34px, 7vh, 75px);
+}
+
+/* ==================================================
+   ADAPTACIÓN A DISPOSITIVOS MÓVILES
+   ================================================== */
+
+@media (max-width: 700px) {
+
+    .home-page .hud {
+        justify-content: center;
+        row-gap: 5px;
+    }
+
+    .home-page .hud strong {
+        flex-basis: 100%;
+        text-align: center;
+    }
+
+    .home-page .hud-actions {
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .home-page .hud-button {
+        padding: 5px 7px;
+        min-height: 34px;
+    }
+
+    .home-page .logo {
+        top: clamp(96px, 16vh, 145px);
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(1.75rem, 10vw, 3.8rem);
+    }
+
+    .home-page .menu {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 18px;
+        width: min(300px, calc(100% - 32px));
+        max-height: calc(100% - 220px);
+    }
+
+    .home-page .speech-panel {
+        bottom: 18px;
+        max-height: 48vh;
+    }
+}
+
+/* ==================================================
+   PANTALLAS HORIZONTALES DE POCA ALTURA
+   ================================================== */
+
+@media (max-height: 500px) and (min-width: 701px) {
+
+    .home-page .logo {
+        top: 58px;
+    }
+
+    .home-page .logo h1 {
+        font-size: clamp(2rem, 6vh, 3.4rem);
+    }
+
+    .home-page .menu {
+        top: 135px;
+        bottom: auto;
+        width: min(390px, 46%);
+        max-height: calc(100% - 160px);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+    }
+
+    .home-page .menu h2 {
+        grid-column: 1 / -1;
+    }
+
+    .home-page .menu .pixel-button {
+        padding: 7px 10px;
+        font-size: .72rem;
+    }
+
+    .home-page .speech-panel {
+        bottom: 28px;
+        max-height: 46vh;
+    }
+}
+
+/* Pantallas pequeñas de poca altura */
+@media (max-width: 700px) and (max-height: 450px) {
+
+    .home-page .logo {
+        top: 92px;
+    }
+
+    .home-page .logo h1 {
+        font-size: 1.7rem;
+    }
+
+    .home-page .menu {
+        max-height: calc(100% - 160px);
+        bottom: 10px;
+    }
+
+    .home-page .speech-panel {
+        bottom: 10px;
+        max-height: 45vh;
+    }
+}
+
+/* ==================================================
+   STARFLOW - AVISOS DEL CONTROLADOR DEL FLUJO
+   ================================================== */
+.flow-notice {
+    position: fixed;
+    left: 50%;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 10000;
+    width: min(92vw, 560px);
+    margin: 0;
+    padding: 12px 16px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--moon);
+    box-shadow: 0 0 0 3px var(--border), 5px 5px 0 #06091d;
+    font: inherit;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+}
