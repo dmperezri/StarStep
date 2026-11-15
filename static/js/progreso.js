@@ -10,11 +10,13 @@ window.StarProgress = (() => {
   const FLOW='starstep_flujo', FLOW_BACKUP='starstep_flujo_respaldo', completedKey='starstep_completed';
   const ACTS=['luna','marte','huellas'];
   const PHOTO='starstep_foto';
+  // Cinemáticas vistas por el jugador (solo presentación: no otorga progreso ni toca StarFlow).
+  const CINEMATICS='starstep_cinematicas', CINEMATIC_IDS=['history_intro'];
   /* Identidad actual: no hay cuentas; un jugador = este navegador (LocalStorage).
      PLAYER_KEYS son los datos del jugador y se borran juntos en «Nueva partida»: si quedara
      alguno heredado (inventario, actos o perfil), la migración de flujo.js reconstruiría
      la partida anterior. PREFERENCE_KEYS son del dispositivo y se conservan. */
-  const PLAYER_KEYS=Object.freeze([FLOW,FLOW_BACKUP,INVENTORY,completedKey,PROFILE,NOTES,PHOTO]);
+  const PLAYER_KEYS=Object.freeze([FLOW,FLOW_BACKUP,INVENTORY,completedKey,PROFILE,NOTES,PHOTO,CINEMATICS]);
   const PREFERENCE_KEYS=Object.freeze(['starstep_lang','starstep_audio']);
   let resetting=false;
   const catalog={
@@ -87,7 +89,17 @@ window.StarProgress = (() => {
   /* Nueva partida: borra solo los datos del jugador de este navegador. No toca el servidor.
      Quien llama debe recargar la página después (el controlador en memoria queda obsoleto). */
   function hasPersonalData(){
-    try{return PLAYER_KEYS.some(k=>k!==FLOW&&k!==FLOW_BACKUP&&localStorage.getItem(k)!==null);}catch{return false;}
+    // Haber visto una cinemática no es progreso: no hace aparecer «Nueva partida» por sí solo.
+    try{return PLAYER_KEYS.some(k=>k!==FLOW&&k!==FLOW_BACKUP&&k!==CINEMATICS&&localStorage.getItem(k)!==null);}catch{return false;}
+  }
+  function cinematics(){const c=read(CINEMATICS,{});return c&&typeof c==='object'&&!Array.isArray(c)?c:{};}
+  function hasSeenCinematic(id){return CINEMATIC_IDS.includes(id)&&typeof cinematics()[id]?.seenAt==='string';}
+  function markCinematicSeen(id){
+    if(!CINEMATIC_IDS.includes(id))return false;
+    if(hasSeenCinematic(id))return true;
+    const all=cinematics();all[id]={seenAt:new Date().toISOString()};
+    try{write(CINEMATICS,all);}catch{return false;}
+    return hasSeenCinematic(id);
   }
   function resetPlayerData(){
     resetting=true;
@@ -103,5 +115,5 @@ window.StarProgress = (() => {
   });
 
   return {catalog,list,unlock,player,setPlayer,getNotes,setNotes,completed,completeAct,canFinish,connectFlow,loadFlow,saveFlow,backupFlow,
-    PLAYER_KEYS,PREFERENCE_KEYS,hasPersonalData,resetPlayerData};
+    PLAYER_KEYS,PREFERENCE_KEYS,hasPersonalData,resetPlayerData,hasSeenCinematic,markCinematicSeen};
 })();

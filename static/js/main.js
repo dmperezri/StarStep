@@ -191,6 +191,22 @@ window.StarI18n=(()=>{
  "start.continue": "CONTINUAR AVENTURA",
  "start.review": "CONSULTAR PROGRESO",
  "newgame.button": "NUEVA PARTIDA",
+ "voice.off": "VOZ OFF",
+ "intro.next": "SIGUIENTE",
+ "intro.skip": "SALTAR",
+ "intro.replay": "VER INTRODUCCIÓN",
+ "intro.scene.curiosity.title": "La curiosidad humana",
+ "intro.scene.curiosity.text": "Desde tiempos antiguos, la humanidad ha mirado hacia las estrellas, preguntándose qué secretos esconden otros mundos.",
+ "intro.scene.apollo.title": "El comienzo de una aventura",
+ "intro.scene.apollo.text": "Una misión cambiaría para siempre nuestra manera de comprender el universo: Apollo 11.",
+ "intro.scene.footprints.title": "Las huellas en la Luna",
+ "intro.scene.footprints.text": "Por primera vez, seres humanos caminaban sobre otro mundo. Sus descubrimientos abrieron nuevas preguntas.",
+ "intro.scene.mars.title": "Un nuevo horizonte",
+ "intro.scene.mars.text": "Décadas después, un pequeño explorador robótico continuaría la búsqueda de respuestas sobre Marte.",
+ "intro.scene.story.title": "Tu historia comienza",
+ "intro.scene.story.text": "Dos mundos. Dos historias. Una misma curiosidad. Ahora es tu turno de explorar.",
+ "lito.welcome": "¡Hola, cadete! Soy LITO, tu compañero de exploración. Juntos viajaremos a lugares increíbles, resolveremos misterios y descubriremos los secretos del universo. ¿Estás preparado?",
+ "lito.ready": "¡ESTOY LISTO!",
  "alias.error.empty": "Escribí el nombre del cadete: no puede quedar vacío ni tener solo espacios.",
  "alias.error.length": "El nombre del cadete debe tener entre 2 y 18 caracteres, sin contar los espacios del principio y del final.",
  "alias.error.chars": "Usá solo letras (con tildes o ñ), números, espacios, guiones o guiones bajos.",
@@ -238,6 +254,22 @@ window.StarI18n=(()=>{
  "start.continue": "CONTINUE ADVENTURE",
  "start.review": "VIEW PROGRESS",
  "newgame.button": "NEW GAME",
+ "voice.off": "VOICE OFF",
+ "intro.next": "NEXT",
+ "intro.skip": "SKIP",
+ "intro.replay": "WATCH INTRO",
+ "intro.scene.curiosity.title": "Human curiosity",
+ "intro.scene.curiosity.text": "Since ancient times, humanity has looked to the stars, wondering what secrets other worlds may hold.",
+ "intro.scene.apollo.title": "The beginning of an adventure",
+ "intro.scene.apollo.text": "One mission would forever change the way we understand the universe: Apollo 11.",
+ "intro.scene.footprints.title": "Footprints on the Moon",
+ "intro.scene.footprints.text": "For the first time, humans walked on another world. Their discoveries opened new questions.",
+ "intro.scene.mars.title": "A new horizon",
+ "intro.scene.mars.text": "Decades later, a small robotic explorer would continue the search for answers on Mars.",
+ "intro.scene.story.title": "Your story begins",
+ "intro.scene.story.text": "Two worlds. Two stories. One shared curiosity. Now it is your turn to explore.",
+ "lito.welcome": "Hello, cadet! I'm LITO, your exploration companion. Together we will travel to incredible places, solve mysteries, and discover the secrets of the universe. Are you ready?",
+ "lito.ready": "I'M READY!",
  "alias.error.empty": "Enter the cadet name: it cannot be empty or contain only spaces.",
  "alias.error.length": "The cadet name must have 2 to 18 characters, not counting leading or trailing spaces.",
  "alias.error.chars": "Use only letters (accents and ñ allowed), numbers, spaces, hyphens or underscores.",
@@ -280,107 +312,21 @@ window.StarI18n=(()=>{
 
 /* El resto solo corre en la portada. */
 document.addEventListener('DOMContentLoaded',()=>{
- const canvas=document.getElementById('world');if(!canvas || !document.getElementById('start') || !document.getElementById('welcome'))return;
+ const canvas=document.getElementById('world');if(!canvas || !document.getElementById('menu') || !document.getElementById('adventureButton'))return;
  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
- const $=id=>document.getElementById(id);let step=-1,typingTimer=null,transition=false;
- function typeText(text){clearInterval(typingTimer);const node=$('speechText');node.textContent='';let i=0;typingTimer=setInterval(()=>{i=Math.min(text.length,i+2);node.textContent=text.slice(0,i);if(i%6===0)StarSound.effect('type');if(i>=text.length)clearInterval(typingTimer);},23);}
- function showStep(){const lines=StarI18n.t('speech'),line=lines[step];$('speaker').textContent=line[0];typeText(line[1]);$('start').textContent=step===2?StarI18n.t('menu'):StarI18n.t('continue');StarSound.effect('radio');StarSound.speak(line[1],{lito:step===2,onStart:()=>{window.litoState='talking';},onEnd:()=>{window.litoState='idle';}});}
- function showWelcome() {
-    clearInterval(typingTimer);
-    StarSound.stopVoice();
-
-    step = -1;
-    window.litoState = 'idle';
-
-    $('menu').hidden = true;
-    $('help').hidden = true;
-    $('welcome').hidden = false;
-
-    $('speaker').textContent =
-        StarI18n.t('welcome.speaker');
-
-    $('speechText').textContent =
-        StarI18n.t('welcome.message');
-
-    $('start').textContent =
-        StarI18n.t('transmit');
-
-    $('skip').textContent =
-        StarI18n.t('skip');
-}
-
-// Regreso interno desde una misión: muestra el menú sin repetir la bienvenida.
- // No registra objetivos ni toca el progreso; solo cambia la vista.
- let returnedToMenu = false;
- function showReturnMenu() {
-  clearInterval(typingTimer);
-  StarSound.stopVoice();
-  step = 3;
-  returnedToMenu = true;
-  window.litoState = 'idle';
-  $('welcome').hidden = true;
-  $('help').hidden = true;
-  $('menu').hidden = false;
- }
-
- function openMenu() {
-  clearInterval(typingTimer);
-  StarSound.stopVoice();
-  $('welcome').hidden = true;
-  $('menu').hidden = false;
-  StarSound.effect('success');
- }
- $('start').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();step++;if(step<3)showStep();else{window.StarFlow?.recordObjective('lito_welcome.heard',{source:'transmission'});openMenu();}});
- $('skip').addEventListener('click',()=>{StarSound.init();StarSound.startMusic();window.StarFlow?.recordObjective('lito_welcome.heard',{source:'welcome_skip'});openMenu();});
+ const $=id=>document.getElementById(id);let transition=false;
+ // Bienvenida, OUTSTRIP, idioma e introducción histórica: intro-secuencia.js (StarIntro).
  $('how').addEventListener('click',()=>{$('help').hidden=false;$('closeHelp').focus();StarSound.effect('button');});
  $('closeHelp').addEventListener('click',()=>{$('help').hidden=true;$('how').focus();});
  $('music').addEventListener('click',()=>{StarSound.setMusic(!StarSound.musicOn);$('music').textContent=StarSound.musicOn?StarI18n.t('music.on'):'♪ OFF';});
  $('voice').addEventListener('click',()=>{StarSound.setVoice(!StarSound.voiceOn);$('voice').textContent=StarSound.voiceOn?StarI18n.t('voice.on'):'OFF';});
 
-let previousLanguage = StarI18n.lang;
-
+// Etiquetas de audio del menú en el idioma actual.
 document.addEventListener('starstep:language', () => {
-
-    const languageChanged =
-        previousLanguage !== StarI18n.lang;
-
-    previousLanguage = StarI18n.lang;
-
-    // Actualizar botones de audio
     $('music').textContent = StarSound.musicOn
         ? StarI18n.t('music.on')
-        : StarI18n.lang === 'en'
-            ? '♪ MUSIC OFF'
-            : '♪ MÚSICA OFF';
-
-    $('voice').textContent = StarSound.voiceOn
-        ? StarI18n.t('voice.on')
-        : StarI18n.lang === 'en'
-            ? 'VOICE OFF'
-            : 'VOZ OFF';
-
-    // Mostrar nuevamente la bienvenida
-    // si se cambia el idioma desde el menú.
-    if ($('welcome').hidden) {
-        if (languageChanged && !returnedToMenu) {
-            showWelcome();
-        }
-        return;
-    }
-
-    // Traducir el mensaje inicial.
-    if (step === -1) {
-        showWelcome();
-        return;
-    }
-
-    // Traducir el diálogo y reproducir
-    // la narración en el idioma seleccionado.
-    if (step >= 0 && step < 3) {
-        clearInterval(typingTimer);
-        StarSound.stopVoice();
-        showStep();
-    }
+        : StarI18n.lang === 'en' ? '♪ MUSIC OFF' : '♪ MÚSICA OFF';
+    $('voice').textContent = StarSound.voiceOn ? StarI18n.t('voice.on') : StarI18n.t('voice.off');
 });
 
 // Botón principal del menú: INICIAR, CONTINUAR o CONSULTAR PROGRESO.
@@ -424,17 +370,44 @@ $('newGameDialog').addEventListener('keydown', event => { if (event.key === 'Esc
 $('newGameConfirm').addEventListener('click', () => {
     const result = window.StarProgress.resetPlayerData();
     if (!result.ok) { closeNewGame(); window.StarFlow?.notify?.('resetFailed'); return; }
-    clearInterval(typingTimer);
     StarSound.stopAll();
     location.replace('/');
 });
 
-// Apertura inicial: bienvenida en el idioma guardado.
-// Regreso desde una misión (misma sesión, bienvenida ya completada): menú.
-if (window.StarFlow?.getHomeMode?.() === 'menu') showReturnMenu();
-else showWelcome();
+// «VER INTRODUCCIÓN»: vuelve a mostrar la introducción histórica (ya vista, se puede saltar).
+$('replayIntro').addEventListener('click', () => {
+    $('help').hidden = true;
+    StarSound.effect('button');
+    window.StarIntro?.replayHistory();
+});
+
+// Estación terrestre: se anima solo cuando está a la vista (al entrar al menú), para no
+// superponer su animación con la presentación.
+let renderRunning = false;
+function startEarthScene() {
+    if (renderRunning) return;
+    renderRunning = true;
+    const render = ms => { StarArt.earthScene(ctx, ms / 1000, { litoState: window.litoState || 'idle' }); requestAnimationFrame(render); };
+    requestAnimationFrame(render);
+}
+
+// Secuencia de entrada (intro-secuencia.js):
+//   apertura real o recarga ... OUTSTRIP → idioma → intro histórica (1.ª vez) → LITO (hasta completarla) → menú
+//   regreso interno ........... menú directo cuando getHomeMode() === 'menu'
+function onMenuShown() { updateAdventureButton(); updateNewGameButton(); startEarthScene(); }
+if (window.StarIntro) {
+    window.StarIntro.start({ onMenu: onMenuShown });
+} else {
+    // Sin la secuencia (script no cargado): menú directo. La guarda de páginas sigue exigiendo
+    // la bienvenida para avanzar, así que esto no desbloquea progreso.
+    console.warn('StarStep: intro-secuencia.js no está disponible');
+    const presentation = $('introSequence');
+    if (presentation) presentation.hidden = true;
+    document.body.classList.remove('is-entering');
+    $('menu').hidden = false;
+    onMenuShown();
+}
 
  document.querySelectorAll('a[href]').forEach(a=>a.addEventListener('click',ev=>{if(ev.metaKey||ev.ctrlKey||ev.button!==0)return;ev.preventDefault();if(transition)return;transition=true;StarSound.effect('travel');StarSound.stopAll();document.querySelector('.curtain').classList.add('is-dark');setTimeout(()=>location.assign(a.href),430);}));
- function render(ms){StarArt.earthScene(ctx,ms/1000,{litoState:window.litoState||'idle'});requestAnimationFrame(render);}requestAnimationFrame(render);
- window.addEventListener('pagehide',()=>{clearInterval(typingTimer);StarSound.stopAll();});
+ window.addEventListener('pagehide',()=>{StarSound.stopAll();});
 });

@@ -659,6 +659,9 @@
   function getHomeMode() {
     return internalNavigation && flow.isStageCompleted("lito_welcome") ? "menu" : "welcome";
   }
+  // Apertura real del juego en esta pestaña (primera página de la sesión): la secuencia de
+  // entrada muestra OUTSTRIP y el selector de idioma solo en este caso. Solo presentación.
+  function isInitialOpening() { return !internalNavigation; }
 
   // Guarda de página: recargar o usar el historial no desbloquea contenido.
   function guard() {
@@ -684,5 +687,5 @@
     notify("locked");
   }, true);
 
-  window.StarFlow = Object.freeze(Object.assign({}, flow, { notify, getHomeMode }));
+  window.StarFlow = Object.freeze(Object.assign({}, flow, { notify, getHomeMode, isInitialOpening }));
 })();

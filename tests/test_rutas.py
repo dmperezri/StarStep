@@ -10,6 +10,7 @@ No modifica starstep.db: las pruebas de API usan una base temporal.
 
 import importlib
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -88,10 +89,27 @@ class RutasExistentes(unittest.TestCase):
 
     def test_portada_ofrece_nueva_partida_con_confirmacion(self):
         html = self.cliente.get("/").get_data(as_text=True)
-        self.assertIn('id="newGame" data-i18n="newgame.button" type="button" hidden', html)
+        # Independiente del formato de la plantilla (atributos en una o varias líneas).
+        boton = re.search(r'<button\s[^>]*\bid="newGame"[^>]*>', html)
+        self.assertIsNotNone(boton)
+        self.assertIn('data-i18n="newgame.button"', boton.group(0))
+        self.assertRegex(boton.group(0), r"\shidden\b", "oculto por defecto")
         self.assertIn('id="newGameDialog"', html)
         self.assertIn('id="newGameConfirm"', html)
         self.assertIn('id="newGameCancel"', html)
+
+    def test_portada_carga_la_secuencia_de_entrada(self):
+        html = self.cliente.get("/").get_data(as_text=True)
+        pos_flujo = html.find("js/flujo.js")
+        pos_main = html.find("js/main.js")
+        pos_intro = html.find("js/intro-secuencia.js")
+        self.assertTrue(0 <= pos_flujo < pos_main < pos_intro,
+                        "intro-secuencia.js debe cargarse después de flujo.js y main.js")
+        for elemento in ["introSplash", "introLanguage", "introHistory", "introCanvas", "replayIntro"]:
+            self.assertIn('id="%s"' % elemento, html)
+        respuesta = self.cliente.get("/static/js/intro-secuencia.js")
+        self.assertEqual(respuesta.status_code, 200)
+        respuesta.close()
 
     def test_salud(self):
         datos = self.cliente.get("/api/health").get_json()

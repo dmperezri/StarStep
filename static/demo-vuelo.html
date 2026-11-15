@@ -1,0 +1,1833 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>StarStep · Rumbo a la Luna</title>
+
+    <style>
+
+        /* =========================================
+           PALETA OFICIAL STARSTEP
+           ========================================= */
+
+        :root {
+            --night: #0E1233;
+            --panel: #1A1F4D;
+            --raised: #262C66;
+            --border: #1A1340;
+            --cream: #FFF8E7;
+            --soft: #B9BEE6;
+            --mint: #8FF0D8;
+            --violet: #ABA1F5;
+            --purple: #6E62CE;
+            --moon: #FFE066;
+            --mars: #D9593A;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            background: var(--night);
+            color: var(--cream);
+            font-family: "Courier New", monospace;
+        }
+
+        main {
+            width: min(1080px, 95%);
+            margin: auto;
+            padding: 18px 0 24px;
+        }
+
+        header,
+        .actions,
+        .hud,
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            color: var(--mint);
+            font-size: .8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           BOTONES
+           ========================================= */
+
+        button,
+        a {
+            font: bold .8rem "Courier New", monospace;
+            color: var(--cream);
+            background: var(--raised);
+            border: 2px solid var(--violet);
+            min-height: 42px;
+            padding: 9px 13px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 3px 3px var(--border);
+        }
+
+        button.primary,
+        button[aria-pressed="true"] {
+            background: var(--mint);
+            color: var(--night);
+            border-color: var(--mint);
+        }
+
+        button:not(:disabled):hover,
+        a:hover {
+            border-color: var(--moon);
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid var(--moon);
+            outline-offset: 3px;
+        }
+
+        h1 {
+            font-size: clamp(1.3rem, 4vw, 2.4rem);
+            color: var(--moon);
+            text-shadow: 3px 3px var(--purple);
+            margin: 22px 0 8px;
+        }
+
+        p {
+            line-height: 1.5;
+        }
+
+        .sub,
+        footer,
+        #hint {
+            color: var(--soft);
+            font-size: .8rem;
+        }
+
+        /* =========================================
+           INDICADORES DE MISIÓN
+           ========================================= */
+
+        .hud {
+            background: var(--panel);
+            border: 2px solid var(--purple);
+            padding: 10px;
+            margin: 14px 0 8px;
+            font-size: .75rem;
+        }
+
+        .hud strong {
+            display: block;
+            margin-top: 4px;
+            color: var(--mint);
+            font-size: 1rem;
+        }
+
+        .track {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 9px;
+        }
+
+        .track span {
+            height: 9px;
+            background: var(--raised);
+            border: 1px solid var(--violet);
+        }
+
+        .track span.done {
+            background: var(--mint);
+        }
+
+        .track span.active {
+            background: linear-gradient(
+                90deg,
+                var(--moon) var(--p),
+                var(--raised) var(--p)
+            );
+        }
+
+        /* =========================================
+           ESCENARIO DEL MINIJUEGO
+           ========================================= */
+
+        .game {
+            position: relative;
+            border: 3px solid var(--violet);
+            box-shadow: 6px 6px var(--border);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            image-rendering: pixelated;
+            touch-action: none;
+        }
+
+        /* =========================================
+           VENTANAS DE CONTROL DE MISIÓN
+           ========================================= */
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 8px;
+            overflow: auto;
+            background: #0E1233C9;
+        }
+
+        .dialog {
+            width: min(480px, 100%);
+            background: var(--panel);
+            border: 3px solid var(--violet);
+            padding: clamp(8px, 2vw, 24px);
+            text-align: center;
+            box-shadow: 5px 5px var(--border);
+        }
+
+        .dialog h2 {
+            color: var(--moon);
+            font-size: clamp(1rem, 3vw, 1.45rem);
+            margin: 0;
+        }
+
+        .dialog p {
+            font-size: clamp(.7rem, 1.5vw, .95rem);
+            margin: 8px 0 12px;
+        }
+
+        .dialog button {
+            width: min(280px, 100%);
+        }
+
+        /* =========================================
+           CONTROLES
+           ========================================= */
+
+        .controls {
+            margin-top: 17px;
+        }
+
+        #thrust {
+            flex: 1;
+            min-height: 54px;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #thrust.held {
+            background: var(--moon);
+        }
+
+        footer {
+            text-align: center;
+            margin: 18px 0 0;
+        }
+
+        /* =========================================
+           DISEÑO ADAPTABLE
+           ========================================= */
+
+        @media (max-width: 550px) {
+
+            header {
+                justify-content: center;
+            }
+
+            .brand {
+                text-align: center;
+                width: 100%;
+            }
+
+            .hud {
+                font-size: .65rem;
+            }
+
+            .hud strong {
+                font-size: .85rem;
+            }
+
+            button,
+            a {
+                font-size: .72rem;
+                padding: 6px 9px;
+            }
+
+            .dialog {
+                padding: 7px;
+            }
+
+            .dialog p {
+                line-height: 1.3;
+                margin: 5px 0;
+            }
+
+            .dialog button {
+                min-height: 34px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<main>
+
+    <!-- BARRA SUPERIOR -->
+
+    <header>
+
+        <span class="brand">
+            OUTSTRIP · STARSTEP
+        </span>
+
+        <div class="actions">
+
+            <a href="demo-rock-roll.html"
+               data-t="back">
+                VOLVER
+            </a>
+
+            <button data-lang="es"
+                    aria-pressed="true">
+                ES
+            </button>
+
+            <button data-lang="en"
+                    aria-pressed="false">
+                EN
+            </button>
+
+        </div>
+
+    </header>
+
+    <!-- TÍTULO -->
+
+    <h1 data-t="title">
+        RUMBO A LA LUNA
+    </h1>
+
+    <p class="sub" data-t="sub">
+        Mantené para subir, soltá para bajar.
+        Esquivá los asteroides.
+    </p>
+
+    <!-- INFORMACIÓN DEL VUELO -->
+
+    <div class="hud">
+
+        <span>
+            <span data-t="distance">
+                DISTANCIA RESTANTE
+            </span>
+
+            <strong id="distance">
+                384.400 km
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="checkpoint">
+                CHECKPOINT
+            </span>
+
+            <strong id="checkpoint">
+                0%
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="attempt">
+                INTENTO
+            </span>
+
+            <strong id="attempt">
+                1
+            </strong>
+        </span>
+
+        <span>
+            <span data-t="assist">
+                ASISTENCIA
+            </span>
+
+            <strong id="assist">
+                0/3
+            </strong>
+        </span>
+
+    </div>
+
+    <!-- BARRA DE CUATRO TRAMOS -->
+
+    <div class="track" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- ESCENARIO ESPACIAL -->
+
+    <div class="game">
+
+        <canvas
+            id="world"
+            width="320"
+            height="180"
+            aria-label="Nave y asteroides">
+        </canvas>
+
+        <div class="overlay" id="overlay">
+
+            <section
+                class="dialog"
+                aria-labelledby="messageTitle">
+
+                <h2 id="messageTitle"></h2>
+
+                <p id="messageText"></p>
+
+                <button class="primary" id="action">
+                </button>
+
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- CONTROLES TÁCTILES -->
+
+    <div class="controls">
+
+        <button
+            class="primary"
+            id="thrust"
+            data-t="thrust">
+
+            ↑ MANTENÉ PARA ASCENDER
+
+        </button>
+
+        <button id="pause" data-t="pause">
+            PAUSA
+        </button>
+
+    </div>
+
+    <p id="hint" role="status"></p>
+
+    <footer data-t="preview">
+        VISTA DE DESARROLLO · NO MODIFICA TU PARTIDA
+    </footer>
+
+</main>
+
+<script id="engine">
+
+"use strict";
+
+/* ==================================================
+   STARSTEP — MOTOR DE VUELO ESPACIAL
+   Referencia: prototipo Rock & Roll
+   ================================================== */
+
+const Flight = (() => {
+
+    const W = 320;
+    const H = 180;
+
+    const X = 56;
+
+    const TOTAL = 24;
+    const DT = 1 / 120;
+
+    const RX = 12;
+    const RY = 8;
+
+    // Obstáculos distribuidos en cuatro tramos.
+
+    const centers = [
+        [90, 110, 76, 99],
+        [104, 75, 113, 86],
+        [78, 115, 88, 104],
+        [109, 73, 105, 90]
+    ];
+
+    const layout = centers.flatMap(
+        (row, s) => row.map(
+            (center, i) => ({
+                at: s * 6 + 1.1 + i * 1.15,
+                center,
+                s
+            })
+        )
+    );
+
+    // Asistencia progresiva.
+
+    const level = n =>
+        Math.min(3, Math.floor(n / 3));
+
+    // Estado inicial.
+
+    function create() {
+
+        return {
+            time: 0,
+            y: 90,
+            vy: 0,
+            cp: 0,
+            fails: 0,
+            mode: "ready"
+        };
+
+    }
+
+    // Recuperar el último checkpoint.
+
+    function reset(g) {
+
+        g.time = g.cp;
+        g.y = 90;
+        g.vy = 0;
+        g.mode = "ready";
+
+    }
+
+    // Calcular la posición de los obstáculos.
+
+    function obstacles(g) {
+
+        return layout.map(o => {
+
+            const gap =
+                74 - o.s * 7 +
+                level(g.fails) * 12;
+
+            return {
+
+                x: X +
+                    (o.at - g.time) *
+                    (95 + o.s * 11),
+
+                top: o.center - gap / 2,
+
+                bottom: o.center + gap / 2,
+
+                w: 14
+
+            };
+
+        });
+
+    }
+
+    // Físicas de vuelo.
+
+    function step(g, held) {
+
+        if (g.mode !== "running") {
+            return;
+        }
+
+        const dt =
+            DT * (1 - .09 * level(g.fails));
+
+        // Mantener: ascender.
+        // Soltar: descender.
+
+        g.vy = Math.max(
+
+            -150,
+
+            Math.min(
+                150,
+                g.vy +
+                (held ? -560 : 300) * dt
+            )
+
+        );
+
+        g.y += g.vy * dt;
+
+        g.time = Math.min(
+            TOTAL,
+            g.time + dt
+        );
+
+        // Detectar colisiones.
+
+        const hit =
+
+            g.y - RY < 0 ||
+
+            g.y + RY > H ||
+
+            obstacles(g).some(o =>
+
+                Math.abs(o.x - X) <
+                    o.w / 2 + RX &&
+
+                (
+                    g.y - RY < o.top ||
+
+                    g.y + RY > o.bottom
+                )
+
+            );
+
+        // La colisión tiene prioridad.
+
+        if (hit) {
+
+            g.fails++;
+            g.mode = "crashed";
+
+            return;
+
+        }
+
+        // Guardar puntos de control seguros.
+
+        g.cp = Math.max(
+
+            g.cp,
+
+            Math.min(
+
+                18,
+
+                Math.floor(
+                    (g.time + 1e-8) / 6
+                ) * 6
+
+            )
+
+        );
+
+        // Victoria.
+
+        if (g.time >= TOTAL) {
+
+            g.mode = "won";
+
+        }
+
+    }
+
+    return {
+
+        W,
+        H,
+        X,
+        TOTAL,
+        DT,
+        RX,
+        RY,
+
+        create,
+        reset,
+        obstacles,
+        step,
+        level
+
+    };
+
+})();
+
+</script>
+
+<script>
+
+"use strict";
+
+/* ==================================================
+   TRADUCCIONES
+   ================================================== */
+
+const $ = id => document.getElementById(id);
+
+const text = {
+
+    es: {
+
+        back: "VOLVER",
+
+        title: "RUMBO A LA LUNA",
+
+        sub:
+            "Mantené para subir, soltá para bajar. " +
+            "Esquivá los asteroides.",
+
+        distance: "DISTANCIA RESTANTE",
+
+        checkpoint: "CHECKPOINT",
+
+        attempt: "INTENTO",
+
+        assist: "ASISTENCIA",
+
+        thrust: "↑ MANTENÉ PARA ASCENDER",
+
+        pause: "PAUSA",
+
+        preview:
+            "VISTA DE DESARROLLO · NO MODIFICA TU PARTIDA",
+
+        ready: [
+
+            "CONTROL DE MISIÓN",
+
+            "Cadete, mantené ESPACIO, ↑ o el botón " +
+            "de impulso para ascender. Soltá para bajar. " +
+            "Superá los cuatro tramos del vuelo.",
+
+            "¡ENCENDER MOTORES!"
+
+        ],
+
+        crashed: [
+
+            "¡CHOQUE!",
+
+            "Volverás al último punto de control seguro. " +
+            "No hay límite de intentos.",
+
+            "REINTENTAR"
+
+        ],
+
+        paused: [
+
+            "VUELO EN PAUSA",
+
+            "Reanudá cuando estés preparado.",
+
+            "REANUDAR"
+
+        ],
+
+        won: [
+
+            "¡LLEGAMOS A LA ÓRBITA LUNAR!",
+
+            "Completaste el vuelo de prueba. " +
+            "Todavía no se desbloquea la Luna.",
+
+            "REPETIR VUELO"
+
+        ],
+
+        hints: [
+
+            "ESPACIO / ↑ / control táctil",
+
+            "Asistencia 1 · corredores más amplios",
+
+            "Asistencia 2 · más tiempo para reaccionar",
+
+            "Asistencia 3 · máxima ayuda, colisiones activas"
+
+        ]
+
+    },
+
+    en: {
+
+        back: "BACK",
+
+        title: "BOUND FOR THE MOON",
+
+        sub:
+            "Hold to rise, release to fall. " +
+            "Dodge the asteroids.",
+
+        distance: "DISTANCE REMAINING",
+
+        checkpoint: "CHECKPOINT",
+
+        attempt: "ATTEMPT",
+
+        assist: "ASSIST",
+
+        thrust: "↑ HOLD TO ASCEND",
+
+        pause: "PAUSE",
+
+        preview:
+            "DEVELOPMENT PREVIEW · DOES NOT MODIFY YOUR SAVE",
+
+        ready: [
+
+            "MISSION CONTROL",
+
+            "Cadet, hold SPACE, ↑ or the thrust button " +
+            "to ascend. Release to descend. " +
+            "Clear all four flight sections.",
+
+            "IGNITE ENGINES!"
+
+        ],
+
+        crashed: [
+
+            "CRASH!",
+
+            "Return to the last safe checkpoint. " +
+            "Retries are unlimited.",
+
+            "RETRY"
+
+        ],
+
+        paused: [
+
+            "FLIGHT PAUSED",
+
+            "Resume when ready.",
+
+            "RESUME"
+
+        ],
+
+        won: [
+
+            "WE REACHED LUNAR ORBIT!",
+
+            "You cleared the test flight. " +
+            "The Moon is not unlocked yet.",
+
+            "REPLAY FLIGHT"
+
+        ],
+
+        hints: [
+
+            "SPACE / ↑ / touch controls",
+
+            "Assist 1 · wider corridors",
+
+            "Assist 2 · more reaction time",
+
+            "Assist 3 · maximum help, collisions active"
+
+        ]
+
+    }
+
+};
+
+/* ==================================================
+   ESTADO DEL MINIJUEGO
+   ================================================== */
+
+let lang = "es";
+
+let g = Flight.create();
+
+let keys = new Set();
+
+let pointers = new Set();
+
+let acc = 0;
+
+let last = null;
+
+const c = $("world").getContext("2d");
+
+c.imageSmoothingEnabled = false;
+
+const reduced = matchMedia(
+    "(prefers-reduced-motion: reduce)"
+);
+
+/* ==================================================
+   LIBERAR CONTROLES
+   ================================================== */
+
+function release() {
+
+    keys.clear();
+
+    pointers.clear();
+
+    $("thrust").classList.remove("held");
+
+}
+
+/* ==================================================
+   ACTUALIZAR INTERFAZ
+   ================================================== */
+
+function refresh() {
+
+    const w = text[lang];
+
+    const running =
+        g.mode === "running";
+
+    const distance = Math.max(
+
+        0,
+
+        Math.round(
+            384400 * (1 - g.time / 24)
+        )
+
+    );
+
+    $("distance").textContent =
+
+        distance.toLocaleString(
+
+            lang === "es"
+                ? "es-ES"
+                : "en-US"
+
+        ) + " km";
+
+    $("checkpoint").textContent =
+
+        Math.round(
+            g.cp / 24 * 100
+        ) + "%";
+
+    $("attempt").textContent =
+        g.fails + 1;
+
+    $("assist").textContent =
+        Flight.level(g.fails) + "/3";
+
+    $("hint").textContent =
+        w.hints[Flight.level(g.fails)];
+
+    $("overlay").hidden = running;
+
+    $("pause").disabled = !running;
+
+    $("thrust").disabled = !running;
+
+    document.querySelectorAll(".track span")
+
+        .forEach((e, i) => {
+
+            e.classList.toggle(
+
+                "done",
+
+                g.time >= (i + 1) * 6
+
+            );
+
+            e.classList.toggle(
+
+                "active",
+
+                g.time >= i * 6 &&
+
+                g.time < (i + 1) * 6
+
+            );
+
+            const progress = Math.max(
+
+                0,
+
+                Math.min(
+                    100,
+                    (g.time - i * 6) / 6 * 100
+                )
+
+            );
+
+            e.style.setProperty(
+                "--p",
+                progress + "%"
+            );
+
+        });
+
+    if (!running) {
+
+        const m = w[g.mode];
+
+        $("messageTitle").textContent = m[0];
+
+        $("messageText").textContent = m[1];
+
+        $("action").textContent = m[2];
+
+    }
+
+}
+
+/* ==================================================
+   CAMBIO DE IDIOMA
+   ================================================== */
+
+function language(l) {
+
+    lang = l;
+
+    document.documentElement.lang = l;
+
+    document.querySelectorAll("[data-t]")
+
+        .forEach(e => {
+
+            e.textContent =
+                text[l][e.dataset.t];
+
+        });
+
+    document.querySelectorAll("[data-lang]")
+
+        .forEach(b => {
+
+            b.setAttribute(
+
+                "aria-pressed",
+
+                String(b.dataset.lang === l)
+
+            );
+
+        });
+
+    $("world").setAttribute(
+
+        "aria-label",
+
+        l === "es"
+            ? "Nave y asteroides"
+            : "Ship and asteroids"
+
+    );
+
+    refresh();
+
+}
+
+/* ==================================================
+   PAUSA
+   ================================================== */
+
+function pause() {
+
+    if (g.mode === "running") {
+
+        g.mode = "paused";
+
+        release();
+
+        acc = 0;
+
+        refresh();
+
+        $("action").focus();
+
+    }
+
+}
+
+/* ==================================================
+   INICIO, REINTENTO Y REANUDACIÓN
+   ================================================== */
+
+$("action").onclick = () => {
+
+    release();
+
+    acc = 0;
+
+    last = null;
+
+    if (g.mode === "crashed") {
+
+        Flight.reset(g);
+
+    } else if (g.mode === "won") {
+
+        g = Flight.create();
+
+    }
+
+    g.mode = "running";
+
+    refresh();
+
+    $("thrust").focus();
+
+};
+
+$("pause").onclick = pause;
+
+document.querySelectorAll("[data-lang]")
+
+    .forEach(b => {
+
+        b.onclick = () =>
+            language(b.dataset.lang);
+
+    });
+
+/* ==================================================
+   CONTROLES DE TECLADO
+   ================================================== */
+
+addEventListener("keydown", e => {
+
+    if (e.code === "Escape") {
+
+        pause();
+
+        return;
+
+    }
+
+    if (
+
+        g.mode !== "running" ||
+
+        !["Space", "ArrowUp"].includes(e.code)
+
+    ) {
+
+        return;
+
+    }
+
+    if (
+
+        e.target.closest?.("button,a") &&
+
+        e.target !== $("thrust")
+
+    ) {
+
+        return;
+
+    }
+
+    e.preventDefault();
+
+    if (!e.repeat) {
+
+        keys.add(e.code);
+
+    }
+
+});
+
+addEventListener("keyup", e => {
+
+    if (keys.delete(e.code)) {
+
+        e.preventDefault();
+
+    }
+
+});
+
+/* ==================================================
+   CONTROLES TÁCTILES Y RATÓN
+   ================================================== */
+
+for (const el of [
+
+    $("thrust"),
+
+    $("world")
+
+]) {
+
+    el.addEventListener("pointerdown", e => {
+
+        if (g.mode !== "running") {
+            return;
+        }
+
+        e.preventDefault();
+
+        pointers.add(e.pointerId);
+
+        el.setPointerCapture(e.pointerId);
+
+    });
+
+    for (const type of [
+
+        "pointerup",
+
+        "pointercancel",
+
+        "lostpointercapture"
+
+    ]) {
+
+        el.addEventListener(type, e => {
+
+            pointers.delete(e.pointerId);
+
+        });
+
+    }
+
+}
+
+// Evitar perder el control al cambiar de ventana.
+
+addEventListener("blur", pause);
+
+document.addEventListener(
+
+    "visibilitychange",
+
+    () => {
+
+        if (document.hidden) {
+
+            pause();
+
+        }
+
+        last = null;
+
+    }
+
+);
+
+/* ==================================================
+   MOTOR GRÁFICO PIXEL ART
+   ================================================== */
+
+function R(x, y, w, h, col) {
+
+    c.fillStyle = col;
+
+    c.fillRect(
+
+        Math.round(x),
+
+        Math.round(y),
+
+        Math.round(w),
+
+        Math.round(h)
+
+    );
+
+}
+
+// Círculos pixelados.
+
+function disc(x, y, r, col) {
+
+    r = Math.max(
+        1,
+        Math.round(r)
+    );
+
+    for (let a = -r; a <= r; a++) {
+
+        const b = Math.floor(
+
+            Math.sqrt(r * r - a * a)
+
+        );
+
+        R(
+            x - b,
+            y + a,
+            b * 2 + 1,
+            1,
+            col
+        );
+
+    }
+
+}
+
+/* ==================================================
+   LUNA — APROXIMACIÓN PROGRESIVA
+   ================================================== */
+
+function moon(x, y, r) {
+
+    // Contorno.
+
+    disc(
+        x,
+        y,
+        r + 1,
+        "#1A1340"
+    );
+
+    // Superficie.
+
+    disc(
+        x,
+        y,
+        r,
+        "#C3C7D6"
+    );
+
+    // Sombra lunar.
+
+    disc(
+
+        x + r * .18,
+
+        y + r * .15,
+
+        r * .78,
+
+        "#868CA4"
+
+    );
+
+    // Cráteres.
+
+    for (const [a, b, s] of [
+
+        [-.35, -.3, .18],
+
+        [.3, -.15, .12],
+
+        [-.1, .35, .14],
+
+        [.45, .35, .08],
+
+        [.05, -.55, .09]
+
+    ]) {
+
+        disc(
+
+            x + a * r,
+
+            y + b * r,
+
+            s * r,
+
+            "#575C74"
+
+        );
+
+        disc(
+
+            x + a * r - 1,
+
+            y + b * r - 1,
+
+            s * r * .55,
+
+            "#9A9FB5"
+
+        );
+
+    }
+
+}
+
+/* ==================================================
+   ASTEROIDES VIOLETAS
+   ================================================== */
+
+function rock(x, y) {
+
+    // Contorno oscuro.
+
+    disc(
+        x,
+        y,
+        7,
+        "#1A1340"
+    );
+
+    // Cuerpo de la roca.
+
+    disc(
+        x,
+        y,
+        6,
+        "#6A62B5"
+    );
+
+    // Iluminación.
+
+    disc(
+        x - 2,
+        y - 2,
+        2,
+        "#8F88D6"
+    );
+
+    // Sombra.
+
+    R(
+        x + 1,
+        y + 1,
+        3,
+        2,
+        "#4F45A6"
+    );
+
+}
+
+// Barreras de asteroides.
+
+function column(x, y, h) {
+
+    if (h <= 0) {
+        return;
+    }
+
+    c.save();
+
+    c.beginPath();
+
+    c.rect(
+        x - 7,
+        y,
+        14,
+        h
+    );
+
+    c.clip();
+
+    R(
+        x - 7,
+        y,
+        14,
+        h,
+        "#262C66"
+    );
+
+    for (
+
+        let v = y + 5;
+
+        v < y + h + 7;
+
+        v += 10
+
+    ) {
+
+        rock(x, v);
+
+    }
+
+    c.restore();
+
+}
+
+/* ==================================================
+   NAVE STARSTEP
+   ================================================== */
+
+function ship(x, y, t, held) {
+
+    const P = (a, b, w, h, col) => {
+
+        R(
+
+            x - 12 + a,
+
+            y - 5 + b,
+
+            w,
+
+            h,
+
+            col
+
+        );
+
+    };
+
+    const O = "#1A1340";
+
+    // Animación de propulsión.
+
+    const f = held
+
+        ? 3
+
+        : Math.floor(t * 14) % 2;
+
+    P(
+        -6 - f,
+        3,
+        6 + f,
+        5,
+        "#D9593A"
+    );
+
+    P(
+        -4 - f,
+        4,
+        4 + f,
+        3,
+        "#FFE066"
+    );
+
+    P(
+        -2,
+        5,
+        2,
+        1,
+        "#FFF8E7"
+    );
+
+    // Aleta superior.
+
+    P(1, -2, 5, 3, O);
+
+    P(2, -1, 4, 2, "#6E62CE");
+
+    // Aleta inferior.
+
+    P(1, 10, 5, 3, O);
+
+    P(2, 10, 4, 2, "#6E62CE");
+
+    // Contorno del fuselaje.
+
+    P(0, 1, 17, 9, O);
+
+    // Cuerpo blanco.
+
+    P(1, 2, 15, 7, "#FFF8E7");
+
+    // Sombra inferior.
+
+    P(1, 7, 15, 2, "#C3C7D6");
+
+    // Franja violeta.
+
+    P(5, 2, 2, 7, "#ABA1F5");
+
+    // Ventana.
+
+    P(9, 3, 4, 4, O);
+
+    P(10, 4, 2, 2, "#3FD0E0");
+
+    // Punta menta.
+
+    P(16, 1, 3, 9, O);
+
+    P(16, 2, 3, 7, "#8FF0D8");
+
+    P(19, 2, 2, 7, O);
+
+    P(19, 3, 2, 5, "#8FF0D8");
+
+    P(21, 3, 2, 5, O);
+
+    P(21, 4, 1, 3, "#4FC9AE");
+
+    P(23, 5, 1, 1, O);
+
+    P(16, 7, 5, 1, "#4FC9AE");
+
+}
+
+/* ==================================================
+   DIBUJAR ESCENARIO COMPLETO
+   ================================================== */
+
+function draw() {
+
+    const p = g.time / 24;
+
+    const t = reduced.matches
+        ? 0
+        : g.time;
+
+    // Fondo espacial.
+
+    R(
+        0,
+        0,
+        320,
+        180,
+        "#0E1233"
+    );
+
+    // Estrellas con movimiento de profundidad.
+
+    for (let i = 0; i < 140; i++) {
+
+        const x = (
+
+            (
+
+                i * 137 + 19 -
+
+                t * (i % 3 + 1) * 20
+
+            ) % 320 + 320
+
+        ) % 320;
+
+        R(
+
+            x,
+
+            (i * 71 + 13) % 180,
+
+            i % 13 === 0 ? 2 : 1,
+
+            i % 13 === 0 ? 2 : 1,
+
+            i % 7 === 0
+
+                ? "#8FF0D8"
+
+                : "#B9BEE6"
+
+        );
+
+    }
+
+    // La Luna aumenta de tamaño.
+
+    moon(
+
+        360 - p * 120,
+
+        90,
+
+        20 + p * 60
+
+    );
+
+    // Corredores de asteroides.
+
+    for (const o of Flight.obstacles(g)) {
+
+        if (
+
+            o.x < -14 ||
+
+            o.x > 334
+
+        ) {
+
+            continue;
+
+        }
+
+        // Barrera superior.
+
+        column(
+
+            o.x,
+
+            0,
+
+            o.top
+
+        );
+
+        // Barrera inferior.
+
+        column(
+
+            o.x,
+
+            o.bottom,
+
+            180 - o.bottom
+
+        );
+
+    }
+
+    // Explosión al colisionar.
+
+    if (g.mode === "crashed") {
+
+        for (let i = 0; i < 10; i++) {
+
+            disc(
+
+                Flight.X +
+                ((i * 7) % 21) - 10,
+
+                g.y +
+                ((i * 11) % 19) - 9,
+
+                2,
+
+                i % 2
+
+                    ? "#FFE066"
+
+                    : "#D9593A"
+
+            );
+
+        }
+
+    } else {
+
+        // Nave en funcionamiento.
+
+        ship(
+
+            Flight.X,
+
+            g.y,
+
+            t,
+
+            keys.size + pointers.size > 0
+
+        );
+
+    }
+
+}
+
+/* ==================================================
+   BUCLE PRINCIPAL
+   ================================================== */
+
+function tick(now) {
+
+    if (last === null) {
+
+        last = now;
+
+    }
+
+    const delta = Math.min(
+
+        .1,
+
+        Math.max(
+
+            0,
+
+            (now - last) / 1000
+
+        )
+
+    );
+
+    last = now;
+
+    if (g.mode === "running") {
+
+        acc += delta;
+
+        while (
+
+            acc >= Flight.DT &&
+
+            g.mode === "running"
+
+        ) {
+
+            Flight.step(
+
+                g,
+
+                keys.size + pointers.size > 0
+
+            );
+
+            acc -= Flight.DT;
+
+        }
+
+        if (g.mode !== "running") {
+
+            release();
+
+            acc = 0;
+
+            refresh();
+
+            $("action").focus();
+
+        } else {
+
+            refresh();
+
+        }
+
+    }
+
+    $("thrust").classList.toggle(
+
+        "held",
+
+        keys.size + pointers.size > 0
+
+    );
+
+    draw();
+
+    requestAnimationFrame(tick);
+
+}
+
+/* ==================================================
+   INICIAR STARSTEP
+   ================================================== */
+
+const initialLanguage =
+    new URLSearchParams(window.location.search)
+        .get("lang");
+
+language(
+    ["es", "en"].includes(initialLanguage)
+        ? initialLanguage
+        : "es"
+);
+
+requestAnimationFrame(tick);
+
+</script>
+
+</body>
+</html>

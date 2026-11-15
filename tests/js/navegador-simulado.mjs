@@ -37,15 +37,27 @@ export class FakeElement {
   append(...nodes) { this.children.push(...nodes); }
   replaceChildren(...nodes) { this.children = nodes; }
   setAttribute(k, v) { this.attrs[k] = String(v); }
+  getAttribute(k) { return Object.prototype.hasOwnProperty.call(this.attrs, k) ? this.attrs[k] : null; }
+  focus() { this.ownerFocus?.(this); }
+  click() { for (const fn of this.listeners.click || []) fn({ type: "click", target: this, preventDefault() {} }); }
   addEventListener(type, fn) { (this.listeners[type] ||= []).push(fn); }
-  get classList() { return { add() {}, remove() {}, toggle() {}, contains: () => false }; }
+  get classList() {
+    const set = (this.classes ||= new Set());
+    return {
+      add: (...names) => names.forEach(n => set.add(n)),
+      remove: (...names) => names.forEach(n => set.delete(n)),
+      toggle: (n, force) => { const on = force === undefined ? !set.has(n) : !!force; if (on) set.add(n); else set.delete(n); return on; },
+      contains: n => set.has(n)
+    };
+  }
   findAll(pred, out = []) { for (const c of this.children) { if (pred(c)) out.push(c); c.findAll?.(pred, out); } return out; }
 }
 
-export function makePage({ path = "/", search = "", tab, elements = [] }) {
+export function makePage({ path = "/", search = "", tab, elements = [], bodyClasses = [] }) {
   const listeners = {};
   const byId = new Map(elements.filter(e => e.id).map(e => [e.id, e]));
   const body = new FakeElement("body");
+  body.classList.add(...bodyClasses);
   const document = {
     readyState: "loading",
     body,
