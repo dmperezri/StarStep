@@ -124,7 +124,9 @@ function openBriefing(tab) {
   function elapse(ms) {for(let i=0;i<=ms/100;i++){const pending=frames.splice(0);time+=100;for(const fn of pending)fn(time);}}
   return {page,el,elapse};
 }
-test('interfaz Rock & Roll: lectura obligatoria, listo avanza al despegue sin doble cuenta',()=>{
+// Bloque 1: con cinematica.js la presentación empieza con el video (tests/js/cinematica.test.mjs).
+// Esta prueba no carga el reproductor: cubre la presentación de respaldo, que no cambió.
+test('interfaz Rock & Roll (respaldo sin reproductor): lectura obligatoria, listo avanza al despegue sin doble cuenta',()=>{
   const tab=tabWithProfile();openChapters(tab).start.click();
   const {page,el,elapse}=openBriefing(tab);
   assert.equal(el.launchButton.hidden,true);el.launchButton.click();assert.equal(page.ctx.StarFlow.getCurrentStage(),'chapter_briefing');

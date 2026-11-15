@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded',()=>{
  // StarFlow valida la etapa: las esférulas solo se localizan después de registrar Opportunity.
  function scan(id){const found=window.StarFlow?.locateArtifact(id,{mechanic:'mars_panel_scan'});if(found&&!found.ok&&found.code!=='ARTIFACT_NOT_IMPLEMENTED'){window.StarFlow.notify('locked');return;}window.openStarArtifact(id,{context:'mission'});}
  document.getElementById('inspectOpportunity').addEventListener('click',()=>scan('opportunity'));
- document.getElementById('inspectBlueberries').addEventListener('click',()=>scan('blueberries'));
+ // Enigma de instrumentos (enigma-hematita.js): reemplaza la localización provisional de la hematita.
+ document.getElementById('inspectBlueberries').addEventListener('click',()=>{if(window.StarHematiteEnigma)window.StarHematiteEnigma.open();else scan('blueberries');});
  // Los dos descubrimientos son los objetivos implementados de Marte.
  // Mostrar el estado real del flujo ayuda a entender por qué Huellas sigue cerrada.
  function updateGuide(){

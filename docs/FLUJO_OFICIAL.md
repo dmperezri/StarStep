@@ -553,3 +553,42 @@ Integración de `origin/feature/integracion-visual` (`5c7b2e2`) sobre `integrati
 **Eagle 3D:** `static/assets/models/eagle.glb` (glTF 2.0, Blender I/O 4.2, 134 mallas) exige `KHR_draco_mesh_compression` y usa `EXT_texture_webp`. El repositorio solo incluye Three.js r170 (`three.module.js`, `GLTFLoader`, `OrbitControls`). El visor busca primero `static/vendor/three/examples/jsm/loaders/DRACOLoader.js` y `static/vendor/draco/`; si no están, usa la CDN con la misma versión (jsDelivr para el cargador y gstatic para el decodificador 1.5.7). Sin red o sin WebGL queda el modelo procedural con sus puntos de inspección. El GLB no se modificó.
 
 **Pruebas agregadas por la integración:** una prueba de StarFlow (reparación lunar con las etapas nuevas) y una de rutas (recursos de la bitácora, el viaje a Marte, el estado lunar y el orden `planetas.js` → `scene.js`).
+
+## Capítulo 1 · Bloque 1: cinemática de Apollo 11
+
+Al elegir Rock & Roll en `/capitulos` (`chapter_select.chapter1`), `/rock-roll` empieza con el video completo de Apollo 11 y después sigue la presentación:
+
+```
+/capitulos → /rock-roll: video (2:32) → tres actos → mensaje breve de LITO → instrucciones del vuelo → ¡ESTOY LISTO! → /despegue (cuenta regresiva única) → /vuelo
+```
+
+* **Reproductor** (`static/js/cinematica.js`, `static/css/cinematica.css`, `window.StarCinematic.mount()`): marco con la relación de aspecto original (16:9), reproducir y pausar, barra de progreso, sonido y volumen, subtítulos, ES/EN, pantalla completa y teclado (espacio/K, M, C, F, ← →). Si el navegador bloquea la reproducción con sonido, muestra «▶ VER CINEMÁTICA». Al reproducir detiene la música y la voz de LITO, y al ocultar la pestaña pausa el video.
+* **Primera vez:** se ve completa, sin SALTAR y sin adelantar más allá de lo ya visto (se puede retroceder y pausar). Al terminar se marca `rock_roll_intro` en `starstep_cinematicas`.
+* **Después:** aparece «SALTAR CINEMÁTICA». La marca es una **preferencia del dispositivo** (`PREFERENCE_KEYS`), así que NUEVA PARTIDA la conserva.
+* **Repetición:** botón «VER CINEMÁTICA» en la página «Mi diario» de la bitácora, habilitado solo si ya se vio. Se abre en modo repetición, con CERRAR.
+* **Si el video falla:** se muestra la misma historia como narración en texto (10 partes, ES/EN). Leerla completa también cuenta como vista y permite continuar.
+* **Solo presentación:** ver, saltar o repetir el video no registra objetivos. `chapter_briefing.ready` sigue registrándose al pulsar ¡ESTOY LISTO!. Si `cinematica.js` no carga, la presentación anterior sigue completa (respaldo).
+* **Escenas:** después del video se omiten «Dos mundos» y el título, que el video ya muestra. El mensaje de LITO ahora retoma el video, y la escena «¡ESTOY LISTO!» explica los controles del vuelo.
+
+**Subtítulos:** el video trae el inglés incrustado y no tiene pista de subtítulos. El guion se transcribió de esos subtítulos con sus tiempos (36 frases, incluidas las citas «The Eagle has landed» y «One small step»). La traducción al español es del equipo de desarrollo. El guion vive en `cinematica.js` (fuente única) y genera `static/assets/videos/rock-roll-intro.{es,en}.vtt`; una prueba verifica que coincidan. En español, la franja propia tapa el inglés incrustado solo mientras hay una frase. En inglés queda oculta (el texto ya está en el video) y se puede activar.
+
+**Archivo:** `static/assets/videos/rock-roll-intro.mp4`. Es una copia sin modificar del video entregado: 2:32, 1024×576, H.264 + AAC, 24,8 MB, con inicio rápido. Flask lo sirve con rangos (206).
+
+**Créditos y verificación pendientes:**
+
+* La autoría y la licencia del video **no constan**: hay que verificarlas antes de una distribución pública.
+* El video dice «They ventured up to 100 meters away from the module». Las fuentes de la NASA describen recorridos de unos 60 m (cráter Little West), así que conviene revisarlo. No se modificó el video; los subtítulos lo traducen tal cual.
+
+Pruebas: `tests/js/cinematica.test.mjs` (11) y `tests/test_rutas.py::test_cinematica_rock_roll`. La prueba anterior de la interfaz de Rock & Roll (`capitulos.test.mjs`) se conserva y ahora cubre el respaldo sin reproductor.
+
+## Capítulo 1 · Acto II: enigma de la hematita
+
+`static/js/enigma-hematita.js` y `static/css/enigma.css` (capturas 09 y 10). En `/marte`, el botón «HEMATITA 3D» ya no registra las esférulas directamente: abre el enigma.
+
+1. Foto real de las esférulas (`hematite-spherules.webp`, NASA/JPL-Caltech/Cornell/USGS) y la pregunta.
+2. Se eligen 2 de 6 instrumentos: Pancam, Mini-TES, Microscopic Imager, RAT, APXS y Mössbauer.
+3. **Analizar.** Si la combinación es incorrecta, se explica por qué cada instrumento no alcanza (por ejemplo, APXS mide hierro pero no el mineral) y se puede reintentar sin límite. La respuesta educativa del prototipo es Microscopic Imager + Mössbauer.
+4. Resultado con las tres categorías oficiales: Observado (#3FD0E0), Interpretado (#B79CFF) y Narrativa (#FFD23F). Aclara que es evidencia de agua, no de vida.
+5. **Guardar en la bitácora.** StarFlow localiza (`mars_panel_scan`), inspecciona (`hematite`) y registra `blueberries`. No hay duplicados, y solo se puede después de registrar Opportunity (`canEnter('mars_hematite')`).
+
+`mars_hematite.enigma` sigue `implemented:false`: activarlo como objetivo nuevo bloquearía partidas que ya registraron las esférulas. El enigma se exige en la interfaz antes del registro. Pruebas: `tests/js/enigma-hematita.test.mjs` (4).

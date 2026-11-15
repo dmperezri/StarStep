@@ -138,6 +138,22 @@ class RutasExistentes(unittest.TestCase):
             self.assertEqual(respuesta.status_code, 200, archivo)
             respuesta.close()
 
+    def test_cinematica_rock_roll(self):
+        # Bloque 1: el video de Apollo 11 se reproduce en /rock-roll con subtítulos ES/EN.
+        html = self.cliente.get("/rock-roll").get_data(as_text=True)
+        self.assertIn('id="cinematic"', html)
+        self.assertTrue(0 <= html.find("js/flujo.js") < html.find("js/cinematica.js") < html.find("js/rock-roll.js"))
+        respuesta = self.cliente.get("/static/assets/videos/rock-roll-intro.mp4", headers={"Range": "bytes=0-99"})
+        self.assertEqual(respuesta.status_code, 206, "el video admite rangos (buscar y reanudar)")
+        self.assertEqual(respuesta.mimetype, "video/mp4")
+        respuesta.close()
+        for idioma in ["es", "en"]:
+            respuesta = self.cliente.get("/static/assets/videos/rock-roll-intro.%s.vtt" % idioma)
+            self.assertEqual(respuesta.status_code, 200)
+            self.assertTrue(respuesta.get_data(as_text=True).startswith("WEBVTT"))
+            respuesta.close()
+        self.assertIn('data-cinematic-replay="rock_roll_intro"', self.cliente.get("/bitacora").get_data(as_text=True))
+
     def test_salud(self):
         datos = self.cliente.get("/api/health").get_json()
         self.assertEqual(datos["status"], "ok")

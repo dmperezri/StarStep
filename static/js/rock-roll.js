@@ -27,15 +27,18 @@
 
                 speaker: "LITO · CONTROL DE MISIÓN",
 
+                // Mensaje breve tras la cinemática de Apollo 11.
                 briefing:
-                    "Cadete, nuestra misión es explorar dos mundos, " +
-                    "investigar sus secretos y descubrir las huellas " +
-                    "que la ciencia dejó en la Luna y Marte.",
+                    "¡Ahora es nuestro turno, cadete! " +
+                    "Vamos a explorar dos mundos, investigar sus secretos " +
+                    "y descubrir las huellas que la ciencia dejó en la Luna y Marte.",
 
+                // Instrucciones del vuelo (minijuego de /vuelo).
                 ready:
-                    "Todo está preparado. " +
-                    "Activaremos los sistemas de lanzamiento. " +
-                    "¡La aventura comienza ahora!",
+                    "Primero, el viaje a la Luna. Mantené ESPACIO, la flecha ↑ " +
+                    "o tocá la pantalla para subir; soltá para bajar. " +
+                    "Esquivá los asteroides: si chocás, volvés al último punto seguro. " +
+                    "¿Listo para la cuenta regresiva?",
 
                 next: "CONTINUAR",
                 launch: "¡ESTOY LISTO!",
@@ -76,14 +79,15 @@
                 speaker: "LITO · MISSION CONTROL",
 
                 briefing:
-                    "Cadet, our mission is to explore two worlds, " +
-                    "investigate their secrets and discover the " +
-                    "traces science left on the Moon and Mars.",
+                    "Now it's our turn, cadet! " +
+                    "We will explore two worlds, investigate their secrets " +
+                    "and discover the traces science left on the Moon and Mars.",
 
                 ready:
-                    "Everything is ready. " +
-                    "We will activate the launch systems. " +
-                    "The adventure begins now!",
+                    "First, the trip to the Moon. Hold SPACE, the ↑ arrow " +
+                    "or touch the screen to climb; release to drop. " +
+                    "Dodge the asteroids: if you crash, you return to the last safe point. " +
+                    "Ready for the countdown?",
 
                 next: "CONTINUE",
                 launch: "I'M READY!",
@@ -129,6 +133,8 @@
 
         let elapsed = 0;
         let lastTime = null;
+        // Mientras se reproduce la cinemática no avanza ninguna escena ni habla LITO.
+        let cinematicActive = false;
 
         const $ = id => document.getElementById(id);
 
@@ -146,7 +152,7 @@
 
         function stopVoice() { StarSound.stopVoice(); }
         function speak(text) {
-            if (voiceEnabled && !paused && !document.hidden) StarSound.speak(text, {lito:true});
+            if (voiceEnabled && !paused && !document.hidden && !cinematicActive) StarSound.speak(text, {lito:true});
         }
 
         function currentSpeech() {
@@ -330,7 +336,7 @@
 
             lastTime = time;
 
-            if (!paused && !document.hidden) {
+            if (!paused && !document.hidden && !cinematicActive) {
 
                 const duration = durations[scene];
 
@@ -479,6 +485,8 @@
 
         function drawStars(time = 0) {
 
+            if (cinematicActive) { requestAnimationFrame(drawStars); return; }
+
             if (!paused && !reducedMotion.matches) {
                 starTime = time;
             }
@@ -516,7 +524,21 @@
         // INICIO
         // ==========================================
 
-        showScene(0);
+        // Bloque 1: al elegir Rock & Roll se ve completa la cinemática de Apollo 11
+        // (cinematica.js). Al terminar siguen los tres actos, el mensaje breve de LITO y las
+        // instrucciones del vuelo; se omiten «Dos mundos» y el título, que el video ya muestra.
+        // Si el reproductor no está disponible, sigue la presentación anterior completa.
+        const cinematicHost = $("cinematic");
+        if (window.StarCinematic && cinematicHost) {
+            cinematicActive = true;
+            window.StarCinematic.mount(cinematicHost, {
+                id: "rock_roll_intro",
+                mode: "chapter",
+                onDone: () => { cinematicActive = false; showScene(2); }
+            });
+        } else {
+            showScene(0);
+        }
         requestAnimationFrame(updateScene);
         requestAnimationFrame(drawStars);
 

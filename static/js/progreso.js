@@ -12,7 +12,8 @@ window.StarProgress = (() => {
   const PHOTO='starstep_foto';
   // Cinemáticas vistas en este navegador (solo presentación: no otorga progreso ni toca StarFlow).
   // Es una preferencia del dispositivo: NUEVA PARTIDA la conserva (solo decide si aparece SALTAR).
-  const CINEMATICS='starstep_cinematicas', CINEMATIC_IDS=['history_intro'];
+  // rock_roll_intro: video completo de Apollo 11 al elegir el Capítulo 1 (cinematica.js).
+  const CINEMATICS='starstep_cinematicas', CINEMATIC_IDS=['history_intro','rock_roll_intro'];
   // Marca de un solo uso, en sessionStorage (solo esta pestaña): la bienvenida breve de NUEVA
   // PARTIDA terminó. flujo.js la consume al cargar la página siguiente (sección 5.8).
   const SESSION='starstep_sesion', NEW_GAME_WELCOME='starstep_nueva_partida';

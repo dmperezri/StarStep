@@ -10,16 +10,21 @@
     <title>StarStep · Rock & Roll</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/rock-roll.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cinematica.css') }}">
     <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/audio.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/cinematica.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/rock-roll.js') }}"></script>
 
 </head>
 
 <body>
+
+    <!-- Cinemática de Apollo 11 (cinematica.js): se reproduce completa al elegir el capítulo. -->
+    <div id="cinematic" class="cine-host" hidden></div>
 
     <canvas id="stars"
             width="480"
