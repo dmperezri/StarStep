@@ -18,3 +18,27 @@
 .page-shell{padding:20px;width:min(1000px,95%);margin:0 auto}.puzzle-window{margin:7vh auto;padding:30px;max-width:800px}.matching-game{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:25px 0}.match-column{display:flex;flex-direction:column;gap:13px}.match-column button{min-height:69px}.match-column button.selected{border-color:#8FF0D8}.match-column button.matched{background:#245B48;border-color:#5BE39A}#matchFeedback{color:#FFE066;min-height:28px}.certificate{margin:25px auto;padding:25px;background:#FFF8E7;color:#0E1233;border:8px double #6E62CE;text-align:center}.certificate h1{font-size:2rem}.next-act{color:#8FF0D8;font-weight:bold;text-decoration:none;padding:10px}.visor-modal[hidden]{display:none!important}
 @media print{.diary-cover,.diary-top,.pixel-button,.hud{display:none!important}.certificate{display:block!important;min-height:80vh;margin:0}}
 @media(max-width:550px){.matching-game{gap:7px}.match-column button{font-size:.65rem}}
+
+/* StarStep visual system integration: 16:9, never stretch the pixel world. */
+.stage>canvas#world{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.hud{flex-wrap:wrap;row-gap:8px;min-width:0;max-width:100%}
+.hud-actions{flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.hud-button{white-space:nowrap;min-height:34px}
+.logo{top:clamp(76px,12vh,135px);width:min(92%,900px)}
+.logo h1{font-size:clamp(2.3rem,7vw,5.5rem);overflow-wrap:normal;white-space:nowrap}
+.speech-panel{width:min(735px,calc(100% - 36px));bottom:clamp(18px,5vh,64px);max-height:42vh;overflow-y:auto;padding:clamp(12px,2vw,20px)}
+.speech-actions{flex-wrap:wrap}.speech-actions .pixel-button{min-width:110px}
+.science-wrap{width:min(1180px,96%);margin:0 auto;padding:16px 0 70px}
+.science-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 30px}
+.science-hero{background:#1A1F4D;border:3px solid #ABA1F5;padding:22px 28px}
+.science-hero h1{font-size:clamp(1.7rem,4vw,2.9rem);color:#8FF0D8}
+.science-hero p{line-height:1.55}
+.science-section{margin:36px 0}.science-section h2{color:#FFE066;font-size:1.2rem}
+.science-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+.science-card{background:#262C66;border:3px solid #ABA1F5;padding:12px 12px 18px;display:flex;flex-direction:column;gap:9px}
+.science-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#0E1233;border:2px solid #1A1340}
+.science-card h3{font-size:1.03rem;margin:5px 0;color:#8FF0D8}
+.science-card p{font-size:.84rem;line-height:1.5;margin:0;flex:1}
+.science-card small{color:#B9BEE6}.science-card a{color:#FFE066}
+@media(max-width:700px){.logo{top:clamp(75px,15vh,115px)}.logo h1{font-size:clamp(1.7rem,8.4vw,3.6rem)}.hud{left:10px;right:10px}.hud-actions{gap:4px}.speech-panel{bottom:12px;max-height:44vh}.chapter-label{display:none}}
+@media(max-height:570px){.logo{top:60px}.logo h1{font-size:2.4rem}.speech-panel{bottom:6px;max-height:50vh}.menu{top:30%}}

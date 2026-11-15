@@ -9,16 +9,16 @@ window.StarViewerFallback={
   overlay=document.createElement('div');overlay.id='fallbackViewer';overlay.className='visor-modal';
   const panel=document.createElement('div');panel.className='visor-panel';panel.style.padding='22px';
   const heading=document.createElement('h2');heading.textContent=item.name;
-  const warning=document.createElement('p');warning.textContent='Visor 3D no disponible sin conexión. Podés inspeccionar la ficha científica.';
+  const warning=document.createElement('p');warning.textContent=StarI18n.t('viewer.unavailable');
   const content=document.createElement('div');content.className='evidence observed';
-  content.textContent='LO QUE SE VIO: '+item.observed;
+  content.textContent=StarI18n.t('science.observe')+': '+(window.StarScience?.facts?.[id]?.[StarI18n.lang]?.observed||item.observed);
   const info=document.createElement('div');info.className='evidence interpreted';
-  info.textContent='LO QUE INTERPRETAN: '+item.interpreted;
+  info.textContent=StarI18n.t('science.infer')+': '+(window.StarScience?.facts?.[id]?.[StarI18n.lang]?.interpreted||item.interpreted);
   const story=document.createElement('div');story.className='evidence narrative';
-  story.textContent='NUESTRA HISTORIA: '+item.narrative;
-  const unlock=document.createElement('button');unlock.className='pixel-button mint';unlock.textContent='GUARDAR DESCUBRIMIENTO';
+  story.textContent=StarI18n.t('science.story')+': '+(window.StarScience?.facts?.[id]?.[StarI18n.lang]?.narrative||item.narrative);
+  const unlock=document.createElement('button');unlock.className='pixel-button mint';unlock.textContent=StarI18n.t('viewer.store');
   unlock.onclick=()=>{StarProgress.unlock(id);overlay.remove();};
-  const close=document.createElement('button');close.className='pixel-button';close.textContent='CERRAR';close.onclick=()=>overlay.remove();
+  const close=document.createElement('button');close.className='pixel-button';close.textContent=StarI18n.t('viewer.close');close.onclick=()=>overlay.remove();
   panel.append(heading,warning,content,info,story,unlock,close);overlay.append(panel);document.body.append(overlay);
  }
 };

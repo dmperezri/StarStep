@@ -146,6 +146,11 @@ def bitacora():
     return render_template("bitacora.html")
 
 
+
+@app.get("/archivo-nasa")
+def archivo_nasa():
+    return render_template("archivo-nasa.html")
+
 # ============================================================
 # DIAGNÓSTICO
 # ============================================================
