@@ -1172,3 +1172,47 @@
     }
 
 }
+
+
+/* OUTSTRIP - Presentacion cinematografica */
+
+.home-page .intro-splash {
+    gap: 28px;
+    background: radial-gradient(
+        ellipse at center,
+        #262C66 0%,
+        #0E1233 55%,
+        #06091D 100%
+    );
+}
+
+.home-page .intro-splash-brand {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(1.4rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.5;
+    color: #FFF8E7;
+    text-shadow:
+        4px 4px 0 #4F45A6,
+        0 0 24px rgba(171, 161, 245, .35);
+}
+
+.home-page .intro-splash-tagline {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(.55rem, 1.4vw, .9rem);
+    letter-spacing: .24em;
+    color: #ABA1F5;
+    text-shadow: 2px 2px 0 #1A1340;
+}
+
+.home-page .intro-splash-tagline::before,
+.home-page .intro-splash-tagline::after {
+    content: "";
+    display: inline-block;
+    width: clamp(16px, 4vw, 45px);
+    height: 2px;
+    background: #6E62CE;
+    vertical-align: middle;
+    margin: 0 16px;
+}
+
