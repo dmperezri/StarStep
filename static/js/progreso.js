@@ -5,7 +5,6 @@ window.StarProgress = (() => {
   const catalog={
     eagle:{id:'eagle',name:'Eagle · Apollo 11',world:'moon',source:'https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C',observed:'La etapa de descenso del módulo Eagle quedó en la superficie lunar.',interpreted:'La parte inferior actuó como plataforma para que la etapa de ascenso despegara de la Luna.',narrative:'Una plataforma silenciosa aún marca dónde comenzó el regreso.'},
     easep:{id:'easep',name:'EASEP · Apollo 11',world:'moon',source:'https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C',observed:'Apollo 11 dejó un paquete de experimentos científicos en la Luna.',interpreted:'Sus instrumentos permitieron registrar datos del entorno lunar.',narrative:'Una pequeña estación se quedó escuchando la Luna.'},
-    alsep:{id:'alsep',name:'ALSEP y núcleo · Apollo 15',world:'moon',source:'https://www.nasa.gov/history/alsj/a15/a15.html',observed:'Apollo 15 desplegó instrumentos ALSEP y obtuvo un núcleo profundo de aproximadamente 2,4 metros.',interpreted:'Las capas del regolito permiten investigar cómo se acumuló y cambió la superficie lunar. El tubo de 3 m del visor es un esquema ampliado.',narrative:'LITO observa un archivo de capas bajo nuestros pies. Los paneles y colores son recursos didácticos, no una reconstrucción del ALSEP real.'},
     reflector:{id:'reflector',name:'Retrorreflector láser',world:'moon',source:'https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C',observed:'Se dejó un reflector que devuelve pulsos de láser hacia la Tierra.',interpreted:'Los tiempos de ida y vuelta de la luz ayudan a medir la distancia Tierra-Luna.',narrative:'Una señal de luz conecta dos mundos.'},
     opportunity:{id:'opportunity',name:'Rover Opportunity',world:'mars',source:'https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/',observed:'Opportunity investigó rocas de Marte durante más de 14 años.',interpreted:'Hematita, yeso y arcillas aportan evidencia de ambientes con agua pasada; no prueban vida.',narrative:'El geólogo de seis ruedas dejó huellas que cuentan una historia.'},
     blueberries:{id:'blueberries',name:'Esférulas de hematita',world:'mars',source:'https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/',observed:'Opportunity encontró pequeñas esférulas ricas en hematita.',interpreted:'Su formación es compatible con procesos relacionados con agua líquida antigua.',narrative:'Pequeñas pistas azules, preguntas enormes.'}
@@ -25,5 +24,9 @@ window.StarProgress = (() => {
          el motor conserva su descubrimiento, pero no se guarda sin inspección. */
     }
   });
-  return {catalog,list,unlock,player,setPlayer,getNotes,setNotes};
+  const completedKey='starstep_completed';
+  function completed(){return read(completedKey,[]);}
+  function completeAct(act){if(!['luna','marte','huellas'].includes(act))return;const all=new Set(completed());all.add(act);localStorage.setItem(completedKey,JSON.stringify([...all]));document.dispatchEvent(new CustomEvent('starstep:completed',{detail:{act}}));}
+  function canFinish(){return ['luna','marte','huellas'].every(x=>completed().includes(x));}
+  return {catalog,list,unlock,player,setPlayer,getNotes,setNotes,completed,completeAct,canFinish};
 })();
