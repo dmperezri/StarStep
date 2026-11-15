@@ -12,8 +12,6 @@ Este documento describe el controlador central del flujo, **StarFlow**, y el con
 | `tests/js/archivo-nasa.test.mjs` | Pruebas de la navegación del archivo en un navegador simulado (`node --test tests/js/`). |
 | `tests/js/nueva-partida.test.mjs` | Pruebas de «Nueva partida» y de la identidad del jugador (sección 5.5). |
 | `tests/js/astronauta.test.mjs` | Pruebas del nombre del cadete: pattern del navegador y regla de recorte (sección 5.6). |
-| `static/js/intro-secuencia.js` | Secuencia de entrada: OUTSTRIP, idioma, introducción histórica y bienvenida de LITO (sección 5.7). Solo presentación. |
-| `tests/js/intro-secuencia.test.mjs` | Pruebas de la secuencia de entrada (sección 5.7). |
 | `tests/js/navegador-simulado.mjs` | Navegador simulado compartido por las pruebas (no es un archivo de pruebas). |
 | `tests/test_rutas.py` | Pruebas de las rutas Flask (`python -m unittest tests.test_rutas -v`). |
 
@@ -27,9 +25,9 @@ Leyenda: ✅ implementada en el recorrido actual · ⏳ prevista (no bloquea).
 
 | # | Grupo | Etapa (`id`) | Página | Estado | Objetivos obligatorios implementados |
 |---|---|---|---|---|---|
-| 1 | Presentación | `outstrip_presentation` | `/` | ⏳ | — (pantalla implementada como presentación, sección 5.7) |
-| 2 | Presentación | `history_intro` | `/` | ⏳ | — (intro implementada como cinemática del jugador, sección 5.7) |
-| 3 | Presentación | `lito_welcome` | `/` | ✅ | `lito_welcome.heard` (¡ESTOY LISTO!, sección 5.7) |
+| 1 | Presentación | `outstrip_presentation` | `/` | ⏳ | — |
+| 2 | Presentación | `history_intro` | `/` | ⏳ | — |
+| 3 | Presentación | `lito_welcome` | `/` | ✅ | `lito_welcome.heard` (transmisión completa o SALTAR) |
 | 4 | Presentación | `profile` | `/astronauta` | ✅ | `profile.alias` |
 | 5 | Presentación | `cadet_custom` | `/astronauta` | ✅ | `cadet_custom.avatar` |
 | 6 | Presentación | `chapter_select` | `/` | ⏳ | — |
@@ -126,12 +124,11 @@ Enlaces internos a la portada `/`: **TIERRA** (`luna.html`, `data-i18n="moon.ear
 | Apertura inicial: primera página de la pestaña o sesión del navegador | Bienvenida de LITO |
 | Pestaña abierta directamente en `/archivo-nasa` y luego VOLVER AL MENÚ, con `lito_welcome` completada | Menú de misión (el archivo también marca la sesión, sección 5.4) |
 | Bienvenida todavía no completada (partida nueva), en cualquier caso | Bienvenida (es obligatoria) |
-| Navegación interna en la misma sesión con `lito_welcome` completada (TIERRA, VOLVER, URL, atrás/adelante) | Menú de misión, sin narración ni sonido |
-| Recarga de la portada (F5) | `getHomeMode()` sigue devolviendo `'menu'`, pero la portada la trata como apertura real: OUTSTRIP → idioma → intro (con SALTAR) → menú (sección 5.7) |
+| Navegación interna en la misma sesión con `lito_welcome` completada (TIERRA, VOLVER, URL, atrás/adelante, recarga) | Menú de misión, sin narración ni sonido |
 
 * La decisión la toma `StarFlow.getHomeMode()` (`'welcome'` o `'menu'`) con una marca de sesión en `sessionStorage` (`starstep_sesion`). Es solo presentación: no forma parte del estado del flujo, no se sincroniza y no otorga progreso.
 * Volver al menú **no** completa objetivos, no cambia artefactos, no mueve la etapa actual ni el checkpoint. Si el jugador vuelve a escuchar la transmisión, `recordObjective` responde `ALREADY_COMPLETED` sin efecto.
-* Cambiar ES/EN en el menú traduce el menú sin reproducir la bienvenida. (Antes, en la apertura inicial, cambiar el idioma desde el menú volvía a mostrar la bienvenida; la secuencia de la sección 5.7 lo reemplaza: el idioma se elige antes de la intro.)
+* Cambiar ES/EN en el menú de regreso traduce el menú sin reproducir la bienvenida. En la apertura inicial se conserva el comportamiento corregido por el equipo: cambiar el idioma desde el menú vuelve a mostrar la bienvenida traducida.
 * La marca `sessionStorage` es **transitoria**. En las Fases 2 y 3 se distinguirán las preferencias del perfil, las cinemáticas vistas y el inicio de una sesión.
 
 ### 5.1.1 Botón principal: iniciar, continuar o consultar
@@ -243,74 +240,6 @@ El `pattern` de HTML se mantiene como respaldo sin JavaScript. No puede expresar
 
 Pruebas: `tests/js/astronauta.test.mjs` (14 pruebas). Cubren el pattern compilado con la bandera `v`, solo espacios, un carácter rodeado de espacios, nombres válidos con espacios al principio o al final, tildes combinadas, la misma regla en el almacenamiento y el controlador, y el formulario real en ES y EN.
 
-### 5.7 Secuencia de entrada de la portada (rediseño visual)
-
-`static/js/intro-secuencia.js` (`window.StarIntro`) muestra, encima de la lógica de StarFlow:
-
-```
-OUTSTRIP → selector de idioma → introducción histórica → bienvenida de LITO → menú principal
-```
-
-**Qué pasos se muestran** lo decide `StarIntroCore.planEntry()` (función pura, probada en Node) con tres datos:
-
-| Dato | Fuente | Alcance |
-|---|---|---|
-| Apertura real | `StarFlow.isInitialOpening()`: primera página de la pestaña (marca `starstep_sesion`, sección 5.1) | Sesión |
-| Intro histórica vista | `StarProgress.hasSeenCinematic('history_intro')` (clave `starstep_cinematicas`): decide si aparece SALTAR | Jugador |
-| Bienvenida completada | `StarFlow.isStageCompleted('lito_welcome')` | Jugador (partida) |
-
-| Situación | Pasos |
-|---|---|
-| Pestaña nueva, jugador nuevo | OUTSTRIP → idioma → intro (sin SALTAR) → LITO → menú (INICIAR AVENTURA) |
-| Pestaña nueva, intro vista y bienvenida completada | OUTSTRIP → idioma → intro en el idioma elegido **con SALTAR** → menú (CONTINUAR AVENTURA si hay partida) |
-| Pestaña nueva, partida anterior a este cambio (bienvenida completada, intro sin ver) | OUTSTRIP → idioma → intro (sin SALTAR hasta verla completa una vez) → menú |
-| Regreso desde Luna, Marte, Huellas, bitácora o Archivo NASA (sin recargar) | Menú directo (es exactamente `getHomeMode() === 'menu'`) |
-| Recarga de la portada (F5), con intro y bienvenida completadas | OUTSTRIP → idioma → intro con SALTAR → menú. LITO no se repite. |
-| Recarga a mitad de la secuencia | OUTSTRIP → idioma → intro (si no se terminó, desde la escena 1, sin SALTAR) → LITO → menú |
-| Volver a la portada sin recargar a mitad de la secuencia | Sin OUTSTRIP ni idioma: continúa con la intro y/o LITO pendientes |
-| «VER INTRODUCCIÓN» en el menú | Intro con SALTAR → menú. No toca la partida. |
-
-**Pasos:**
-
-1. **OUTSTRIP**: pantalla propia con «OUTSTRIP» y «Two Worlds, Two Stories», estrellas y destello en CSS (no hay logo independiente de OUTSTRIP). Dura 3,2 s (1,5 s con `prefers-reduced-motion`) y avanza sola. No se puede omitir en la apertura real; no se muestra en regresos internos.
-2. **Idioma**: logo StarStep, consigna en ambos idiomas (la del idioma guardado arriba), botones ESPAÑOL / ENGLISH; el guardado aparece marcado. La elección usa `StarI18n.setLang()` (misma clave `starstep_lang`) y es el primer gesto del jugador: desde ahí se habilitan música y voz. Aparece en **cada apertura real**, antes de la intro.
-3. **Introducción histórica**: aparece **después de cada elección de idioma** (apertura real o recarga), con títulos, subtítulos, botones y narración en el idioma elegido. Son cinco escenas pixel art en un canvas 480×270 sin recursos externos. Reutiliza `launchScene`, `descentScene` y `lito` de `scene.js` sin modificarlo; Curiosidad, Marte y el cierre se dibujan en `intro-secuencia.js`. Cada escena tiene título, subtítulo y narración (si la voz está activa), SIGUIENTE / NEXT y un botón de voz. **SALTAR solo aparece si ya se vio completa alguna vez** (la primera vez no se puede saltar). Se marca como vista al pulsar SIGUIENTE en la escena 5. En un regreso interno con la bienvenida pendiente (p. ej. volver sin recargar a mitad de la secuencia) solo aparece si todavía no se vio.
-4. **Bienvenida de LITO**: pantalla propia dentro de la presentación (`#introLito`). Muestra LITO animado sobre el campo de estrellas, el panel crema con el texto animado, la voz de LITO, «¡ESTOY LISTO! / I'M READY!» e ES/EN/voz. Al confirmar registra `lito_welcome.heard` con la evidencia de siempre (`transmission`). Tocar el texto completa la animación. La bienvenida antigua sobre el escenario terrestre (`#welcome`) se eliminó.
-5. **Menú**: sin cambios (`getEntryPoint()`, NUEVA PARTIDA, etc.), más «VER INTRODUCCIÓN / WATCH INTRO», visible solo si la intro ya se vio.
-
-**Continuidad visual (sin cortes):**
-
-* `<body class="… is-entering">` viene así desde el HTML. Desde el **primer renderizado**, el escenario terrestre, el HUD, el logotipo, el menú, la etiqueta del capítulo y los diálogos están ocultos (`opacity:0; visibility:hidden`), también mientras se decide el modo de entrada.
-* `#introSequence` es un **contenedor permanente a pantalla completa**: visible desde el inicio (fondo `--night`) y con el telón `#introFade` opaco (`#0E1233`).
-* Cada cambio de etapa es un **fundido a azul noche de 420 ms**. El telón se vuelve opaco, se cambia la pantalla y el telón se aclara. Ninguna etapa recarga la página.
-* El escenario y el menú **solo se revelan al entrar al menú**: se quita `is-entering`, el escenario aparece con su propio fundido, el telón se aclara y el contenedor se retira (`hidden`) para no interceptar clics. En el regreso desde una misión ocurre lo mismo, sin pasos previos.
-* VER INTRODUCCIÓN funde a azul noche sobre el menú, vuelve a ocultar el escenario y al terminar repite el fundido de entrada al menú.
-* **Sin superposiciones:**
-  * un solo fundido activo (uno nuevo anula los temporizadores del anterior); los clics se ignoran mientras el telón se oscurece (evita dobles avances) y la pantalla nueva responde en cuanto aparece, aunque el telón siga aclarándose;
-  * antes de cada narración se detiene la anterior;
-  * un solo bucle de animación por pantalla;
-  * la estación terrestre (`earthScene`) solo se anima desde que el menú está a la vista;
-  * `startMusic()` no duplica la música.
-* **Movimiento reducido** (`prefers-reduced-motion`): cambios inmediatos sin fundidos, OUTSTRIP de 1,5 s y sin animaciones de estrellas, destello ni logotipo.
-
-**Recarga:** una recarga de la portada (Navigation Timing `type === 'reload'`) cuenta como apertura real y vuelve a mostrar OUTSTRIP, el selector de idioma y la intro (con SALTAR si ya se vio). LITO no se repite si ya se completó. Ir a la portada sin recargar (TIERRA, VOLVER AL MENÚ, atrás) sigue siendo regreso interno. `getHomeMode()` y `flujo.js` no cambian para esto: la distinción está en `intro-secuencia.js`.
-
-**Cambiar ES/EN durante la secuencia** (selector, barra de la intro o HUD durante LITO) traduce la pantalla actual y vuelve a narrarla en el idioma nuevo, sin cambiar de escena.
-
-**Decisiones conservadoras:**
-
-* `outstrip_presentation` e `history_intro` siguen como etapas **previstas** (`implemented:false`). Volverlas obligatorias en StarFlow bloquearía las partidas existentes (la etapa actual se recalcula). La intro vista se guarda como **cinemática del jugador** en `progreso.js`, fuera del estado del flujo.
-* `starstep_cinematicas` es dato del jugador (`PLAYER_KEYS`): NUEVA PARTIDA la borra y el siguiente jugador ve la intro sin poder saltarla. Por sí sola no hace aparecer NUEVA PARTIDA.
-* **Cambio de regla (pedido del equipo):** antes la intro solo aparecía la primera vez por jugador. Ahora aparece tras cada elección de idioma, en ese idioma, y solo la primera vez es obligatoria. La «cinemática vista» ya no decide si se muestra, solo si se puede saltar. LITO sigue mostrándose solo hasta completarla.
-* Los jugadores con partida previa ven la intro sin SALTAR hasta completarla una vez. Su partida no cambia.
-* Si `intro-secuencia.js` no carga, `main.js` muestra el menú directamente. Las guardas siguen exigiendo la bienvenida para avanzar, así que no se desbloquea progreso.
-* Reemplaza a la transmisión anterior de tres mensajes (INICIAR TRANSMISIÓN / SALTAR), al panel `#welcome` sobre el escenario y al comportamiento de la sección 5.1 que volvía a mostrar la bienvenida al cambiar el idioma desde el menú en una apertura inicial. `getHomeMode()` no cambia.
-* `static/js/intro.js` (prototipo anterior) no está enlazado en ninguna plantilla; no se modificó.
-
-**Limitaciones:** la voz depende de `speechSynthesis` del navegador y de un gesto previo. En una recarga a mitad de la secuencia, el primer texto puede aparecer sin voz hasta el siguiente clic. La intro no guarda en qué escena se quedó el jugador.
-
-Pruebas: `tests/js/intro-secuencia.test.mjs` (24 pruebas). Después de **cada** clic y de **cada** temporizador comprueban que, mientras se ve OUTSTRIP, el idioma, la intro o LITO, el menú y el escenario terrestre no estén visibles y que nunca haya dos pantallas a la vez. También cubren el fundido (telón opaco, ~420 ms, clics ignorados mientras se oscurece y pantalla usable mientras se aclara), la intro repetida en el idioma elegido (ES y EN, textos y narración, con SALTAR), el movimiento reducido, que la Tierra solo se anime en el menú, las voces sin superponerse, el regreso desde Luna, Marte y Huellas, la recarga con OUTSTRIP, la recarga y la vuelta sin recargar a mitad de la secuencia, VER INTRODUCCIÓN con fundido, NUEVA PARTIDA y el HTML/CSS del primer renderizado. También `tests/test_rutas.py` (la portada carga la secuencia).
-
 ## 6. Repetición
 
 * `canReplay(etapa)`: solo etapas implementadas, ya completadas y que no sean de recompensa.
@@ -340,7 +269,6 @@ Todas devuelven objetos `{ok:true, …}` o `{ok:false, code}`. Los códigos son 
 | `getEntryPoint()` | Punto de entrada para continuar: `{status, stage, page}` (solo lectura, sección 5.1.1). |
 | `getActStatus(act)` / `getChapterStatus()` | Recompensas `none`/`provisional`/`official` (sección 5.3). |
 | `getHomeMode()` | Solo navegador: `'welcome'` en la apertura inicial, `'menu'` al regresar desde una misión (sección 5.1). |
-| `isInitialOpening()` | Solo navegador: `true` si la portada es la primera página de la pestaña (secuencia de entrada, sección 5.7). |
 
 Cambios respecto a la interfaz propuesta: se agregaron `isStageCompleted`, `isActComplete`, las funciones de artefactos, `checkPage`, `getSyncState`, `markSynced` y `notify`. `resume()` además de quitar la pausa devuelve el checkpoint a recuperar.
 

@@ -282,6 +282,30 @@
       return changed;
     }
 
+    // Repara partidas guardadas que ya tienen evidencia verificable de Eagle,
+    // pero que perdieron los hitos previos por una integración antigua.
+    // Nunca inventa descubrimientos ni completa la exploración: solo reconoce
+    // que una inspección lunar registrada implica haber llegado a la Luna.
+    function recoverLunarArrivalEvidence() {
+      if (state.artifacts.eagle?.state !== "registered") return false;
+      const profile = (() => { try { return storage.legacyProfile?.() || {}; } catch { return {}; } })();
+      const validAlias = normalizeAlias(profile.alias).ok;
+      if (!validAlias) return false;
+      const repaired = [];
+      for (const id of ["lito_welcome", "profile", "cadet_custom", "launch", "moon_landing"]) {
+        const stage = stageById(id);
+        if (stage?.implemented && !own(state.completed, id)) {
+          state.completed[id] = { at: now(), via: "registered_eagle_evidence" };
+          repaired.push(id);
+        }
+      }
+      if (repaired.length) {
+        state.legacy = isObject(state.legacy) ? state.legacy : {};
+        state.legacy.lunarArrivalRepaired = { at: now(), stages: repaired };
+      }
+      return repaired.length > 0;
+    }
+
     function load() {
       let raw = null;
       try { raw = storage.load?.() ?? null; } catch { raw = null; }
@@ -296,6 +320,7 @@
       } else {
         state = sanitize(parsed);
       }
+      recoverLunarArrivalEvidence();
       reconcile("reconcile");
       syncActs();
       persist();
@@ -659,9 +684,6 @@
   function getHomeMode() {
     return internalNavigation && flow.isStageCompleted("lito_welcome") ? "menu" : "welcome";
   }
-  // Apertura real del juego en esta pestaña (primera página de la sesión): la secuencia de
-  // entrada muestra OUTSTRIP y el selector de idioma solo en este caso. Solo presentación.
-  function isInitialOpening() { return !internalNavigation; }
 
   // Guarda de página: recargar o usar el historial no desbloquea contenido.
   function guard() {
@@ -687,5 +709,5 @@
     notify("locked");
   }, true);
 
-  window.StarFlow = Object.freeze(Object.assign({}, flow, { notify, getHomeMode, isInitialOpening }));
+  window.StarFlow = Object.freeze(Object.assign({}, flow, { notify, getHomeMode }));
 })();

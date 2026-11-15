@@ -1,0 +1,54 @@
+/* Visual book skin isolated from mission/game styles */
+.diary-redesign{width:min(1240px,96%);padding-top:16px}.mission-diary-heading{text-align:center;padding:18px 0 5px}.mission-diary-heading h1{color:#ffe078;font-size:clamp(20px,3vw,34px);margin:5px}.mission-diary-heading p{color:#e5dbee}.diary-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0 23px}.diary-tab{font:inherit;font-size:clamp(9px,1.25vw,15px);color:#efe9ff;background:#22295e;border:3px solid #41417b;min-height:56px;cursor:pointer}.diary-tab.active{background:#85e9d2;color:#16183f;border-color:#ead17f}.diary-tab:focus-visible{outline:3px solid #ffdf7a;outline-offset:2px}.diary-tab-panel[hidden]{display:none!important}.mission-book{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);position:relative;background:#dcc18b;border:8px solid #e7c85b;outline:3px solid #7970ad;outline-offset:2px;box-shadow:10px 10px #090c24}.mission-book:after{content:'';position:absolute;top:0;bottom:0;left:calc(50% - 5px);width:10px;pointer-events:none;background:linear-gradient(90deg,#8e79a5,#ead6af,#8e79a5)}.mission-page{min-width:0;min-height:590px;padding:30px clamp(14px,2.6vw,32px) 45px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,rgba(58,61,115,.07) 32px,transparent 33px),#fff7e6;color:#1e214e}.mission-page:first-child{border-right:2px solid #c0a47c}.mission-page h2{font-size:clamp(12px,1.35vw,18px);color:#242453;margin:20px 0 11px}.mission-page-title{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:3px double #7771a5;margin-bottom:23px}.mission-page-title h2{margin:0 0 13px}.mission-page-title span{font-size:10px;background:#242657;color:#87f0d7;padding:7px}.mission-page .hint{color:#615b82}.mission-page .identity p{color:#484b88}.mission-page .identity strong{font-size:22px;color:#242453}.mission-page .photo-slot{border-color:#e9c957}.mission-page .text-btn{color:#393b88}.diary-eyebrow{font-size:11px;font-weight:900;letter-spacing:1px;color:#565182}.mission-page textarea{background:rgba(255,255,255,.7);border:2px solid #7b6d9e;color:#171942;line-height:1.7}.mission-page #notice{color:#176b61}.mission-paper-card{border:2px solid #8e85ad;padding:16px;margin:14px 0;background:rgba(255,255,255,.6);line-height:1.7;color:#302e65}.mission-card-list{display:grid;gap:11px}.mission-mini-card{border:2px solid #b4a7bc;border-left:6px solid #71cdb8;background:#fffbf2;padding:15px;color:#23234f}.mission-mini-card.locked{opacity:.65;border-left-color:#b0a7b6}.mission-mini-card strong{display:block;color:#27265d}.mission-mini-card p{line-height:1.5;font-size:12px}.mission-page .collectible{background:#fffaf1;border-color:#78d3be;color:#2e2a5c}.mission-page .collectible strong{color:#282857}.mission-page .collection,.mission-page .badges{color:#27265b}.mission-page .achievement{display:block;margin:8px 0;background:#e9fff7;color:#184c42}.mission-page .station-list{display:flex;flex-wrap:wrap;gap:8px}.mission-certificate-preview{border:4px solid #d6bc58;background:#f3e9d7;padding:5px}.mission-certificate-preview img{max-width:100%;display:block;height:auto}.mission-preview-warning{font-size:12px;line-height:1.7;background:#fff0bc;border-left:5px solid #ddbb55;padding:10px}.mission-page #certificate{font-size:12px}.mission-page #certificate h1{font-size:22px}.mission-page #printCertificate{margin-top:16px}.mission-page .pixel-button{font-size:11px}.mission-page .pixel-button.small{font-size:10px}@media(max-width:800px){.mission-book{grid-template-columns:1fr}.mission-book:after{display:none}.mission-page{min-height:auto}.mission-page:first-child{border-right:0;border-bottom:8px solid #c1a875}.diary-tabs{grid-template-columns:repeat(2,1fr)}}
+
+/* Vista previa del diploma generada con el perfil real: no contiene nombres de ejemplo. */
+.certificate-cover{position:relative;display:flex;min-height:290px;flex-direction:column;align-items:center;justify-content:center;gap:11px;text-align:center;background:#fff8e7;color:#1a1340;border:8px double #aba1f5;padding:24px 14px;box-shadow:inset 0 0 0 4px #ffe066}
+.certificate-logo{font-size:clamp(16px,2vw,24px);font-weight:900;color:#6e62ce;letter-spacing:2px}
+.certificate-caption{font-size:clamp(13px,1.7vw,19px);font-weight:900}.certificate-caption-small,.certificate-awarded{font-size:12px;color:#56527a}
+.certificate-explorer{font-size:clamp(20px,3vw,32px);font-weight:900;border-bottom:3px dotted #1a1340;padding:4px 18px;max-width:100%;overflow-wrap:anywhere}
+.certificate-mission,.certificate-footer{font-size:12px;font-weight:bold}.certificate-footer{margin-top:14px;color:#6e62ce}
+.certificate-lock{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(17,20,50,.87);color:#fff8e7;font-size:clamp(15px,2vw,21px);font-weight:900;padding:15px}
+.certificate-lock[hidden]{display:none!important}
+/* Evitar que reglas globales muestren diplomas ocultos antes de tiempo. */
+#certificate[hidden],#printCertificate[hidden]{display:none!important}
+
+
+/* StarStep 2026-11: ajustes de maquetación, sin cambiar el diario ni la persistencia. */
+.diary-redesign{padding-bottom:clamp(44px,6vh,85px);}
+.diary-redesign .diary-top{align-items:center;gap:14px;padding:16px 4px 19px;}
+.diary-redesign .diary-top .hud-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;}
+.diary-redesign .diary-top .hud-button{display:inline-flex;align-items:center;justify-content:center;min-width:46px;min-height:38px;padding:8px 12px;text-decoration:none;line-height:1.15;background:#fff8e7;color:#181a43;border:2px solid #aaa1f5;text-shadow:none;white-space:nowrap;}
+.diary-redesign .diary-top .hud-button:hover{background:#8ff0d8;color:#16183f;}
+.diary-redesign .diary-top .hud-button[aria-pressed="true"]{background:#8ff0d8;}
+.diary-redesign .diary-top .hud-actions>span{font-size:clamp(10px,1vw,13px);color:#8ff0d8;white-space:normal;line-height:1.5;}
+.diary-redesign .diary-tabs{margin-block:20px 25px;}
+.diary-redesign .diary-tab{line-height:1.4;padding:10px 7px;text-align:center;}
+.diary-redesign .mission-page{overflow-wrap:anywhere;}
+.diary-redesign .mission-page #notes{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:220px;resize:vertical;padding:15px 16px;margin:14px 0 16px;background:#fffcf4;border:2px solid #8275a5;color:#20244d;font:inherit;font-size:clamp(13px,1.15vw,16px);line-height:1.8;}
+.diary-redesign .mission-page #notes::placeholder{color:#696789;opacity:1;}
+.diary-redesign .mission-page #saveNotes{display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:43px;padding:10px 16px;font-size:clamp(11px,1vw,13px);line-height:1.35;white-space:normal;margin:0 0 8px;}
+.diary-redesign .mission-page #notice{min-height:1.3em;}
+.diary-redesign .mission-page .mission-paper-card{max-width:100%;}
+.diary-redesign .mission-page .identity{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:start;gap:18px;}
+.diary-redesign .mission-page .identity>div:last-child{min-width:0;}
+.diary-redesign .mission-page #explorerName{display:block;overflow-wrap:anywhere;line-height:1.4;}
+.diary-redesign .mission-page .photo-slot{flex:none;}
+.diary-redesign .mission-page .text-btn{text-align:left;}
+.diary-redesign .mission-page .station-list{max-width:100%;}
+@media(max-width:950px){
+ .diary-redesign .mission-page{padding:24px 17px 34px;}
+ .diary-redesign .mission-page .identity{grid-template-columns:95px minmax(0,1fr);gap:12px;}
+ .diary-redesign .mission-page .photo-slot{width:95px;height:95px;}
+}
+@media(max-width:800px){
+ .diary-redesign .mission-page .identity{grid-template-columns:110px minmax(0,1fr);}
+ .diary-redesign .mission-page .photo-slot{width:110px;height:110px;}
+ .diary-redesign .mission-page #notes{min-height:190px;}
+}
+@media(max-width:520px){
+ .diary-redesign .diary-top{align-items:flex-start;}
+ .diary-redesign .diary-top .hud-actions{justify-content:flex-start;}
+ .diary-redesign .mission-page .identity{grid-template-columns:90px minmax(0,1fr);}
+ .diary-redesign .mission-page .photo-slot{width:90px;height:90px;}
+ .diary-redesign .diary-tab{font-size:10px;min-height:52px;}
+}

@@ -25,7 +25,6 @@ function playUntilEagle(page, alias = "ARIEL") {
   for (const c of ["structure", "legs", "ladder"]) StarFlow.inspectComponent("eagle", c, M);
   StarProgress.setNotes("Notas del jugador anterior");
   page.ctx.localStorage.setItem("starstep_foto", "data:image/webp;base64,AAAA"); // como bitacora.js
-  StarProgress.markCinematicSeen("history_intro"); // como la introducción histórica
 }
 
 test("jugador nuevo: sin datos guardados, StarFlow crea un invitado nuevo", () => {
@@ -165,12 +164,8 @@ test("toda clave de almacenamiento está clasificada como dato del jugador o pre
 
 test("portada: botón NUEVA PARTIDA oculto por defecto y diálogo de confirmación bilingüe", () => {
   const html = template("index.html");
-  // Independiente del formato de la plantilla (atributos en una o varias líneas).
-  const tag = id => (html.match(new RegExp(`<[a-z]+[^>]*[\\s]id="${id}"[^>]*>`)) || [""])[0];
-  assert.match(tag("newGame"), /data-i18n="newgame.button"/);
-  assert.match(tag("newGame"), /\shidden\b/, "oculto por defecto");
-  assert.match(tag("newGameDialog"), /role="alertdialog"/);
-  assert.match(tag("newGameDialog"), /\shidden\b/);
+  assert.match(html, /<button class="pixel-button" id="newGame" data-i18n="newgame.button" type="button" hidden>/);
+  assert.match(html, /id="newGameDialog"[\s\S]*role="alertdialog"[\s\S]*hidden/);
   for (const id of ["newGameCancel", "newGameConfirm"]) assert.match(html, new RegExp(`id="${id}"`));
   for (const lang of ["es", "en"]) {
     const { StarI18n } = openHome(newTab({ starstep_lang: lang })).ctx;
