@@ -207,11 +207,12 @@ window.StarI18n=(()=>{
  "intro.scene.story.text": "Dos mundos. Dos historias. Una misma curiosidad. Ahora es tu turno de explorar.",
  "lito.welcome": "¡Hola, cadete! Soy LITO, tu compañero de exploración. Juntos viajaremos a lugares increíbles, resolveremos misterios y descubriremos los secretos del universo. ¿Estás preparado?",
  "lito.ready": "¡ESTOY LISTO!",
+ "lito.newgame": "¡Una nueva aventura nos espera! Prepará tu traje, cadete.",
  "alias.error.empty": "Escribí el nombre del cadete: no puede quedar vacío ni tener solo espacios.",
  "alias.error.length": "El nombre del cadete debe tener entre 2 y 18 caracteres, sin contar los espacios del principio y del final.",
  "alias.error.chars": "Usá solo letras (con tildes o ñ), números, espacios, guiones o guiones bajos.",
  "newgame.title": "¿EMPEZAR UNA PARTIDA NUEVA?",
- "newgame.body": "Se borrarán de este navegador el nombre del cadete, el avatar, los descubrimientos, las insignias, las notas y la foto de la bitácora. El idioma y el audio se conservan. No se puede deshacer.",
+ "newgame.body": "Se borrarán de este navegador el nombre del cadete, el avatar, los descubrimientos, las insignias, las notas y la foto de la bitácora. El idioma, el audio y la introducción ya vista se conservan. No se puede deshacer.",
  "newgame.cancel": "CANCELAR",
  "newgame.confirm": "SÍ, EMPEZAR DE NUEVO",
  "flow.notice.resetFailed": "No se pudo borrar la partida en este navegador. Revisá los permisos de almacenamiento del sitio.",
@@ -270,11 +271,12 @@ window.StarI18n=(()=>{
  "intro.scene.story.text": "Two worlds. Two stories. One shared curiosity. Now it is your turn to explore.",
  "lito.welcome": "Hello, cadet! I'm LITO, your exploration companion. Together we will travel to incredible places, solve mysteries, and discover the secrets of the universe. Are you ready?",
  "lito.ready": "I'M READY!",
+ "lito.newgame": "A new adventure awaits! Get your suit ready, cadet.",
  "alias.error.empty": "Enter the cadet name: it cannot be empty or contain only spaces.",
  "alias.error.length": "The cadet name must have 2 to 18 characters, not counting leading or trailing spaces.",
  "alias.error.chars": "Use only letters (accents and ñ allowed), numbers, spaces, hyphens or underscores.",
  "newgame.title": "START A NEW GAME?",
- "newgame.body": "This will delete the cadet name, avatar, discoveries, badges, notes and journal photo from this browser. Language and audio settings are kept. This cannot be undone.",
+ "newgame.body": "This will delete the cadet name, avatar, discoveries, badges, notes and journal photo from this browser. Language, audio settings and the watched intro are kept. This cannot be undone.",
  "newgame.cancel": "CANCEL",
  "newgame.confirm": "YES, START OVER",
  "flow.notice.resetFailed": "The game could not be deleted in this browser. Check the site's storage permissions.",
@@ -346,8 +348,13 @@ updateAdventureButton();
 document.addEventListener('starflow:change', updateAdventureButton);
 
 // NUEVA PARTIDA: para otro jugador en el mismo navegador o para empezar de cero.
-// Solo aparece si hay algo que borrar; pide confirmación y luego recarga la portada,
-// donde el controlador crea un jugador invitado nuevo y la bienvenida vuelve a ser obligatoria.
+// Solo aparece si hay algo que borrar y pide confirmación. Al confirmar (sección 5.8):
+//   1. se borran solo los datos de la partida (idioma, audio e intro vista se conservan);
+//   2. LITO da una bienvenida breve (~3 s) sobre la presentación, sin volver a OUTSTRIP,
+//      el idioma, la intro, la bienvenida extensa ni el menú;
+//   3. se deja una marca de un solo uso y se navega a /astronauta. Allí flujo.js crea el
+//      invitado nuevo y registra lito_welcome.heard (new_game_welcome); perfil, cadete,
+//      capítulo y misiones siguen siendo obligatorios.
 function updateNewGameButton() {
     const entry = window.StarFlow?.getEntryPoint?.();
     const hasData = (entry && entry.status !== 'new') || window.StarProgress?.hasPersonalData?.() === true;
@@ -367,11 +374,24 @@ $('newGame').addEventListener('click', () => {
 });
 $('newGameCancel').addEventListener('click', closeNewGame);
 $('newGameDialog').addEventListener('keydown', event => { if (event.key === 'Escape') closeNewGame(); });
+const NEW_GAME_PAGE = '/astronauta';
+let newGameStarted = false;
 $('newGameConfirm').addEventListener('click', () => {
+    if (newGameStarted) return;                 // un solo reinicio por página
     const result = window.StarProgress.resetPlayerData();
     if (!result.ok) { closeNewGame(); window.StarFlow?.notify?.('resetFailed'); return; }
-    StarSound.stopAll();
-    location.replace('/');
+    newGameStarted = true;
+    $('newGameDialog').hidden = true;
+    StarSound.init();                           // el clic habilita la voz de LITO
+    // replace: «atrás» no vuelve a esta página, cuyo controlador tiene la partida borrada.
+    const leave = () => {
+        StarSound.stopAll();
+        if (window.StarProgress.markNewGameWelcome?.()) location.replace(NEW_GAME_PAGE);
+        else location.replace('/');            // sin marca: portada con la bienvenida completa
+    };
+    // Sin la secuencia (script no cargado) no se muestra la bienvenida breve: la portada
+    // se recarga y pide la bienvenida completa, como antes.
+    if (!window.StarIntro?.newGameWelcome?.({ onDone: leave })) { StarSound.stopAll(); location.replace('/'); }
 });
 
 // «VER INTRODUCCIÓN»: vuelve a mostrar la introducción histórica (ya vista, se puede saltar).
@@ -392,7 +412,7 @@ function startEarthScene() {
 }
 
 // Secuencia de entrada (intro-secuencia.js):
-//   apertura real o recarga ... OUTSTRIP → idioma → intro histórica (1.ª vez) → LITO (hasta completarla) → menú
+//   apertura real o recarga ... OUTSTRIP → idioma → intro histórica → LITO (hasta completarla) → menú
 //   regreso interno ........... menú directo cuando getHomeMode() === 'menu'
 function onMenuShown() { updateAdventureButton(); updateNewGameButton(); startEarthScene(); }
 if (window.StarIntro) {

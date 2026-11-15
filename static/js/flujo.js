@@ -239,7 +239,7 @@
 
     function getChapterStatus() {
       if (computeCurrent() !== null) return "in_progress";
-      return stages.every(s => s.implemented && isCompleted(s.id)) ? "official_complete" : "provisional_complete";
+      return stages.every(s => s.implemented && isCompleted(s.id) && state.completed[s.id].via !== "legacy_access") ? "official_complete" : "provisional_complete";
     }
 
     /*
@@ -295,6 +295,20 @@
         state.recovered = { at: now(), reason: parsed === undefined ? "invalid_json" : "invalid_shape" };
       } else {
         state = sanitize(parsed);
+      }
+      // Compatibilidad: un lanzamiento ya registrado prueba que la partida antigua
+      // había entrado al único capítulo disponible. No inventar objetivos ni premios.
+      if (isCompleted("launch")) {
+        for (const id of ["chapter_select", "chapter_briefing"]) {
+          if (stageById(id)?.implemented && !isCompleted(id)) {
+            state.completed[id] = { at: state.completed.launch.at || now(), via: "legacy_access" };
+          }
+        }
+      }
+      // Las partidas que aterrizaron antes de incorporar el vuelo conservan el acceso.
+      // No se inventa una victoria ni se modifica el inventario.
+      if (stageById("space_travel")?.implemented && isCompleted("moon_landing") && !isCompleted("space_travel")) {
+        state.completed.space_travel = { at: state.completed.moon_landing.at || now(), via: "legacy_access" };
       }
       reconcile("reconcile");
       syncActs();
@@ -352,6 +366,7 @@
       if (!canEnter(stage.id)) return fail("STAGE_LOCKED");
       if (state.current !== stage.id) return fail("NOT_CURRENT_STAGE");
       if (own(state.objectives, objectiveId)) return fail("ALREADY_RECORDED");
+      if (objectiveId === "space_travel.arrive" && (state.checkpoint?.stage !== "space_travel" || state.checkpoint.flight?.seconds !== 18 || evidence.seconds !== 24)) return fail("INVALID_EVIDENCE");
 
       state.objectives[objectiveId] = record;
       commit("objective", { objective: objectiveId, source: evidence.source });
@@ -387,6 +402,24 @@
       updateCheckpoint();
       commit("advance", { from: cur, to: state.current });
       return { ok: true, from: cur, current: state.current };
+    }
+
+    // Solo almacena límites de tramo seguros, nunca una posición en pleno obstáculo.
+    function getFlightCheckpoint() {
+      const f = state.checkpoint?.stage === "space_travel" ? state.checkpoint.flight : null;
+      return { seconds: [0, 6, 12, 18].includes(f?.seconds) ? f.seconds : 0,
+        fails: Number.isSafeInteger(f?.fails) && f.fails >= 0 ? f.fails : 0 };
+    }
+    function saveFlightCheckpoint(seconds, fails) {
+      if (state.current !== "space_travel" || state.replay || state.paused) return fail("NOT_CURRENT_STAGE");
+      if (![0, 6, 12, 18].includes(seconds) || !Number.isSafeInteger(fails) || fails < 0) return fail("INVALID_ARGUMENT");
+      const previous = getFlightCheckpoint();
+      if (seconds < previous.seconds || seconds > previous.seconds + 6 || fails < previous.fails) return fail("INVALID_ARGUMENT");
+      if (seconds === previous.seconds && fails === previous.fails) return { ok:true, checkpoint:previous };
+      const cp = updateCheckpoint();
+      cp.flight = { seconds, fails };
+      commit("flight_checkpoint", { seconds, fails });
+      return { ok:true, checkpoint:getFlightCheckpoint() };
     }
 
     function saveCheckpoint() {
@@ -585,7 +618,7 @@
     return Object.freeze({
       // Estado y etapas
       getState, getCurrentStage, getObjectives, canEnter, canAdvance, isStageCompleted,
-      recordObjective, completeStage, advance, saveCheckpoint, resume, pause,
+      recordObjective, completeStage, advance, saveCheckpoint, getFlightCheckpoint, saveFlightCheckpoint, resume, pause,
       getAvailableStages, canReplay, startReplay, finishReplay, isActComplete,
       getActStatus, getChapterStatus, getEntryPoint,
       // Descubrimientos
@@ -662,6 +695,16 @@
   // Apertura real del juego en esta pestaña (primera página de la sesión): la secuencia de
   // entrada muestra OUTSTRIP y el selector de idioma solo en este caso. Solo presentación.
   function isInitialOpening() { return !internalNavigation; }
+
+  // NUEVA PARTIDA (sección 5.8): la portada reinició los datos, mostró la bienvenida breve
+  // de LITO y dejó una marca de un solo uso en esta pestaña. Aquí se registra el único
+  // objetivo que esa bienvenida cumple, y solo si la partida está recién creada (ningún
+  // objetivo, etapa actual lito_welcome). La marca se consume siempre: no se reutiliza.
+  // No completa perfil, cadete, capítulo ni misiones; no toca artefactos.
+  if (P && typeof P.takeNewGameWelcome === "function" && P.takeNewGameWelcome()) {
+    const fresh = flow.getCurrentStage() === "lito_welcome" && Object.keys(flow.getState().objectives || {}).length === 0;
+    if (fresh) flow.recordObjective("lito_welcome.heard", { source: "new_game_welcome" });
+  }
 
   // Guarda de página: recargar o usar el historial no desbloquea contenido.
   function guard() {

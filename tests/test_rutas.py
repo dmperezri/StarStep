@@ -42,14 +42,14 @@ class RutasExistentes(unittest.TestCase):
         cls.temporal.cleanup()
 
     def test_paginas_responden(self):
-        for ruta in ["/", "/astronauta", "/despegue", "/luna", "/marte",
+        for ruta in ["/", "/astronauta", "/capitulos", "/rock-roll", "/despegue", "/vuelo", "/luna", "/marte",
                      "/huellas", "/bitacora", "/archivo-nasa", "/diagnostico"]:
             with self.subTest(ruta=ruta):
                 respuesta = self.cliente.get(ruta)
                 self.assertEqual(respuesta.status_code, 200)
 
     def test_paginas_de_juego_cargan_el_controlador(self):
-        for ruta in ["/", "/astronauta", "/despegue", "/luna", "/marte", "/huellas", "/bitacora"]:
+        for ruta in ["/", "/astronauta", "/capitulos", "/rock-roll", "/despegue", "/vuelo", "/luna", "/marte", "/huellas", "/bitacora"]:
             with self.subTest(ruta=ruta):
                 html = self.cliente.get(ruta).get_data(as_text=True)
                 pos_progreso = html.find("js/progreso.js")
@@ -59,7 +59,7 @@ class RutasExistentes(unittest.TestCase):
                                 "flujo.js debe cargarse después de progreso.js y de la definición")
 
     def test_archivos_estaticos_del_flujo(self):
-        for archivo in ["js/flujo.js", "js/flujo-definicion.js", "js/progreso.js", "js/visor3d.js"]:
+        for archivo in ["js/flujo.js", "js/flujo-definicion.js", "js/progreso.js", "js/visor3d.js", "js/vuelo-motor.js", "js/vuelo.js"]:
             with self.subTest(archivo=archivo):
                 respuesta = self.cliente.get("/static/" + archivo)
                 self.assertEqual(respuesta.status_code, 200)

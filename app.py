@@ -132,9 +132,24 @@ def astronauta():
     return render_template("astronauta.html")
 
 
+@app.get("/capitulos")
+def capitulos():
+    return render_template("capitulos.html")
+
+
+@app.get("/rock-roll")
+def rock_roll():
+    return render_template("rock-roll.html")
+
+
 @app.get("/despegue")
 def despegue():
     return render_template("despegue.html")
+
+
+@app.get("/vuelo")
+def vuelo():
+    return render_template("vuelo.html")
 
 
 @app.get("/luna")

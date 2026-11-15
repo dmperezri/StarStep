@@ -38,19 +38,23 @@
     { id: "history_intro", group: "presentation", page: "/", implemented: false, kind: "narrative",
       objectives: [o("history_intro.seen", { implemented: false, sources: ["history_sequence", "history_skip"] })] },
     { id: "lito_welcome", group: "presentation", page: "/", implemented: true, kind: "narrative",
-      objectives: [o("lito_welcome.heard", { sources: ["transmission", "welcome_skip"] })] },
+      // new_game_welcome: bienvenida breve de NUEVA PARTIDA (sección 5.8); solo la registra
+      // flujo.js en una partida recién creada y tras confirmar el reinicio en esta pestaña.
+      objectives: [o("lito_welcome.heard", { sources: ["transmission", "welcome_skip", "new_game_welcome"] })] },
     { id: "profile", group: "presentation", page: "/astronauta", implemented: true, kind: "interactive", checkpoint: true,
       objectives: [o("profile.alias", { sources: ["avatar_form"], requires: ["alias"] })] },
     { id: "cadet_custom", group: "presentation", page: "/astronauta", implemented: true, kind: "interactive",
       objectives: [o("cadet_custom.avatar", { sources: ["avatar_form"], requires: ["avatar"] })] },
-    { id: "chapter_select", group: "presentation", page: "/", implemented: false, kind: "interactive",
-      objectives: [o("chapter_select.chapter1", { implemented: false, sources: ["chapter_menu"] })] },
+    { id: "chapter_select", group: "presentation", page: "/capitulos", implemented: true, kind: "interactive", checkpoint: true,
+      objectives: [o("chapter_select.chapter1", { sources: ["chapter_menu"] })] },
+    { id: "chapter_briefing", group: "prologue", page: "/rock-roll", implemented: true, kind: "narrative", checkpoint: true,
+      objectives: [o("chapter_briefing.ready", { sources: ["chapter_briefing_sequence"] })] },
 
     // ── PRÓLOGO ──────────────────────────────────────────────────
     { id: "launch", group: "prologue", page: "/despegue", implemented: true, kind: "narrative", checkpoint: true,
       objectives: [o("launch.liftoff", { sources: ["launch_sequence"] })] },
-    { id: "space_travel", group: "prologue", page: "/despegue", implemented: false, kind: "challenge",
-      objectives: [o("space_travel.arrive", { implemented: false, sources: ["travel_minigame"] })] },
+    { id: "space_travel", group: "prologue", page: "/vuelo", implemented: true, kind: "challenge", checkpoint: true,
+      objectives: [o("space_travel.arrive", { sources: ["travel_minigame"] })] },
     { id: "moon_prologue", group: "prologue", page: "/despegue", implemented: false, kind: "narrative",
       objectives: [o("moon_prologue.seen", { implemented: false, sources: ["prologue_sequence"] })] },
 

@@ -41,7 +41,11 @@ function playIntro(flow) {
   assert.equal(flow.recordObjective("lito_welcome.heard", { source: "transmission" }).ok, true);
   assert.equal(flow.recordObjective("profile.alias", { source: "avatar_form", alias: "ARIEL" }).ok, true);
   assert.equal(flow.recordObjective("cadet_custom.avatar", { source: "avatar_form", avatar: "vice" }).ok, true);
+  assert.equal(flow.recordObjective("chapter_select.chapter1", { source: "chapter_menu" }).ok, true);
+  assert.equal(flow.recordObjective("chapter_briefing.ready", { source: "chapter_briefing_sequence" }).ok, true);
   assert.equal(flow.recordObjective("launch.liftoff", { source: "launch_sequence" }).ok, true);
+  for (const cp of [6,12,18]) assert.ok(flow.saveFlightCheckpoint(cp,0).ok);
+  assert.ok(flow.recordObjective("space_travel.arrive",{source:"travel_minigame",seconds:24}).ok);
   assert.equal(flow.recordObjective("moon_landing.touchdown", { source: "descent_sequence" }).ok, true);
 }
 function discover(flow, id, mechanic) {
@@ -120,7 +124,7 @@ test("3. un objetivo desconocido o con evidencia inválida es rechazado", () => 
   assert.equal(flow.recordObjective("profile.alias", { source: "avatar_form" }).code, "INVALID_EVIDENCE", "falta el alias");
   assert.equal(flow.recordObjective("profile.alias", { source: "avatar_form", alias: "ARIEL" }).code, "STAGE_LOCKED");
   assert.equal(flow.recordObjective("moon_exploration.eagle", { source: "x" }).code, "ARTIFACT_OBJECTIVE");
-  assert.equal(flow.recordObjective("space_travel.arrive", { source: "travel_minigame" }).code, "OBJECTIVE_NOT_IMPLEMENTED");
+  assert.equal(flow.recordObjective("space_travel.arrive", { source: "travel_minigame" }).code, "STAGE_LOCKED");
   assert.equal(flow.getState().revision, before, "un rechazo no modifica el estado");
   assert.equal(JSON.parse(storage.box.flow).revision, before);
 });
@@ -412,7 +416,11 @@ test("continuar: jugador nuevo inicia; existente continúa en la etapa actual si
 function playIntro2(flow) {
   flow.recordObjective("profile.alias", { source: "avatar_form", alias: "ARIEL" });
   flow.recordObjective("cadet_custom.avatar", { source: "avatar_form", avatar: "vice" });
+  assert.equal(flow.recordObjective("chapter_select.chapter1", { source: "chapter_menu" }).ok, true);
+  assert.equal(flow.recordObjective("chapter_briefing.ready", { source: "chapter_briefing_sequence" }).ok, true);
   flow.recordObjective("launch.liftoff", { source: "launch_sequence" });
+  for (const cp of [6,12,18]) assert.ok(flow.saveFlightCheckpoint(cp,0).ok);
+  assert.ok(flow.recordObjective("space_travel.arrive",{source:"travel_minigame",seconds:24}).ok);
   flow.recordObjective("moon_landing.touchdown", { source: "descent_sequence" });
 }
 

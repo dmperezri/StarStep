@@ -11,7 +11,7 @@ import { createRequire } from "node:module";
 import { template, makePage, makeStore, newTab, openHome, FakeElement } from "./navegador-simulado.mjs";
 
 const require = createRequire(import.meta.url);
-const { planEntry, SCENES, FADE_MS } = require("../../static/js/intro-secuencia.js");
+const { planEntry, SCENES, FADE_MS, NEW_GAME_MS, NEW_GAME_VOICE_GRACE_MS } = require("../../static/js/intro-secuencia.js");
 
 // ── Planificador (puro) ─────────────────────────────────────────
 test("plan: combina apertura real, intro vista y bienvenida completada", () => {
@@ -466,16 +466,203 @@ test("VER INTRODUCCIÓN: fundido desde el menú, se puede saltar y no toca la pa
   assert.deepEqual(page.violations, []);
 });
 
-test("NUEVA PARTIDA borra la intro vista: el próximo jugador la ve sin poder saltarla", () => {
-  const local = makeStore();
-  const page = openIndex({ localStorage: local, sessionStorage: makeStore() });
-  playFullSequence(page);
-  assert.equal(page.ctx.StarProgress.resetPlayerData().ok, true);
-  const next = openIndex({ localStorage: local, sessionStorage: page.ctx.sessionStorage });
-  assert.deepEqual(next.visible(), ["introHistory"]);
-  assert.equal(next.el.introSkip.hidden, true);
-  assert.equal(next.ctx.StarProgress.hasPersonalData(), false);
-  assert.deepEqual(next.violations, []);
+// ── NUEVA PARTIDA: bienvenida breve de LITO (sección 5.8) ──────
+const BRIEF = {
+  es: "¡Una nueva aventura nos espera! Prepará tu traje, cadete.",
+  en: "A new adventure awaits! Get your suit ready, cadet."
+};
+const MARK = "starstep_nueva_partida";
+// Jugador con partida en curso (perfil y cadete) en el menú, listo para NUEVA PARTIDA.
+function menuWithGame(lang = "es", options = {}, local = {}) {
+  const tab = newTab(local);
+  const page = openIndex(tab, options);
+  playFullSequence(page, lang);
+  const { StarFlow, StarProgress } = page.ctx;
+  StarProgress.setPlayer({ alias: "ARIEL", avatar: "vice" });
+  assert.equal(StarFlow.recordObjective("profile.alias", { source: "avatar_form", alias: "ARIEL" }).ok, true);
+  assert.equal(StarFlow.recordObjective("cadet_custom.avatar", { source: "avatar_form", avatar: "vice" }).ok, true);
+  assert.deepEqual(page.visible(), ["menu"]);
+  assert.equal(page.el.newGame.hidden, false, "hay partida: NUEVA PARTIDA visible");
+  return { tab, page };
+}
+const pending = (page, ms) => page.timers.filter(x => !x.cancelled && !x.done && x.ms === ms);
+function runPending(page, ms) {
+  const [timer] = pending(page, ms);
+  assert.ok(timer, `hay temporizador de ${ms} ms`);
+  timer.done = true; timer.fn();
+}
+function openAstronauta(tab) {
+  const page = makePage({ path: "/astronauta", tab });
+  page.load("main.js", "progreso.js", "flujo-definicion.js", "flujo.js").ready();
+  return page;
+}
+
+for (const lang of ["es", "en"]) {
+  test(`NUEVA PARTIDA [${lang}]: mensaje breve de LITO y directo a /astronauta, sin OUTSTRIP, idioma, intro ni menú`, () => {
+    const audio = JSON.stringify({ music: true, fx: true, voice: true });
+    const { tab, page } = menuWithGame(lang, {}, { starstep_audio: audio });
+    const oldId = page.ctx.StarFlow.getState().player.id;
+    page.tap(page.el.newGame);
+    assert.equal(page.el.newGameDialog.hidden, false, "se mantiene la confirmación");
+    assert.equal(tab.localStorage.getItem("starstep_flujo") !== null, true, "abrir el diálogo no borra nada");
+    const spokenBefore = page.spoken().length;
+
+    page.tapNow(page.el.newGameConfirm);
+    for (const key of page.ctx.StarProgress.PLAYER_KEYS) assert.equal(tab.localStorage.getItem(key), null, `borrado ${key}`);
+    assert.equal(page.el.newGameDialog.hidden, true);
+    assert.equal(page.curtain(), "in", "fundido a azul noche sobre el menú");
+    page.settle();
+
+    // Solo la pantalla de LITO, con el mensaje breve y sin ¡ESTOY LISTO!
+    assert.equal(page.step(), "newgame");
+    assert.deepEqual(page.visible(), ["introLito"]);
+    assert.equal(page.stageVisible(), false, "menú y estación ocultos");
+    assert.equal(page.el.litoReady.hidden, true, "sin botón: avanza sola");
+    assert.equal(page.el.litoText.dataset.fullText, BRIEF[lang]);
+    const voice = page.spoken().slice(spokenBefore);
+    assert.equal(voice.length, 1, "una sola narración");
+    assert.equal(voice[0].text, BRIEF[lang]);
+    assert.equal(voice[0].lito, true);
+    assert.equal(voice[0].lang, lang);
+    assert.equal(page.focused(), page.el.litoVoice, "el foco queda dentro de la pantalla de LITO");
+    page.runFrames();
+    assert.ok(page.ops.includes("lito"), "LITO animado");
+
+    // ~3 s después: telón opaco y navegación (no antes).
+    assert.equal(pending(page, NEW_GAME_MS).length, 1);
+    assert.equal(page.ctx.__navigated, undefined);
+    runPending(page, NEW_GAME_MS);
+    assert.equal(page.curtain(), "in");
+    assert.equal(page.ctx.__navigated, undefined, "espera el fundido de salida");
+    page.settle();
+    assert.equal(page.ctx.__navigated, "/astronauta");
+    assert.equal(tab.sessionStorage.getItem(MARK), "1");
+    assert.notEqual(page.step(), "menu", "el menú nunca vuelve a aparecer");
+    assert.equal(page.stageVisible(), false);
+
+    // Preferencias conservadas; nada de la partida anterior.
+    assert.equal(tab.localStorage.getItem("starstep_lang"), lang);
+    assert.equal(tab.localStorage.getItem("starstep_audio"), audio);
+    assert.equal(page.ctx.StarProgress.hasSeenCinematic("history_intro"), true, "intro vista conservada");
+    for (const key of page.ctx.StarProgress.PLAYER_KEYS) assert.equal(tab.localStorage.getItem(key), null, `el mensaje no escribe ${key}`);
+
+    // Página siguiente: /astronauta acepta al jugador nuevo con la bienvenida breve.
+    const astro = openAstronauta(tab);
+    assert.equal(astro.ctx.__navigated, undefined, "sin redirección");
+    const state = astro.ctx.StarFlow.getState();
+    assert.notEqual(state.player.id, oldId);
+    assert.equal(state.objectives["lito_welcome.heard"].source, "new_game_welcome");
+    assert.equal(Object.keys(state.objectives).length, 1);
+    assert.equal(astro.ctx.StarFlow.getEntryPoint().page, "/astronauta");
+    assert.equal(JSON.stringify(astro.ctx.StarProgress.player()), "{}");
+    assert.equal(astro.ctx.StarI18n.lang, lang);
+    assertNoOverlappingVoice(page);
+    assert.deepEqual(page.violations, []);
+  });
+}
+
+test("NUEVA PARTIDA con movimiento reducido: sin fundidos ni texto animado, y ~3 s de mensaje", () => {
+  const { page } = menuWithGame("es", { reducedMotion: true });
+  page.tap(page.el.newGame);
+  page.tapNow(page.el.newGameConfirm);
+  assert.deepEqual(page.visible(), ["introLito"], "cambio inmediato");
+  assert.equal(page.el.litoText.textContent, BRIEF.es, "texto completo de una vez");
+  assert.equal(pending(page, FADE_MS).length, 0, "sin temporizadores de fundido");
+  runPending(page, NEW_GAME_MS);
+  assert.equal(page.ctx.__navigated, "/astronauta", "sin fundido de salida");
+  assert.deepEqual(page.violations, []);
+});
+
+test("NUEVA PARTIDA: cambiar idioma o voz durante el mensaje no superpone voces ni temporizadores", () => {
+  const { page } = menuWithGame("es");
+  page.tap(page.el.newGame);
+  page.tap(page.el.newGameConfirm);
+  page.barLang("en");
+  assert.equal(page.el.litoText.dataset.fullText, BRIEF.en);
+  assert.equal(page.spoken().at(-1).text, BRIEF.en);
+  assert.equal(page.spoken().at(-1).lang, "en");
+  page.tap(page.el.litoVoice);                       // voz OFF
+  assert.equal(page.ctx.StarSound.voiceOn, false);
+  const count = page.spoken().length;
+  page.tap(page.el.litoVoice);                       // voz ON: vuelve a hablar una vez
+  assert.equal(page.spoken().length, count + 1);
+  assert.equal(pending(page, NEW_GAME_MS).length, 1, "un solo temporizador de salida");
+  assertNoOverlappingVoice(page);
+  runPending(page, NEW_GAME_MS); page.settle();
+  assert.equal(page.ctx.__navigated, "/astronauta");
+  assert.deepEqual(page.violations, []);
+});
+
+test("NUEVA PARTIDA: si LITO sigue hablando a los 3 s, espera a que termine (con un máximo)", () => {
+  for (const ends of [true, false]) {
+    const { page } = menuWithGame("es");
+    let last = null;
+    page.ctx.StarSound.speak = (text, opts = {}) => { page.speech.push({ text, lito: !!opts.lito, lang: page.ctx.StarI18n.lang }); last = opts; opts.onStart?.(); };
+    page.tap(page.el.newGame);
+    page.tap(page.el.newGameConfirm);
+    runPending(page, NEW_GAME_MS);
+    page.settle();
+    assert.equal(page.ctx.__navigated, undefined, "no corta a LITO a mitad de la frase");
+    assert.equal(pending(page, NEW_GAME_VOICE_GRACE_MS).length, 1);
+    if (ends) last.onEnd();
+    else runPending(page, NEW_GAME_VOICE_GRACE_MS);
+    page.settle();
+    assert.equal(page.ctx.__navigated, "/astronauta", ends ? "al terminar la voz" : "al cumplirse el máximo");
+    assert.deepEqual(page.violations, []);
+  }
+});
+
+test("NUEVA PARTIDA: confirmar dos veces no reinicia dos veces ni duplica el mensaje", () => {
+  const { page } = menuWithGame("es");
+  page.tap(page.el.newGame);
+  page.tapNow(page.el.newGameConfirm);
+  page.tapNow(page.el.newGameConfirm);
+  page.settle();
+  page.tap(page.el.newGameConfirm);
+  assert.equal(pending(page, NEW_GAME_MS).length, 1);
+  assert.equal(page.spoken().filter(s => s.text === BRIEF.es).length, 1);
+  assert.equal(page.ctx.StarIntro.newGameWelcome({ onDone() {} }), false, "no se puede iniciar otra vez");
+  assert.deepEqual(page.violations, []);
+});
+
+test("NUEVA PARTIDA: CANCELAR no borra nada y deja el menú como estaba", () => {
+  const { tab, page } = menuWithGame("es");
+  const before = JSON.stringify([...tab.localStorage.data.entries()].sort());
+  page.tap(page.el.newGame);
+  page.tap(page.el.newGameCancel);
+  assert.equal(page.el.newGameDialog.hidden, true);
+  assert.deepEqual(page.visible(), ["menu"]);
+  assert.equal(JSON.stringify([...tab.localStorage.data.entries()].sort()), before);
+  assert.equal(page.step(), "menu");
+  assert.equal(page.ctx.__navigated, undefined);
+});
+
+test("NUEVA PARTIDA: recargar durante el mensaje no salta la bienvenida (secuencia completa, intro con SALTAR)", () => {
+  const { tab, page } = menuWithGame("es");
+  page.tap(page.el.newGame);
+  page.tap(page.el.newGameConfirm);
+  assert.equal(page.step(), "newgame");
+  const reloaded = openIndex(tab, { reload: true });   // F5 antes de los 3 s: no hay marca
+  assert.equal(tab.sessionStorage.getItem(MARK), null);
+  assert.deepEqual(reloaded.visible(), ["introSplash"]);
+  reloaded.flushSplash();
+  reloaded.tap(reloaded.el.introLangEs);
+  assert.deepEqual(reloaded.visible(), ["introHistory"]);
+  assert.equal(reloaded.el.introSkip.hidden, false, "la intro vista se conservó: se puede saltar");
+  reloaded.tap(reloaded.el.introSkip);
+  assert.equal(reloaded.step(), "lito", "la bienvenida de LITO vuelve a ser obligatoria");
+  assert.equal(reloaded.el.litoReady.hidden, false);
+  assert.equal(reloaded.ctx.StarFlow.isStageCompleted("lito_welcome"), false);
+  assert.deepEqual(reloaded.violations, []);
+});
+
+test("NUEVA PARTIDA sin intro-secuencia.js: recarga la portada con la bienvenida completa (sin marca)", () => {
+  const { tab, page } = menuWithGame("es");
+  page.ctx.StarIntro = undefined;
+  page.tap(page.el.newGame);
+  page.tapNow(page.el.newGameConfirm);
+  assert.equal(page.ctx.__navigated, "/");
+  assert.equal(tab.sessionStorage.getItem(MARK), null);
 });
 
 test("las cinco escenas y LITO se dibujan sin errores", () => {

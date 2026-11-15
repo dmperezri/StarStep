@@ -10,14 +10,20 @@ window.StarProgress = (() => {
   const FLOW='starstep_flujo', FLOW_BACKUP='starstep_flujo_respaldo', completedKey='starstep_completed';
   const ACTS=['luna','marte','huellas'];
   const PHOTO='starstep_foto';
-  // Cinemáticas vistas por el jugador (solo presentación: no otorga progreso ni toca StarFlow).
+  // Cinemáticas vistas en este navegador (solo presentación: no otorga progreso ni toca StarFlow).
+  // Es una preferencia del dispositivo: NUEVA PARTIDA la conserva (solo decide si aparece SALTAR).
   const CINEMATICS='starstep_cinematicas', CINEMATIC_IDS=['history_intro'];
+  // Marca de un solo uso, en sessionStorage (solo esta pestaña): la bienvenida breve de NUEVA
+  // PARTIDA terminó. flujo.js la consume al cargar la página siguiente (sección 5.8).
+  const SESSION='starstep_sesion', NEW_GAME_WELCOME='starstep_nueva_partida';
   /* Identidad actual: no hay cuentas; un jugador = este navegador (LocalStorage).
      PLAYER_KEYS son los datos del jugador y se borran juntos en «Nueva partida»: si quedara
      alguno heredado (inventario, actos o perfil), la migración de flujo.js reconstruiría
-     la partida anterior. PREFERENCE_KEYS son del dispositivo y se conservan. */
-  const PLAYER_KEYS=Object.freeze([FLOW,FLOW_BACKUP,INVENTORY,completedKey,PROFILE,NOTES,PHOTO,CINEMATICS]);
-  const PREFERENCE_KEYS=Object.freeze(['starstep_lang','starstep_audio']);
+     la partida anterior. PREFERENCE_KEYS son del dispositivo y se conservan. SESSION_KEYS
+     viven en sessionStorage (solo la pestaña actual) y no son progreso. */
+  const PLAYER_KEYS=Object.freeze([FLOW,FLOW_BACKUP,INVENTORY,completedKey,PROFILE,NOTES,PHOTO]);
+  const PREFERENCE_KEYS=Object.freeze(['starstep_lang','starstep_audio',CINEMATICS]);
+  const SESSION_KEYS=Object.freeze([SESSION,NEW_GAME_WELCOME]);
   let resetting=false;
   const catalog={
     eagle:{id:'eagle',name:'Eagle · Apollo 11',world:'moon',source:'https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C',observed:'La etapa de descenso del módulo Eagle quedó en la superficie lunar.',interpreted:'La parte inferior actuó como plataforma para que la etapa de ascenso despegara de la Luna.',narrative:'Una plataforma silenciosa aún marca dónde comenzó el regreso.'},
@@ -89,8 +95,8 @@ window.StarProgress = (() => {
   /* Nueva partida: borra solo los datos del jugador de este navegador. No toca el servidor.
      Quien llama debe recargar la página después (el controlador en memoria queda obsoleto). */
   function hasPersonalData(){
-    // Haber visto una cinemática no es progreso: no hace aparecer «Nueva partida» por sí solo.
-    try{return PLAYER_KEYS.some(k=>k!==FLOW&&k!==FLOW_BACKUP&&k!==CINEMATICS&&localStorage.getItem(k)!==null);}catch{return false;}
+    // Haber visto una cinemática no es progreso (es preferencia): no hace aparecer «Nueva partida».
+    try{return PLAYER_KEYS.some(k=>k!==FLOW&&k!==FLOW_BACKUP&&localStorage.getItem(k)!==null);}catch{return false;}
   }
   function cinematics(){const c=read(CINEMATICS,{});return c&&typeof c==='object'&&!Array.isArray(c)?c:{};}
   function hasSeenCinematic(id){return CINEMATIC_IDS.includes(id)&&typeof cinematics()[id]?.seenAt==='string';}
@@ -107,6 +113,17 @@ window.StarProgress = (() => {
     for(const key of PLAYER_KEYS){try{localStorage.removeItem(key);}catch{failed.push(key);}}
     return {ok:failed.length===0,removed:PLAYER_KEYS.filter(k=>!failed.includes(k)),failed};
   }
+  /* Bienvenida breve de NUEVA PARTIDA (sección 5.8). Solo se puede marcar en la página que
+     acaba de reiniciar con éxito; la siguiente página la consume una vez (takeNewGameWelcome).
+     No otorga nada por sí sola: flujo.js solo la acepta en una partida recién creada (otra
+     pestaña puede haber creado ya el invitado nuevo; eso no impide usarla). */
+  function markNewGameWelcome(){
+    if(!resetting)return false;
+    try{sessionStorage.setItem(NEW_GAME_WELCOME,'1');return true;}catch{return false;}
+  }
+  function takeNewGameWelcome(){
+    try{const pending=sessionStorage.getItem(NEW_GAME_WELCOME)==='1';sessionStorage.removeItem(NEW_GAME_WELCOME);return pending;}catch{return false;}
+  }
   // Otra pestaña inició una partida nueva (o se borraron los datos del sitio): esta pestaña
   // tiene la partida anterior en memoria y la volvería a guardar. Se detiene y vuelve a la portada.
   window.addEventListener('storage',event=>{
@@ -115,5 +132,5 @@ window.StarProgress = (() => {
   });
 
   return {catalog,list,unlock,player,setPlayer,getNotes,setNotes,completed,completeAct,canFinish,connectFlow,loadFlow,saveFlow,backupFlow,
-    PLAYER_KEYS,PREFERENCE_KEYS,hasPersonalData,resetPlayerData,hasSeenCinematic,markCinematicSeen};
+    PLAYER_KEYS,PREFERENCE_KEYS,SESSION_KEYS,hasPersonalData,resetPlayerData,markNewGameWelcome,takeNewGameWelcome,hasSeenCinematic,markCinematicSeen};
 })();

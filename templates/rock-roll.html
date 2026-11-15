@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>StarStep · Rock & Roll</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rock-roll.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/rock-roll.js') }}"></script>
+
+</head>
+
+<body>
+
+    <canvas id="stars"
+            width="480"
+            height="270"
+            aria-hidden="true">
+    </canvas>
+
+    <main class="presentation">
+
+        <header>
+
+            <span class="brand">
+                OUTSTRIP · STARSTEP
+            </span>
+
+            <div class="controls">
+
+                <a class="button"
+                   href="{{ url_for('inicio') }}"
+                   data-text="back">
+                    VOLVER
+                </a>
+
+                <button type="button"
+                        class="active"
+                        data-lang="es"
+                        aria-pressed="true">
+                    ES
+                </button>
+
+                <button type="button"
+                        data-lang="en"
+                        aria-pressed="false">
+                    EN
+                </button>
+
+                <button type="button"
+                        id="voiceButton"
+                        aria-pressed="false">
+                    VOZ OFF
+                </button>
+
+                <button type="button"
+                        id="pauseButton"
+                        aria-pressed="false">
+                    PAUSA
+                </button>
+
+            </div>
+
+        </header>
+
+        <section class="content">
+
+            <span class="eyebrow" data-text="chapter">
+                CAPÍTULO 01
+            </span>
+
+            <!-- LUNA Y MARTE -->
+
+            <div class="worlds reveal" id="worlds">
+
+                <div class="planet moon">
+
+                    <svg viewBox="0 0 100 100"
+                         shape-rendering="crispEdges"
+                         role="img"
+                         data-label="moonLabel"
+                         aria-label="Luna">
+
+                        <path
+                            d="M30 5H70V13H85V28H95V72H85V87H70V95H30V87H15V72H5V28H15V13H30Z"
+                            fill="#C3C7D6"/>
+
+                        <path
+                            d="M50 5H70V13H85V28H95V72H85V87H70V95H50V70H60V40H50Z"
+                            fill="#868CA4"/>
+
+                        <g fill="#575C74">
+                            <path d="M18 30H35V43H18Z"/>
+                            <path d="M58 67H78V80H58Z"/>
+                            <path d="M60 17H73V29H60Z"/>
+                            <path d="M27 69H38V78H27Z"/>
+                        </g>
+
+                    </svg>
+
+                    <span>APOLLO 11 · 1969</span>
+
+                </div>
+
+                <div class="connection"
+                     aria-hidden="true">
+                </div>
+
+                <div class="planet mars">
+
+                    <svg viewBox="0 0 100 100"
+                         shape-rendering="crispEdges"
+                         role="img"
+                         data-label="marsLabel"
+                         aria-label="Marte">
+
+                        <path
+                            d="M30 5H70V13H85V28H95V72H85V87H70V95H30V87H15V72H5V28H15V13H30Z"
+                            fill="#D9593A"/>
+
+                        <path
+                            d="M60 5H70V13H85V28H95V72H85V87H70V95H50V70H65V40H60Z"
+                            fill="#A63A26"/>
+
+                        <g fill="#7A2818">
+                            <path d="M17 31H39V40H17Z"/>
+                            <path d="M62 68H85V79H62Z"/>
+                            <path d="M31 79H44V87H31Z"/>
+                        </g>
+
+                        <path
+                            d="M20 20H43V26H20Z"
+                            fill="#F7B08E"/>
+
+                    </svg>
+
+                    <span>OPPORTUNITY · 2004</span>
+
+                </div>
+
+            </div>
+
+            <!-- TÍTULO PRINCIPAL -->
+
+            <div id="titleBlock" hidden>
+
+                <h1 class="chapter-title">
+                    ROCK &amp; ROLL
+                </h1>
+
+                <p class="subtitle" data-text="subtitle">
+                    DOS MUNDOS, DOS HISTORIAS
+                </p>
+
+            </div>
+
+            <!-- ACTOS DEL CAPÍTULO -->
+
+            <div class="acts" id="acts" hidden>
+
+                <article class="act">
+                    <strong>I</strong>
+                    <span data-text="moon">
+                        LUNA
+                    </span>
+                </article>
+
+                <article class="act">
+                    <strong>II</strong>
+                    <span data-text="mars">
+                        MARTE
+                    </span>
+                </article>
+
+                <article class="act">
+                    <strong>III</strong>
+                    <span data-text="traces">
+                        HUELLAS
+                    </span>
+                </article>
+
+            </div>
+
+            <!-- LITO -->
+
+            <div class="lito" id="lito" hidden>
+
+                <svg viewBox="0 0 100 138"
+                     shape-rendering="crispEdges"
+                     role="img"
+                     aria-label="LITO">
+
+                    <path d="M50 2L60 12L50 22L40 12Z"
+                          fill="#8FF0D8"
+                          stroke="#1A1340"
+                          stroke-width="3"/>
+
+                    <path d="M50 21V35"
+                          stroke="#1A1340"
+                          stroke-width="5"/>
+
+                    <path
+                        d="M50 30L82 60V86L50 116L18 86V60Z"
+                        fill="#ABA1F5"
+                        stroke="#1A1340"
+                        stroke-width="5"/>
+
+                    <path
+                        d="M50 33L78 61V84L50 112L57 60Z"
+                        fill="#6E62CE"/>
+
+                    <path
+                        d="M78 61V84L50 112L62 85Z"
+                        fill="#4F45A6"/>
+
+                    <path
+                        d="M48 36L23 60L33 59L48 45Z"
+                        fill="#E4DFFF"/>
+
+                    <rect x="22" y="58"
+                          width="56" height="4"
+                          fill="#8FF0D8"/>
+
+                    <rect x="28" y="67"
+                          width="44" height="26"
+                          fill="#4F45A6"/>
+
+                    <rect x="32" y="69"
+                          width="36" height="20"
+                          fill="#0E1233"/>
+
+                    <g fill="#8FF0D8">
+
+                        <rect x="36" y="73"
+                              width="7" height="8"/>
+
+                        <rect x="56" y="73"
+                              width="7" height="8"/>
+
+                        <rect x="44" y="84"
+                              width="12" height="2"/>
+
+                        <path
+                            d="M7 68L13 74L7 80L1 74Z"/>
+
+                        <path
+                            d="M93 68L99 74L93 80L87 74Z"/>
+
+                    </g>
+
+                    <path d="M50 114V124"
+                          stroke="#1A1340"
+                          stroke-width="4"/>
+
+                    <path
+                        d="M50 121L57 128L50 135L43 128Z"
+                        fill="#8FF0D8"
+                        stroke="#1A1340"
+                        stroke-width="2"/>
+
+                </svg>
+
+            </div>
+
+            <!-- INSTRUCCIONES DE LITO -->
+
+            <section class="briefing"
+                     id="briefing"
+                     hidden>
+
+                <strong data-text="speaker">
+                    LITO · CONTROL DE MISIÓN
+                </strong>
+
+                <p id="missionText" aria-live="polite">
+                </p>
+
+            </section>
+
+            <button type="button"
+                    id="nextButton"
+                    class="primary mission-button"
+                    data-text="next"
+                    hidden>
+                CONTINUAR
+            </button>
+
+            <button type="button"
+                    id="launchButton"
+                    class="primary mission-button"
+                    data-text="launch"
+                    hidden>
+                ¡ESTOY LISTO!
+            </button>
+
+        </section>
+
+        <footer>
+
+            <span id="sceneLabel"></span>
+
+            <progress id="progress"
+                      max="1"
+                      value="0"
+                      aria-label="Progreso de la presentación">
+            </progress>
+
+        </footer>
+
+    </main>
+
+    
+
+</body>
+</html>

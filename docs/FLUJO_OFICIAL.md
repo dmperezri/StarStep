@@ -10,9 +10,9 @@ Este documento describe el controlador central del flujo, **StarFlow**, y el con
 | `tests/js/flujo.test.mjs` | Pruebas del controlador (`node --test tests/js/flujo.test.mjs`). |
 | `static/js/archivo-nasa.js` | Galería del Archivo NASA y botón de regreso contextual (sección 5.4). No usa StarFlow. |
 | `tests/js/archivo-nasa.test.mjs` | Pruebas de la navegación del archivo en un navegador simulado (`node --test tests/js/`). |
-| `tests/js/nueva-partida.test.mjs` | Pruebas de «Nueva partida» y de la identidad del jugador (sección 5.5). |
+| `tests/js/nueva-partida.test.mjs` | Pruebas de «Nueva partida», de la identidad del jugador y de la bienvenida breve (secciones 5.5 y 5.8). |
 | `tests/js/astronauta.test.mjs` | Pruebas del nombre del cadete: pattern del navegador y regla de recorte (sección 5.6). |
-| `static/js/intro-secuencia.js` | Secuencia de entrada: OUTSTRIP, idioma, introducción histórica y bienvenida de LITO (sección 5.7). Solo presentación. |
+| `static/js/intro-secuencia.js` | Secuencia de entrada: OUTSTRIP, idioma, introducción histórica y bienvenida de LITO (sección 5.7), y bienvenida breve de NUEVA PARTIDA (sección 5.8). Solo presentación. |
 | `tests/js/intro-secuencia.test.mjs` | Pruebas de la secuencia de entrada (sección 5.7). |
 | `tests/js/navegador-simulado.mjs` | Navegador simulado compartido por las pruebas (no es un archivo de pruebas). |
 | `tests/test_rutas.py` | Pruebas de las rutas Flask (`python -m unittest tests.test_rutas -v`). |
@@ -29,12 +29,13 @@ Leyenda: ✅ implementada en el recorrido actual · ⏳ prevista (no bloquea).
 |---|---|---|---|---|---|
 | 1 | Presentación | `outstrip_presentation` | `/` | ⏳ | — (pantalla implementada como presentación, sección 5.7) |
 | 2 | Presentación | `history_intro` | `/` | ⏳ | — (intro implementada como cinemática del jugador, sección 5.7) |
-| 3 | Presentación | `lito_welcome` | `/` | ✅ | `lito_welcome.heard` (¡ESTOY LISTO!, sección 5.7) |
+| 3 | Presentación | `lito_welcome` | `/` | ✅ | `lito_welcome.heard` (¡ESTOY LISTO!, sección 5.7; en NUEVA PARTIDA, bienvenida breve, sección 5.8) |
 | 4 | Presentación | `profile` | `/astronauta` | ✅ | `profile.alias` |
 | 5 | Presentación | `cadet_custom` | `/astronauta` | ✅ | `cadet_custom.avatar` |
-| 6 | Presentación | `chapter_select` | `/` | ⏳ | — |
+| 6 | Presentación | `chapter_select` | `/capitulos` | ✅ | `chapter_select.chapter1` |
+| 6a | Prólogo | `chapter_briefing` | `/rock-roll` | ✅ | `chapter_briefing.ready` |
 | 7 | Prólogo | `launch` | `/despegue` | ✅ | `launch.liftoff` |
-| 8 | Prólogo | `space_travel` | `/despegue` | ⏳ | — |
+| 8 | Prólogo | `space_travel` | `/vuelo` | ✅ | `space_travel.arrive` |
 | 9 | Prólogo | `moon_prologue` | `/despegue` | ⏳ | — |
 | 10 | Acto I | `moon_landing` | `/despegue` | ✅ | `moon_landing.touchdown` |
 | 11 | Acto I | `moon_exploration` | `/luna` | ✅ | artefacto `eagle` registrado (muestras y placa ⏳) |
@@ -214,15 +215,15 @@ El alias no identifica a nadie (dos niños pueden llamarse igual y uno puede cam
 
 * Solo aparece si hay algo que borrar: `getEntryPoint().status !== 'new'` o hay datos personales (`StarProgress.hasPersonalData()`). Un jugador nuevo no lo ve.
 * Abre un diálogo de confirmación bilingüe (`role="alertdialog"`). El foco queda en **CANCELAR**, y Escape también cancela. El texto dice qué se borra, qué se conserva y que no se puede deshacer.
-* Al confirmar, `StarProgress.resetPlayerData()` borra **juntas** las claves de `StarProgress.PLAYER_KEYS`: `starstep_flujo`, `starstep_flujo_respaldo`, `starstep_inventario`, `starstep_completed`, `starstep_astronauta`, `starstep_notas` y `starstep_foto`. Luego la portada se recarga: StarFlow crea un invitado nuevo, la bienvenida vuelve a ser obligatoria y las misiones vuelven a estar bloqueadas.
-* Se conservan las preferencias del dispositivo (`PREFERENCE_KEYS`: `starstep_lang`, `starstep_audio`).
+* Al confirmar, `StarProgress.resetPlayerData()` borra **juntas** las claves de `StarProgress.PLAYER_KEYS`: `starstep_flujo`, `starstep_flujo_respaldo`, `starstep_inventario`, `starstep_completed`, `starstep_astronauta`, `starstep_notas` y `starstep_foto`. Después LITO da una bienvenida breve y el jugador va directo a `/astronauta` (sección 5.8). Allí StarFlow crea un invitado nuevo; perfil, cadete, capítulo y misiones vuelven a ser obligatorios.
+* Se conservan las preferencias del dispositivo (`PREFERENCE_KEYS`: `starstep_lang`, `starstep_audio` y `starstep_cinematicas`, la intro histórica vista).
 * **Por qué se borran juntas:** si quedara el inventario, los actos o el perfil heredados, la migración (sección 8) reconstruiría la partida anterior. Hay una prueba de control que lo demuestra.
 * **Escrituras tardías:** tras el reinicio, `progreso.js` bloquea toda escritura hasta recargar. Así el controlador en memoria no puede volver a guardar la partida borrada.
 * **Otras pestañas:** una pestaña con la partida anterior escucha el evento `storage`. Si se borra `starstep_flujo` (o todos los datos del sitio), deja de guardar y vuelve a `/`. Esto reduce el riesgo de las dos pestañas (sección 14) para este caso.
 * No toca el servidor ni la base de datos. Si el navegador impide borrar, se muestra `flow.notice.resetFailed` y no se recarga.
-* Toda clave `starstep_*` usada en `static/js` debe estar clasificada en `PLAYER_KEYS` o `PREFERENCE_KEYS`; hay una prueba que falla si aparece una clave nueva sin clasificar.
+* Toda clave `starstep_*` usada en `static/js` debe estar clasificada en `PLAYER_KEYS`, `PREFERENCE_KEYS` o `SESSION_KEYS` (sessionStorage de la pestaña: `starstep_sesion`, `starstep_nueva_partida`); hay una prueba que falla si aparece una clave nueva sin clasificar.
 
-Pruebas: `tests/js/nueva-partida.test.mjs` (9 pruebas: jugador nuevo y existente, borrado completo con preferencias conservadas, volver a jugar con resultados nuevos, control de la migración, escrituras tardías, otra pestaña, clasificación de claves, botón y textos ES/EN) y `tests/test_rutas.py` (la portada incluye el botón oculto y el diálogo).
+Pruebas: `tests/js/nueva-partida.test.mjs` (15 pruebas: jugador nuevo y existente, borrado completo con preferencias conservadas, volver a jugar con resultados nuevos, control de la migración, escrituras tardías, otra pestaña, clasificación de claves, botón y textos ES/EN, y las 6 de la bienvenida breve de la sección 5.8) y `tests/test_rutas.py` (la portada incluye el botón oculto y el diálogo).
 
 ### 5.6 Nombre del cadete (Fase 1.1)
 
@@ -256,7 +257,7 @@ OUTSTRIP → selector de idioma → introducción histórica → bienvenida de L
 | Dato | Fuente | Alcance |
 |---|---|---|
 | Apertura real | `StarFlow.isInitialOpening()`: primera página de la pestaña (marca `starstep_sesion`, sección 5.1) | Sesión |
-| Intro histórica vista | `StarProgress.hasSeenCinematic('history_intro')` (clave `starstep_cinematicas`): decide si aparece SALTAR | Jugador |
+| Intro histórica vista | `StarProgress.hasSeenCinematic('history_intro')` (clave `starstep_cinematicas`): decide si aparece SALTAR | Dispositivo (preferencia; NUEVA PARTIDA la conserva) |
 | Bienvenida completada | `StarFlow.isStageCompleted('lito_welcome')` | Jugador (partida) |
 
 | Situación | Pasos |
@@ -269,6 +270,7 @@ OUTSTRIP → selector de idioma → introducción histórica → bienvenida de L
 | Recarga a mitad de la secuencia | OUTSTRIP → idioma → intro (si no se terminó, desde la escena 1, sin SALTAR) → LITO → menú |
 | Volver a la portada sin recargar a mitad de la secuencia | Sin OUTSTRIP ni idioma: continúa con la intro y/o LITO pendientes |
 | «VER INTRODUCCIÓN» en el menú | Intro con SALTAR → menú. No toca la partida. |
+| NUEVA PARTIDA confirmada | Bienvenida breve de LITO → `/astronauta` (sección 5.8). Sin OUTSTRIP, idioma, intro, bienvenida extensa ni menú. |
 
 **Pasos:**
 
@@ -300,7 +302,7 @@ OUTSTRIP → selector de idioma → introducción histórica → bienvenida de L
 **Decisiones conservadoras:**
 
 * `outstrip_presentation` e `history_intro` siguen como etapas **previstas** (`implemented:false`). Volverlas obligatorias en StarFlow bloquearía las partidas existentes (la etapa actual se recalcula). La intro vista se guarda como **cinemática del jugador** en `progreso.js`, fuera del estado del flujo.
-* `starstep_cinematicas` es dato del jugador (`PLAYER_KEYS`): NUEVA PARTIDA la borra y el siguiente jugador ve la intro sin poder saltarla. Por sí sola no hace aparecer NUEVA PARTIDA.
+* `starstep_cinematicas` es una **preferencia del dispositivo** (`PREFERENCE_KEYS`), no un dato de la partida: NUEVA PARTIDA la conserva (pedido del equipo, sección 5.8), así que tras una partida nueva la intro sigue teniendo SALTAR. Por sí sola no hace aparecer NUEVA PARTIDA. (Antes era dato del jugador y NUEVA PARTIDA la borraba.)
 * **Cambio de regla (pedido del equipo):** antes la intro solo aparecía la primera vez por jugador. Ahora aparece tras cada elección de idioma, en ese idioma, y solo la primera vez es obligatoria. La «cinemática vista» ya no decide si se muestra, solo si se puede saltar. LITO sigue mostrándose solo hasta completarla.
 * Los jugadores con partida previa ven la intro sin SALTAR hasta completarla una vez. Su partida no cambia.
 * Si `intro-secuencia.js` no carga, `main.js` muestra el menú directamente. Las guardas siguen exigiendo la bienvenida para avanzar, así que no se desbloquea progreso.
@@ -309,7 +311,64 @@ OUTSTRIP → selector de idioma → introducción histórica → bienvenida de L
 
 **Limitaciones:** la voz depende de `speechSynthesis` del navegador y de un gesto previo. En una recarga a mitad de la secuencia, el primer texto puede aparecer sin voz hasta el siguiente clic. La intro no guarda en qué escena se quedó el jugador.
 
-Pruebas: `tests/js/intro-secuencia.test.mjs` (24 pruebas). Después de **cada** clic y de **cada** temporizador comprueban que, mientras se ve OUTSTRIP, el idioma, la intro o LITO, el menú y el escenario terrestre no estén visibles y que nunca haya dos pantallas a la vez. También cubren el fundido (telón opaco, ~420 ms, clics ignorados mientras se oscurece y pantalla usable mientras se aclara), la intro repetida en el idioma elegido (ES y EN, textos y narración, con SALTAR), el movimiento reducido, que la Tierra solo se anime en el menú, las voces sin superponerse, el regreso desde Luna, Marte y Huellas, la recarga con OUTSTRIP, la recarga y la vuelta sin recargar a mitad de la secuencia, VER INTRODUCCIÓN con fundido, NUEVA PARTIDA y el HTML/CSS del primer renderizado. También `tests/test_rutas.py` (la portada carga la secuencia).
+Pruebas: `tests/js/intro-secuencia.test.mjs` (32 pruebas; 9 son de la bienvenida breve, sección 5.8). Después de **cada** clic y de **cada** temporizador comprueban que, mientras se ve OUTSTRIP, el idioma, la intro o LITO, el menú y el escenario terrestre no estén visibles y que nunca haya dos pantallas a la vez. También cubren el fundido (telón opaco, ~420 ms, clics ignorados mientras se oscurece y pantalla usable mientras se aclara), la intro repetida en el idioma elegido (ES y EN, textos y narración, con SALTAR), el movimiento reducido, que la Tierra solo se anime en el menú, las voces sin superponerse, el regreso desde Luna, Marte y Huellas, la recarga con OUTSTRIP, la recarga y la vuelta sin recargar a mitad de la secuencia, VER INTRODUCCIÓN con fundido, NUEVA PARTIDA y el HTML/CSS del primer renderizado. También `tests/test_rutas.py` (la portada carga la secuencia).
+
+### 5.8 NUEVA PARTIDA: bienvenida breve y directo al cadete
+
+Antes, al confirmar NUEVA PARTIDA la portada se recargaba y el jugador volvía a pasar por la intro y la bienvenida extensa de LITO, y luego por el menú. Ahora:
+
+```
+NUEVA PARTIDA → confirmación → reinicio de la partida → LITO breve (~3 s) → /astronauta → /capitulos → Rock & Roll …
+```
+
+1. **Confirmación:** el mismo diálogo de la sección 5.5 (foco en CANCELAR, Escape cancela). CANCELAR no borra nada.
+2. **Reinicio:** `StarProgress.resetPlayerData()` borra solo `PLAYER_KEYS`. Se conservan el idioma, el audio (música, efectos y voz) y la intro vista. Si el navegador impide borrar, se muestra `flow.notice.resetFailed` y no pasa nada más. Un segundo clic en confirmar no hace nada.
+3. **Bienvenida breve** (`StarIntro.newGameWelcome()`, `intro-secuencia.js`): fundido a azul noche sobre el menú y la pantalla de LITO de la presentación (`#introLito`), con LITO animado, el texto que se escribe y la voz (si está activa):
+   * ES: «¡Una nueva aventura nos espera! Prepará tu traje, cadete.»
+   * EN: «A new adventure awaits! Get your suit ready, cadet.»
+
+   No hay botón: a los **3 s** el telón se oscurece y la página se va. Si LITO sigue hablando, espera a que termine, como máximo 1 s más, para no cortarlo a mitad de la frase. ES/EN y el botón de voz funcionan durante el mensaje (traducen y vuelven a narrar sin superponer voces). Con `prefers-reduced-motion` no hay fundidos ni texto animado, pero el mensaje dura igual.
+4. **Marca de un solo uso:** al terminar el mensaje, `StarProgress.markNewGameWelcome()` guarda `starstep_nueva_partida` en **sessionStorage** (solo esta pestaña). Solo se puede marcar en la página que acaba de reiniciar con éxito. Luego `location.replace('/astronauta')`: «atrás» no vuelve a la portada vieja, cuyo controlador tiene la partida borrada.
+5. **`/astronauta`:** al cargar, `flujo.js` consume la marca (`takeNewGameWelcome()`; se borra siempre) y, **solo si la partida está recién creada** (etapa actual `lito_welcome` y ningún objetivo), registra `lito_welcome.heard` con la evidencia nueva `new_game_welcome` (agregada a `flujo-definicion.js`). Después corre la guarda de página de siempre. Es el único objetivo que se registra.
+6. El jugador escribe su nombre y elige avatar (sin valores de la partida anterior), y sigue normalmente a `/capitulos` y al flujo de Rock & Roll.
+
+**Qué no se repite:** OUTSTRIP, el selector de idioma, la introducción histórica, la bienvenida extensa de LITO y el menú.
+
+**StarFlow sin atajos:**
+
+* `profile`, `cadet_custom`, `chapter_select`, `chapter_briefing` y las siguientes siguen siendo obligatorias. La bienvenida breve no completa ninguna, no registra artefactos, certificados ni checkpoints y no desbloquea misiones.
+* Identificador nuevo (`guest-…`) y checkpoint nuevo en `profile`. No queda nada de la partida anterior: ni descubrimientos, ni objetivos, ni certificados, ni checkpoints del vuelo, ni el nombre y el avatar.
+* Sin la marca, `/astronauta` sigue bloqueada para una partida nueva (vuelve a la portada). Con una partida en curso, la marca no tiene efecto (StarFlow tampoco aceptaría el objetivo).
+
+**Casos de borde (decisiones conservadoras):**
+
+| Caso | Resultado |
+|---|---|
+| Recargar (F5) durante el mensaje | Todavía no hay marca: la portada hace la apertura real completa (OUTSTRIP → idioma → intro con SALTAR → LITO extensa → menú). Nunca se salta la bienvenida sin verla. |
+| Cerrar la pestaña durante el mensaje | La partida ya se borró; la próxima apertura es la de un jugador nuevo. |
+| `intro-secuencia.js` no carga | No hay bienvenida breve: la portada se recarga sin marca y pide la bienvenida completa (como antes). |
+| Otra pestaña con la partida anterior | Deja de guardar y vuelve a `/` (sección 5.5); no revive datos borrados. Si esa pestaña ya creó el invitado nuevo, `/astronauta` lo usa y la marca sigue valiendo mientras la partida esté sin objetivos. |
+| Primera apertura de StarStep | Sin cambios (sección 5.7). VER INTRODUCCIÓN sigue disponible en el menú. |
+
+**Limitaciones:**
+
+* La duración depende de la voz del navegador. Si no hay voz en el idioma, el navegador usa otra más lenta y el mensaje puede durar hasta ~4 s, o cortarse al final de ese margen.
+* La marca vive en sessionStorage del navegador: quien edite el almacenamiento con las herramientas de desarrollo puede saltarse la bienvenida, igual que puede editar LocalStorage. La validación definitiva corresponde al servidor (Fase 2).
+* Con dos pestañas abiertas sigue valiendo «la última escritura gana» (sección 14).
+
+Pruebas: `tests/js/intro-secuencia.test.mjs`:
+
+* recorrido completo en ES y EN: textos, narración, foco, sin menú ni otras pantallas, ~3 s, navegación a `/astronauta` y página siguiente aceptada;
+* movimiento reducido, cambio de idioma y voz, espera de la voz (y su máximo), doble confirmación, CANCELAR, recarga durante el mensaje y la variante sin `intro-secuencia.js`.
+
+`tests/js/nueva-partida.test.mjs`:
+
+* marca de un solo uso;
+* `/astronauta` con la bienvenida breve: solo `lito_welcome.heard`, identificador nuevo, nada heredado y misiones bloqueadas;
+* recorrido perfil → cadete → `/capitulos` → Rock & Roll;
+* sin la marca;
+* marca sin efecto en una partida en curso;
+* otra pestaña.
 
 ## 6. Repetición
 
@@ -439,7 +498,7 @@ Sin librerías nuevas. Tiempo de ejecución: navegador con LocalStorage; Three.j
 
 * LocalStorage es por navegador: borrar datos del sitio borra la partida hasta que exista sincronización.
 * Dos pestañas abiertas pueden sobrescribirse (última escritura gana). Solo «Nueva partida» escucha el evento `storage` (sección 5.5); el resto de cambios sigue sin sincronizarse entre pestañas.
-* Una computadora compartida no distingue jugadores: depende de que alguien pulse NUEVA PARTIDA (sección 5.5).
+* Una computadora compartida no distingue jugadores: depende de que alguien pulse NUEVA PARTIDA (secciones 5.5 y 5.8).
 * La localización de Marte es provisional (botón del panel).
 * El visor 3D muestra varios textos fijos en español (heredado) y `juego/luna.js` escribe los mensajes de LITO en español.
 * Hay dos archivos `starstep.db` distintos (raíz y `instance/`), lo que confunde diagnósticos.
@@ -453,3 +512,16 @@ Sin librerías nuevas. Tiempo de ejecución: navegador con LocalStorage; Three.j
 4. Migración no destructiva `players` → `Astronauta`/`Descubrimiento`/`Progreso`, agregando códigos estables a `Artefacto` y `Escena`.
 5. Recuperación: al iniciar, el servidor es la fuente oficial; LocalStorage queda como respaldo y cola de operaciones pendientes.
 6. Guardas de página también en Flask para las rutas de misión.
+
+
+## Integración del capítulo · selección y presentación
+
+- El formulario del cadete navega a `getEntryPoint().page`. Un perfil nuevo llega a `/capitulos`; los capítulos 2 y 3 no tienen objetivos ni acceso.
+- Elegir Rock & Roll registra `chapter_select.chapter1` y dirige a `/rock-roll`. La presentación exige visualizar sus escenas y confirmar las instrucciones de LITO antes de registrar `chapter_briefing.ready`.
+- La confirmación final abre `/despegue?inicio=capitulo`, que inicia la cuenta regresiva existente sin repetirla. Continuar una aventura sigue utilizando la etapa actual. La preferencia del idioma se comparte mediante StarI18n y la de voz mediante StarSound.
+- Compatibilidad: una partida que ya registró el lanzamiento antes de esta integración conserva el acceso al capítulo. Las nuevas etapas introductorias se anotan como `legacy_access`, sin fabricar objetivos, descubrimientos ni certificados oficiales. La partida con perfil pero sin lanzamiento sí debe seleccionar el capítulo.
+- El minijuego de vuelo, el prólogo lunar y los checkpoints internos del vuelo siguen pendientes de integración. El despegue conserva por ahora su viaje automático provisional; las páginas `static/demo-*.html` no escriben progreso. Las guardas son de frontend y no reemplazan la futura validación del servidor.
+
+## Integración del vuelo espacial
+
+`launch.liftoff` conduce a `/vuelo` (`space_travel`). El motor de paso fijo de 24 s guarda los límites de 0, 6, 12 y 18 s y fallos mediante StarFlow, sin claves de almacenamiento adicionales. Recargar recupera el último límite seguro. La asistencia aumenta a los 3/6/9 fallos y no elimina colisiones. Solo la victoria registra `space_travel.arrive`, con fuente `travel_minigame`, 24 s y último checkpoint de 18 s; después `/despegue` comienza en descenso, sin repetir el lanzamiento. Partidas con alunizaje previo conservan acceso (`legacy_access`, sin victoria ficticia). El prólogo lunar narrativo sigue previsto. La validación es cliente local, no una protección contra manipulación deliberada ni sincronización de servidor.

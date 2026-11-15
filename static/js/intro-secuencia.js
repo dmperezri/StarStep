@@ -24,9 +24,13 @@
  *     narración). La primera vez no se puede saltar; si ya se vio completa, aparece SALTAR.
  *     En un regreso interno con la bienvenida pendiente, solo si todavía no se vio.
  *   - Bienvenida de LITO: hasta completarla (objetivo lito_welcome.heard).
+ *   - NUEVA PARTIDA (sección 5.8): newGameWelcome() muestra solo un mensaje breve de LITO
+ *     (~3 s, sin botón) y entrega el control a main.js, que navega a /astronauta. No repite
+ *     OUTSTRIP, idioma, intro, la bienvenida extensa ni el menú.
  *
  * Es solo presentación: no avanza etapas, no registra artefactos ni desbloquea misiones.
  * El único evento de juego es el que ya existía: lito_welcome.heard al confirmar a LITO.
+ * (La bienvenida breve no registra nada aquí: lo hace flujo.js en la página siguiente.)
  */
 (function (root, factory) {
   const api = factory();
@@ -38,6 +42,8 @@
   const SPLASH_MS = 3200;
   const SPLASH_MS_REDUCED = 1500;
   const FADE_MS = 420;            // fundido a azul noche entre etapas (350–500 ms)
+  const NEW_GAME_MS = 3000;       // mensaje breve de LITO en NUEVA PARTIDA
+  const NEW_GAME_VOICE_GRACE_MS = 1000; // si LITO sigue hablando, espera hasta este margen extra
   // El selector aparece antes de elegir idioma: muestra la consigna en ambos.
   const LANGUAGE_PROMPT = Object.freeze({ es: "SELECCIONÁ TU IDIOMA", en: "CHOOSE YOUR LANGUAGE" });
 
@@ -53,7 +59,7 @@
     return steps;
   }
 
-  return Object.freeze({ SCENES, STEPS, SPLASH_MS, SPLASH_MS_REDUCED, FADE_MS, LANGUAGE_PROMPT, planEntry });
+  return Object.freeze({ SCENES, STEPS, SPLASH_MS, SPLASH_MS_REDUCED, FADE_MS, NEW_GAME_MS, NEW_GAME_VOICE_GRACE_MS, LANGUAGE_PROMPT, planEntry });
 });
 
 /* ── Navegador ───────────────────────────────────────────────── */
@@ -71,6 +77,7 @@
   let sceneIndex = 0, canSkipHistory = false;
   let splashTimer = 0, typingTimer = 0, frame = 0, bound = false;
   let fadeToken = 0, fadeTimers = [], busy = false;
+  let briefTimer = 0, briefDue = false, leaving = false, briefDone = null;
 
   // ── Utilidades ────────────────────────────────────────────────
   function reducedMotion() {
@@ -81,6 +88,7 @@
   function stopTimers() {
     clearTimeout(splashTimer); splashTimer = 0;
     clearInterval(typingTimer); typingTimer = 0;
+    clearTimeout(briefTimer); briefTimer = 0;
     if (frame && typeof cancelAnimationFrame === "function") cancelAnimationFrame(frame);
     frame = 0;
   }
@@ -88,14 +96,29 @@
     sound()?.stopVoice?.();
     window.litoState = "idle";
   }
-  function narrate(text, lito) {
+  function narrate(text, lito, onEnd) {
     const s = sound();
     if (!s || !s.voiceOn) return;
     s.speak(text, {
       lito: !!lito,
       onStart: () => { window.litoState = "talking"; },
-      onEnd: () => { window.litoState = "idle"; }
+      onEnd: () => { window.litoState = "idle"; if (typeof onEnd === "function") onEnd(); }
     });
+  }
+  // Texto de LITO escrito de a poco; sin animación (movimiento reducido) aparece entero.
+  function typeText(node, text, animate) {
+    if (!node) return;
+    clearInterval(typingTimer); typingTimer = 0;
+    node.dataset.fullText = text;
+    if (!animate) { node.textContent = text; return; }
+    node.textContent = "";
+    let i = 0;
+    typingTimer = setInterval(() => {
+      i = Math.min(text.length, i + 2);
+      node.textContent = text.slice(0, i);
+      if (i % 6 === 0) sound()?.effect?.("type");
+      if (i >= text.length) { clearInterval(typingTimer); typingTimer = 0; }
+    }, 26);
   }
   // Solo desplazamiento, nunca opacidad: si el navegador pausa la animación (pestaña en
   // segundo plano), el texto sigue legible.
@@ -264,6 +287,7 @@
     if (!s.voiceOn) { stopNarration(); return; }
     if (step === "history") renderScene(true);
     else if (step === "lito") { stopNarration(); narrate(t("lito.welcome"), true); }
+    else if (step === "newgame" && !leaving) { stopNarration(); narrate(t("lito.newgame"), true, briefVoiceEnded); }
   }
 
   // 4. Bienvenida de LITO (pantalla propia de la presentación): texto animado, voz y botón.
@@ -274,26 +298,15 @@
   function renderLito(speak) {
     const button = $("litoReady"), node = $("litoText");
     const text = t("lito.welcome");
-    if (button) button.textContent = t("lito.ready");
+    if (button) { button.textContent = t("lito.ready"); button.hidden = false; }
     renderVoiceButtons();
-    if (node) {
-      clearInterval(typingTimer);
-      node.dataset.fullText = text;
-      node.textContent = "";
-      let i = 0;
-      typingTimer = setInterval(() => {
-        i = Math.min(text.length, i + 2);
-        node.textContent = text.slice(0, i);
-        if (i % 6 === 0) sound()?.effect?.("type");
-        if (i >= text.length) { clearInterval(typingTimer); typingTimer = 0; }
-      }, 26);
-    }
+    typeText(node, text, true);
     if (speak) { stopNarration(); narrate(text, true); }
     focus(button);
   }
   function completeTyping() {
     const node = $("litoText");
-    if (step !== "lito" || !node || !typingTimer) return;
+    if ((step !== "lito" && step !== "newgame") || !node || !typingTimer) return;
     clearInterval(typingTimer); typingTimer = 0;
     node.textContent = node.dataset.fullText || "";
   }
@@ -326,6 +339,69 @@
       document.dispatchEvent(new CustomEvent("starstep:intro-done", { detail: { step: "menu" } }));
     });
   }
+  // ── NUEVA PARTIDA: bienvenida breve de LITO (sección 5.8) ─────
+  // main.js ya reinició los datos. Fundido a azul noche sobre el menú, mensaje breve con LITO
+  // animado y narración (si la voz está activa); a los ~3 s el telón se oscurece y se llama
+  // a onDone (main.js navega a /astronauta). Sin botón: avanza sola. No registra nada.
+  function newGameWelcome(options) {
+    bind();
+    const onDone = options?.onDone;
+    if (busy || leaving || step === "newgame" || typeof onDone !== "function") return false;
+    stopTimers();
+    stopNarration();
+    queue = [];
+    briefDone = onDone;
+    briefDue = false;
+    transition(() => {
+      step = "newgame";
+      if (document.body) document.body.dataset.introStep = step;
+      const help = $("help"); if (help) help.hidden = true;
+      setPresenting(true);
+      showScreen("introLito");
+      renderBrief(true);
+      startCanvas("lito");
+      briefTimer = setTimeout(briefElapsed, Core.NEW_GAME_MS);
+    });
+    return true;
+  }
+  function renderBrief(speak) {
+    const button = $("litoReady"), node = $("litoText");
+    const text = t("lito.newgame");
+    if (button) button.hidden = true;       // sin confirmación: avanza sola
+    renderVoiceButtons();
+    typeText(node, text, !reducedMotion());
+    if (speak) { stopNarration(); narrate(text, true, briefVoiceEnded); }
+    focus($("litoVoice"));                  // el foco queda dentro de la pantalla de LITO
+  }
+  // A los ~3 s: si LITO sigue hablando, se espera a que termine (con un margen máximo).
+  function briefElapsed() {
+    briefTimer = 0;
+    if (step !== "newgame" || leaving) return;
+    briefDue = true;
+    if (window.litoState === "talking") briefTimer = setTimeout(leaveBrief, Core.NEW_GAME_VOICE_GRACE_MS);
+    else leaveBrief();
+  }
+  function briefVoiceEnded() { if (step === "newgame" && briefDue) leaveBrief(); }
+  function leaveBrief() {
+    if (step !== "newgame" || leaving) return;
+    leaving = true;
+    stopTimers();
+    const token = ++fadeToken;
+    fadeTimers.forEach(clearTimeout);
+    fadeTimers = [];
+    busy = true;                            // la página se va: no se aceptan más clics
+    const curtain = $("introFade");
+    if (curtain) curtain.dataset.state = "in";
+    const go = () => {
+      if (token !== fadeToken) return;
+      stopNarration();
+      const done = briefDone; briefDone = null;
+      if (typeof done === "function") done();
+    };
+    const ms = fadeMs();
+    if (ms === 0) go(); else fadeTimers.push(setTimeout(go, ms));
+  }
+
   function updateReplayButton() {
     const button = $("replayIntro");
     if (button) button.hidden = window.StarProgress?.hasSeenCinematic?.("history_intro") !== true;
@@ -409,8 +485,9 @@
     if (!ctx || typeof requestAnimationFrame !== "function") return;
     if (frame && typeof cancelAnimationFrame === "function") cancelAnimationFrame(frame);
     ctx.imageSmoothingEnabled = false;
+    const owner = step;                     // «lito» o «newgame» dibujan a LITO
     const loop = ms => {
-      if (step !== kind) { frame = 0; return; }
+      if (step !== owner) { frame = 0; return; }
       try {
         if (kind === "lito") drawLito(ctx, ms / 1000);
         else DRAW[Core.SCENES[sceneIndex]](ctx, ms / 1000);
@@ -436,6 +513,7 @@
       if (step === "language") renderLanguage();
       else if (step === "history") renderScene(true);
       else if (step === "lito") renderLito(true);
+      else if (step === "newgame" && !leaving) renderBrief(true);
     });
     window.addEventListener("pagehide", () => { stopTimers(); stopNarration(); fadeTimers.forEach(clearTimeout); });
   }
@@ -469,7 +547,7 @@
   }
 
   window.StarIntro = Object.freeze({
-    start, replayHistory, planEntry: Core.planEntry,
+    start, replayHistory, newGameWelcome, planEntry: Core.planEntry,
     get step() { return step; },
     get transitioning() { return busy; }
   });
