@@ -14,7 +14,9 @@ const ID = "rock_roll_intro";
 // ── Guion y subtítulos ──────────────────────────────────────────
 test("subtítulos ES/EN: los .vtt coinciden con el guion y tienen los mismos tiempos", () => {
   for (const lang of ["es", "en"]) {
-    const file = readFileSync(asset(`rock-roll-intro.${lang}.vtt`), "utf8");
+    // Git en Windows puede convertir los saltos de línea a CRLF al descargar: se comparan
+    // normalizados (el reproductor y parseVTT también ignoran \r).
+    const file = readFileSync(asset(`rock-roll-intro.${lang}.vtt`), "utf8").replace(/\r\n/g, "\n");
     assert.equal(file, Core.toVTT(ID, lang), `${lang}: regenerar con toVTT()`);
     assert.ok(file.startsWith("WEBVTT\n"));
   }
