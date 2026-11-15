@@ -17,6 +17,8 @@
     <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/cinematica.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/planetas.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/scene.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/rock-roll.js') }}"></script>
 
 
@@ -38,9 +40,9 @@
 
         <header>
 
-            <span class="brand">
-                OUTSTRIP · STARSTEP
-            </span>
+            <img class="ss-logo"
+                 src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+                 alt="StarStep">
 
             <div class="controls">
 
@@ -175,6 +177,9 @@
             <div class="acts" id="acts" hidden>
 
                 <article class="act">
+                    <img class="ss-act-photo"
+                    src="{{ url_for('static', filename='assets/nasa/apollo-eagle.webp') }}"
+                    alt="Apollo 11">
                     <strong>I</strong>
                     <span data-text="moon">
                         LUNA
@@ -182,6 +187,9 @@
                 </article>
 
                 <article class="act">
+                    <img class="ss-act-photo"
+                    src="{{ url_for('static', filename='assets/nasa/opportunity-eagle.webp') }}"
+                    alt="Opportunity">
                     <strong>II</strong>
                     <span data-text="mars">
                         MARTE
@@ -189,12 +197,25 @@
                 </article>
 
                 <article class="act">
+                    <img class="ss-act-photo"
+                    src="{{ url_for('static', filename='assets/nasa/apollo-footprint.webp') }}"
+                    alt="Apollo 11">
                     <strong>III</strong>
                     <span data-text="traces">
                         HUELLAS
                     </span>
                 </article>
 
+            </div>
+
+            <div id="briefCabin" class="ss-cabin" hidden>
+                <canvas id="cabinWindow"
+                        width="320" height="180"></canvas>
+                <canvas id="briefCadet"
+                        width="48" height="48"></canvas>
+                <small data-text="simulation">
+                    SIMULACIÓN DEL DESTINO · N
+                </small>
             </div>
 
             <!-- LITO -->
@@ -293,6 +314,17 @@
 
             </section>
 
+            <div class="ss-brief-options"
+                 id="briefOptions" hidden>
+                <button type="button"
+                        id="previousDialogue"
+                        data-text="previous">ANTERIOR</button>
+                <label>
+                    <input type="checkbox" id="autoDialogue">
+                    <span data-text="auto">Automático</span>
+                </label>
+            </div>
+
             <button type="button"
                     id="nextButton"
                     class="primary mission-button"
@@ -325,7 +357,7 @@
 
     </main>
 
-    
+
 
 </body>
 </html>

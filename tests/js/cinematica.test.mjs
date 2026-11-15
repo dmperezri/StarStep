@@ -154,9 +154,20 @@ test("Rock & Roll: la cinemática se ve completa antes de LITO, sin saltar ni re
   assert.match(r.el.sceneLabel.textContent, /TRES ACTOS/);
   r.elapse(5200);
   assert.equal(r.el.briefing.hidden, false, "mensaje breve de LITO");
-  assert.match(r.el.missionText.textContent, /nuestro turno/);
-  r.elapse(8200); r.el.nextButton.click();
-  assert.match(r.el.missionText.textContent, /ESPACIO.*asteroides/s, "instrucciones del vuelo");
+  assert.match(r.el.missionText.textContent,/robot geólogo/);
+
+  r.el.nextButton.click();
+  assert.match(r.el.missionText.textContent,/testigos/);
+
+  r.el.nextButton.click();
+  assert.match(r.el.missionText.textContent,/nuestro turno/);
+
+  r.el.nextButton.click();
+  assert.match(r.el.missionText.textContent,/Apollo 11/);
+
+  r.el.nextButton.click();
+
+  assert.equal(r.el.missionText.textContent,"","instrucciones en vuelo");
   assert.equal(r.el.launchButton.hidden, false);
   r.el.launchButton.click();
   assert.equal(flow.getCurrentStage(), "launch");
@@ -194,21 +205,31 @@ test("reproducción bloqueada por el navegador: botón propio para comenzar", as
   assert.equal(r.video().paused, false);
 });
 
-test("si el video falla, la misma historia en texto permite continuar legítimamente", async () => {
-  const tab = tabAtBriefing();
-  const r = openRockRoll(tab);
-  await tick();
-  r.video().fire("error");
-  assert.equal(r.find("cine-narrative").hidden, false);
-  assert.equal(r.find("cine-controls").hidden, true);
-  const slides = Core.slidesFor(ID, "es");
-  assert.equal(r.find("cine-narrative-text").textContent, slides[0]);
-  for (let i = 1; i < slides.length; i++) { r.find("cine-next").click(); assert.equal(r.find("cine-narrative-text").textContent, slides[i]); }
-  assert.match(r.find("cine-next").textContent, /CONTINUAR/);
-  r.find("cine-next").click();
-  assert.equal(r.page.ctx.StarProgress.hasSeenCinematic("rock_roll_intro"), true);
-  assert.equal(r.el.acts.hidden, false);
-  assert.equal(r.page.ctx.StarFlow.getCurrentStage(), "chapter_briefing");
+test("si Rock & Roll falla, solo permite reintentar sin avance",async()=>{
+    const r=openRockRoll(tabAtBriefing());
+
+    await tick();
+    r.video().fire("error");
+
+    assert.equal(r.find("cine-narrative").hidden,true);
+    assert.equal(r.find("cine-start").hidden,false);
+    assert.match(r.find("cine-status").textContent,/reintentar/);
+
+    assert.equal(
+        r.page.ctx.StarProgress.hasSeenCinematic("rock_roll_intro"),
+        false
+    );
+
+    assert.equal(
+        r.page.ctx.StarFlow.getCurrentStage(),
+        "chapter_briefing"
+    );
+
+    r.find("cine-start").click();
+
+    await tick();
+
+    assert.equal(r.video().paused,false);
 });
 
 test("ocultar la pestaña pausa el video", async () => {

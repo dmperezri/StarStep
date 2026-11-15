@@ -54,7 +54,7 @@ const IDS = ["world", "menu", "adventureButton", "newGame", "replayIntro",
   "how", "music", "voice", "help", "closeHelp", "newGameDialog", "newGameCancel", "newGameConfirm",
   "introSequence", "introFade", "introSplash", "introLanguage", "introLanguageTitle", "introLanguageAlt", "introLangEs", "introLangEn",
   "introHistory", "introSceneCount", "introVoice", "introCanvas", "introCaption", "introSceneTitle", "introSceneText",
-  "introSkip", "introNext", "introLito", "litoCanvas", "litoText", "litoReady", "litoVoice"];
+  "introSkip", "introNext", "historyVideo", "historyVideoTitle", "historyVideoPanel", "historyVideoPlay", "historyVideoMute", "historyVideoSkip", "historyVideoProgress", "introLito", "litoCanvas", "litoText", "litoReady", "litoVoice"];
 const I18N = { litoReady: "lito.ready", adventureButton: "start", newGame: "newgame.button", replayIntro: "intro.replay",
   introSkip: "intro.skip", introNext: "intro.next" };
 // Estado inicial de la plantilla: presentación visible (telón opaco), todo lo demás oculto.
@@ -68,6 +68,15 @@ function openIndex(tab, { reload = false, reducedMotion = false } = {}) {
     el[id] = new FakeElement(/canvas|world/i.test(id) ? "canvas" : "div", { id, dataset: I18N[id] ? { i18n: I18N[id] } : {} });
     el[id].hidden = HIDDEN.includes(id);
   }
+  // Simulacion de los eventos del reproductor.
+  const v=el.historyVideo;
+  Object.assign(v,{paused:true,currentTime:0,duration:157,muted:false,seeking:false,error:null});
+  v.fire=(type)=>{for(const fn of v.listeners[type]||[])fn({type,target:v});};
+  v.play=()=>{v.paused=false;v.fire('play');return Promise.resolve();};
+  v.pause=()=>{v.paused=true;v.fire('pause');};
+  v.load=()=>{v.error=null;v.currentTime=0;};
+  v.at=t=>{v.currentTime=t;v.fire('timeupdate');};
+  v.end=()=>{v.at(157);v.fire('ended');};
   el.introFade.dataset.state = "in";
   el.introLangEs.dataset.introLang = "es";
   el.introLangEn.dataset.introLang = "en";
@@ -146,6 +155,7 @@ function openIndex(tab, { reload = false, reducedMotion = false } = {}) {
     },
     // Clic y fundido completo (como un jugador que espera la transición).
     tap(node) { click(node); settle(); },
+    finishVideo(){v.end();settle();},
     // Clic sin esperar el fundido.
     tapNow(node) { click(node); },
     spoken: () => speech.filter(s => !s.stop),
@@ -157,7 +167,7 @@ function openIndex(tab, { reload = false, reducedMotion = false } = {}) {
 function playFullSequence(page, lang = "es") {
   page.flushSplash();
   page.tap(lang === "en" ? page.el.introLangEn : page.el.introLangEs);
-  for (let i = 0; i < SCENES.length; i++) page.tap(page.el.introNext);
+  page.finishVideo();
   if (page.step() === "lito") page.tap(page.el.litoReady);
 }
 
@@ -192,14 +202,11 @@ for (const lang of ["es", "en"]) {
     page.tap(lang === "en" ? page.el.introLangEn : page.el.introLangEs);
     assert.equal(tab.localStorage.getItem("starstep_lang"), lang);
     assert.deepEqual(page.visible(), ["introHistory"]);
-    assert.equal(page.el.introSkip.hidden, true, "sin SALTAR la primera vez");
-    assert.equal(page.el.introSceneTitle.textContent, TEXT[lang].first);
-    assert.equal(page.el.introNext.textContent, TEXT[lang].next);
-    page.tap(page.el.introSkip);
+    assert.equal(page.el.historyVideoSkip.hidden,true,"sin SALTAR la primera vez");
+    assert.equal(page.el.historyVideoTitle.textContent,lang==="es"?"CAMINO AL APOLO 11":"ROAD TO APOLLO 11");
+    page.tap(page.el.historyVideoSkip);
     assert.equal(page.step(), "history", "SALTAR no funciona si no se vio");
-    for (let i = 1; i < SCENES.length; i++) page.tap(page.el.introNext);
-    assert.equal(page.el.introSceneTitle.textContent, TEXT[lang].last);
-    page.tap(page.el.introNext);
+    page.finishVideo();
     assert.equal(page.ctx.StarProgress.hasSeenCinematic("history_intro"), true);
     // LITO en su propia pantalla de la presentación, no sobre la estación terrestre.
     assert.deepEqual(page.visible(), ["introLito"]);
@@ -250,14 +257,12 @@ test("fundido a azul noche entre etapas: telón opaco durante el cambio, clics i
   page.settle();
   assert.equal(page.step(), "history");
   assert.equal(page.ctx.StarI18n.lang, "es", "el segundo clic se ignoró");
-  page.tapNow(page.el.introNext);
-  assert.equal(page.el.introSceneCount.textContent, "2 / 5");
-  // Pasar de la última escena a LITO: durante el fundido sigue viéndose la intro, nunca el menú.
-  for (let i = 2; i < SCENES.length; i++) page.tap(page.el.introNext);
-  page.tapNow(page.el.introNext);
+  page.el.historyVideo.at(45);
+  assert.equal(page.el.introSceneCount.textContent,"0:45 / 2:37");
+  page.el.historyVideo.end();
   assert.equal(page.curtain(), "in");
   assert.equal(page.menuVisible(), false);
-  page.tapNow(page.el.introNext);              // ignorado durante el fundido
+  page.el.historyVideo.end();
   page.settle();
   assert.equal(page.step(), "lito");
   assert.deepEqual(page.violations, []);
@@ -280,7 +285,7 @@ test("la estación terrestre solo se anima al entrar al menú (sin animaciones s
   page.tap(page.el.introLangEs);
   page.runFrames();
   assert.equal(page.earthDraws(), 0, "sin dibujar la Tierra durante la intro");
-  for (let i = 0; i < SCENES.length; i++) page.tap(page.el.introNext);
+  page.finishVideo();
   page.runFrames();
   assert.equal(page.earthDraws(), 0, "tampoco durante LITO");
   page.tap(page.el.litoReady);
@@ -299,17 +304,17 @@ test("la secuencia solo completa la bienvenida: no avanza etapas ni registra art
   assert.equal(page.ctx.StarSound.music <= 2, true, "la música se pide al elegir idioma y al confirmar (startMusic no la duplica)");
 });
 
-test("cambiar ES/EN durante la intro y durante LITO traduce y vuelve a narrar sin superponer voces", () => {
+test("cambiar ES/EN durante el video y LITO conserva posicion y narracion", () => {
   const page = openIndex(newTab());
   page.flushSplash();
   page.tap(page.el.introLangEs);
-  page.tap(page.el.introNext);
+  page.el.historyVideo.at(45);
   page.barLang("en");
-  assert.equal(page.el.introSceneTitle.textContent, "The beginning of an adventure");
-  assert.equal(page.el.introSceneCount.textContent, "2 / 5");
-  assert.equal(page.spoken().at(-1).lang, "en");
+  assert.equal(page.el.historyVideoTitle.textContent,"ROAD TO APOLLO 11");
+  assert.equal(page.el.introSceneCount.textContent,"0:45 / 2:37");
+  assert.equal(page.spoken().length,0);
   page.barLang("es");
-  for (let i = 1; i < SCENES.length; i++) page.tap(page.el.introNext);
+  page.finishVideo();
   assert.equal(page.step(), "lito");
   page.barLang("en");
   assert.match(page.el.litoText.dataset.fullText, TEXT.en.lito);
@@ -340,13 +345,11 @@ for (const lang of ["es", "en"]) {
     second.tap(lang === "en" ? second.el.introLangEn : second.el.introLangEs);
     // La secuencia depende del idioma elegido ahora (no del de la vez anterior).
     assert.deepEqual(second.visible(), ["introHistory"]);
-    assert.equal(second.el.introSceneTitle.textContent, TEXT[lang].first);
-    assert.equal(second.el.introNext.textContent, TEXT[lang].next);
-    assert.equal(second.spoken().at(-1).lang, lang, "narración en el idioma elegido");
-    assert.match(second.spoken().at(-1).text, new RegExp("^" + TEXT[lang].first));
-    assert.equal(second.el.introSkip.hidden, false, "ya vista: se puede saltar");
-    assert.equal(second.el.introSkip.textContent, lang === "en" ? "SKIP" : "SALTAR");
-    second.tap(second.el.introSkip);
+    assert.equal(second.el.historyVideoTitle.textContent,lang==="es"?"CAMINO AL APOLO 11":"ROAD TO APOLLO 11");
+    assert.equal(second.spoken().length,0);
+    assert.equal(second.el.historyVideoSkip.hidden,false);
+    assert.equal(second.el.historyVideoSkip.textContent,lang==="en"?"SKIP":"SALTAR");
+    second.tap(second.el.historyVideoSkip);
     assert.deepEqual(second.visible(), ["menu"], "LITO completada: no se repite");
     assert.deepEqual(second.violations, []);
   });
@@ -358,7 +361,7 @@ test("apertura real con la intro ya vista: también se puede ver completa hasta 
   const second = openIndex({ localStorage: local, sessionStorage: makeStore() });
   second.flushSplash();
   second.tap(second.el.introLangEs);
-  for (let i = 0; i < SCENES.length; i++) second.tap(second.el.introNext);
+  second.finishVideo();
   assert.deepEqual(second.visible(), ["menu"]);
   assert.deepEqual(second.violations, []);
 });
@@ -389,9 +392,9 @@ test("recargar la portada: OUTSTRIP, idioma e intro (con SALTAR); LITO completad
   assert.deepEqual(reload.visible(), ["introLanguage"]);
   reload.tap(reload.el.introLangEn);
   assert.deepEqual(reload.visible(), ["introHistory"]);
-  assert.equal(reload.el.introSceneTitle.textContent, TEXT.en.first);
-  assert.equal(reload.el.introSkip.hidden, false);
-  reload.tap(reload.el.introSkip);
+  assert.equal(reload.el.historyVideoTitle.textContent,"ROAD TO APOLLO 11");
+  assert.equal(reload.el.historyVideoSkip.hidden,false);
+  reload.tap(reload.el.historyVideoSkip);
   assert.deepEqual(reload.visible(), ["menu"]);
   assert.equal(reload.ctx.StarFlow.isStageCompleted("lito_welcome"), true, "progreso intacto");
   assert.deepEqual(reload.violations, []);
@@ -402,14 +405,14 @@ test("recargar a mitad de la intro: OUTSTRIP e idioma, la intro vuelve al inicio
   const first = openIndex(tab);
   first.flushSplash();
   first.tap(first.el.introLangEs);
-  first.tap(first.el.introNext); first.tap(first.el.introNext);
+  first.el.historyVideo.at(45);
   const reload = openIndex(tab, { reload: true });
   reload.flushSplash();
   reload.tap(reload.el.introLangEs);
   assert.deepEqual(reload.visible(), ["introHistory"]);
-  assert.equal(reload.el.introSceneCount.textContent, "1 / 5");
-  assert.equal(reload.el.introSkip.hidden, true);
-  for (let i = 0; i < SCENES.length; i++) reload.tap(reload.el.introNext);
+  assert.equal(reload.el.introSceneCount.textContent,"0:00 / 2:37");
+  assert.equal(reload.el.historyVideoSkip.hidden,true);
+  reload.finishVideo();
   assert.deepEqual(reload.visible(), ["introLito"]);
   assert.deepEqual(reload.violations, []);
 });
@@ -436,8 +439,8 @@ test("partida existente: apertura real con intro sin ver → intro obligatoria y
   page.flushSplash();
   page.tap(page.el.introLangEs);
   assert.deepEqual(page.visible(), ["introHistory"]);
-  assert.equal(page.el.introSkip.hidden, true);
-  for (let i = 0; i < SCENES.length; i++) page.tap(page.el.introNext);
+  assert.equal(page.el.historyVideoSkip.hidden,true);
+  page.finishVideo();
   assert.deepEqual(page.visible(), ["menu"], "LITO ya completada: no se repite");
   assert.equal(page.el.adventureButton.textContent, "CONTINUAR AVENTURA");
   const after = page.ctx.StarFlow.getState();
@@ -456,11 +459,11 @@ test("VER INTRODUCCIÓN: fundido desde el menú, se puede saltar y no toca la pa
   page.settle();
   assert.deepEqual(page.visible(), ["introHistory"]);
   assert.equal(page.stageVisible(), false);
-  assert.equal(page.el.introSkip.hidden, false);
-  page.tap(page.el.introSkip);
+  assert.equal(page.el.historyVideoSkip.hidden,false);
+  page.tap(page.el.historyVideoSkip);
   assert.deepEqual(page.visible(), ["menu"], "vuelve al menú, sin LITO");
   page.tap(page.el.replayIntro);
-  for (let i = 0; i < SCENES.length; i++) page.tap(page.el.introNext);
+  page.finishVideo();
   assert.deepEqual(page.visible(), ["menu"]);
   assert.equal(JSON.stringify(page.ctx.StarFlow.getState()), before);
   assert.deepEqual(page.violations, []);
@@ -648,8 +651,8 @@ test("NUEVA PARTIDA: recargar durante el mensaje no salta la bienvenida (secuenc
   reloaded.flushSplash();
   reloaded.tap(reloaded.el.introLangEs);
   assert.deepEqual(reloaded.visible(), ["introHistory"]);
-  assert.equal(reloaded.el.introSkip.hidden, false, "la intro vista se conservó: se puede saltar");
-  reloaded.tap(reloaded.el.introSkip);
+  assert.equal(reloaded.el.historyVideoSkip.hidden,false,"la intro vista se conserva");
+  reloaded.tap(reloaded.el.historyVideoSkip);
   assert.equal(reloaded.step(), "lito", "la bienvenida de LITO vuelve a ser obligatoria");
   assert.equal(reloaded.el.litoReady.hidden, false);
   assert.equal(reloaded.ctx.StarFlow.isStageCompleted("lito_welcome"), false);
@@ -665,15 +668,16 @@ test("NUEVA PARTIDA sin intro-secuencia.js: recarga la portada con la bienvenida
   assert.equal(tab.sessionStorage.getItem(MARK), null);
 });
 
-test("las cinco escenas y LITO se dibujan sin errores", () => {
+test("video original y LITO se muestran sin errores", () => {
   const page = openIndex(newTab());
   page.flushSplash();
   page.tap(page.el.introLangEs);
-  for (let i = 0; i < SCENES.length; i++) { page.runFrames(); page.tap(page.el.introNext); }
+  page.runFrames();page.finishVideo();
   page.runFrames();
   assert.equal(page.step(), "lito");
   assert.deepEqual(page.warnings, []);
-  assert.ok(page.ops.includes("launch") && page.ops.includes("descent") && page.ops.includes("lito"));
+  assert.ok(page.ops.includes("lito"));
+  assert.equal(page.ctx.StarProgress.hasSeenCinematic("history_intro"),true);
 });
 
 test("plantilla: escenario oculto desde el primer renderizado y presentación permanente", () => {
@@ -709,6 +713,31 @@ test("la pantalla nueva responde mientras el telón se aclara (sin esperar el fi
   assert.equal(page.curtain(), "out", "telón aclarándose");
   page.tap(page.el.introLangEn);
   assert.equal(page.step(), "history", "el clic durante el aclarado sí cuenta");
-  assert.equal(page.el.introSceneTitle.textContent, "Human curiosity");
+  assert.equal(page.el.historyVideoTitle.textContent,"ROAD TO APOLLO 11");
   assert.deepEqual(page.violations, []);
+});
+
+
+test("error de video inicial: no permite saltar ni avanzar",()=>{
+    const page=openIndex(newTab());
+
+    page.flushSplash();
+    page.tap(page.el.introLangEs);
+
+    page.el.historyVideo.error={code:4};
+    page.el.historyVideo.fire("error");
+
+    assert.match(
+        page.el.historyVideoTitle.textContent,
+        /reintentar/
+    );
+
+    page.tap(page.el.introNext);
+    page.tap(page.el.historyVideoSkip);
+
+    assert.equal(page.step(),"history");
+    assert.equal(
+        page.ctx.StarProgress.hasSeenCinematic("history_intro"),
+        false
+    );
 });

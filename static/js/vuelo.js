@@ -29,7 +29,7 @@ const text = {
             "Mantené para subir, soltá para bajar. " +
             "Esquivá los asteroides.",
 
-        distance: "DISTANCIA RESTANTE",
+        distance: "DISTANCIA SIMULADA RESTANTE",
 
         checkpoint: "CHECKPOINT",
 
@@ -52,7 +52,7 @@ const text = {
             "de impulso para ascender. Soltá para bajar. " +
             "Superá los cuatro tramos del vuelo.",
 
-            "¡ENCENDER MOTORES!"
+            "¡INICIAR VUELO!"
 
         ],
 
@@ -112,7 +112,7 @@ const text = {
             "Hold to rise, release to fall. " +
             "Dodge the asteroids.",
 
-        distance: "DISTANCE REMAINING",
+        distance: "SIMULATED DISTANCE REMAINING",
 
         checkpoint: "CHECKPOINT",
 
@@ -135,7 +135,7 @@ const text = {
             "to ascend. Release to descend. " +
             "Clear all four flight sections.",
 
-            "IGNITE ENGINES!"
+            "START FLIGHT!"
 
         ],
 
@@ -197,7 +197,7 @@ let g = Flight.create();
 const saved=F.getFlightCheckpoint();
 g.cp=saved.seconds;g.fails=saved.fails;Flight.reset(g);
 let lastSaved={...saved}, graceUntil=performance.now()+1500, finishing=false;
-g.mode="running";
+g.mode="ready";
 function persistFlight(){
     if(g.cp===lastSaved.seconds && g.fails===lastSaved.fails)return;
     const result=F.saveFlightCheckpoint(g.cp,g.fails);
@@ -1162,7 +1162,7 @@ function tick(now) {
    ================================================== */
 
 language(StarI18n.lang);
-$("world").focus();
+$("action").focus();
 
 requestAnimationFrame(tick);
 

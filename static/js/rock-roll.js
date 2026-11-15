@@ -16,6 +16,9 @@
         const translations = {
 
             es: {
+                simulation: "SIMULACIÓN DEL DESTINO · N",
+                previous: "ANTERIOR",
+                auto: "Automático",
                 back: "VOLVER",
                 chapter: "CAPÍTULO 01",
                 subtitle: "DOS MUNDOS, DOS HISTORIAS",
@@ -67,6 +70,9 @@
             },
 
             en: {
+                simulation: "DESTINATION SIMULATION · N",
+                previous: "PREVIOUS",
+                auto: "Automatic",
                 back: "BACK",
                 chapter: "CHAPTER 01",
                 subtitle: "TWO WORLDS, TWO STORIES",
@@ -120,7 +126,39 @@
         let language = StarI18n.lang;
         let voiceEnabled = StarSound.voiceOn;
         let paused = false;
-        let scene = 0;
+        let scene = 0, dialogue = 0;
+
+        const dialogues = {
+            es: [
+                `¡Te doy la bienvenida a bordo, ${StarProgress.player().alias || "cadete"}! Soy Lito, robot geólogo. Mi nombre viene del griego lithos, que significa piedra.`,
+
+                "Mucha gente cree que las máquinas que dejamos en la Luna y Marte son chatarra olvidada. Yo creo que son testigos.",
+
+                "¡Ahora es nuestro turno, cadete! Seremos detectives de rocas. Reuniremos evidencias en dos mundos y descubriremos las huellas que dejó la ciencia.",
+
+                "Primera parada: Apollo 11, julio de 1969. ¡Prepárate, cadete! Nuestra aventura está a punto de despegar."
+            ],
+            en: [
+                `Welcome aboard, ${StarProgress.player().alias || "cadet"}! I'm Lito, a geologist robot. My name comes from the Greek lithos, meaning stone.`,
+
+                "Many people think the machines we left on the Moon and Mars are forgotten junk. I think they're witnesses.",
+
+                "Now it's our turn, cadet! We'll be rock detectives. We'll gather evidence on two worlds and discover the traces science left behind.",
+
+                "First stop: Apollo 11, July 1969. Get ready, cadet! Our adventure is about to lift off."
+            ]
+        };
+
+        function nextDialogue() {
+            if(scene !== 3 || paused || cinematicActive) return;
+
+            if(dialogue < 3) {
+                dialogue++;
+                showScene(3);
+            } else {
+                showScene(4);
+            }
+        }
 
         // Duración en milisegundos.
         const durations = [
@@ -158,11 +196,11 @@
         function currentSpeech() {
 
             if (scene === 3) {
-                return translations[language].briefing;
+                return dialogues[language][dialogue];
             }
 
             if (scene === 4) {
-                return translations[language].ready;
+                return "";
             }
 
             return "";
@@ -276,7 +314,24 @@
                 scene !== 3 && scene !== 4;
 
             $("nextButton").hidden = scene !== 3;
-            $("nextButton").disabled = true;
+            $("nextButton").disabled = false;
+
+            const options = $("briefOptions");
+            const cabin = $("briefCabin");
+
+            if(options) options.hidden = scene !== 3;
+            if(cabin) cabin.hidden = scene !== 3 && scene !== 4;
+
+            if($("previousDialogue")) {
+                $("previousDialogue").disabled = dialogue === 0;
+            }
+
+            if($("briefCadet")) {
+                window.StarArt?.portrait?.(
+                    $("briefCadet"),
+                    StarProgress.player().avatar
+                );
+            }
 
             $("launchButton").hidden = scene !== 4;
 
@@ -353,7 +408,7 @@
 
                             // El jugador confirma que
                             // terminó de leer las instrucciones.
-                            $("nextButton").disabled = false;
+                            if($("autoDialogue")?.checked) nextDialogue();
 
                         } else {
 
@@ -420,6 +475,7 @@
 
             } else {
 
+                $("nextButton").disabled = false;
                 const speech = currentSpeech();
 
                 if (speech) {
@@ -431,19 +487,19 @@
         });
 
         $("nextButton").addEventListener("click", () => {
+            nextDialogue();
+        });
 
-            if (scene === 3 && !paused &&
-                elapsed >= durations[3]) {
-
-                showScene(4);
-
+        $("previousDialogue")?.addEventListener("click", () => {
+            if(scene === 3 && dialogue > 0 && !paused) {
+                dialogue--;
+                showScene(3);
             }
-
         });
 
         $("launchButton").addEventListener("click", () => {
 
-            if (scene !== 4) return;
+            if (scene !== 4 || cinematicActive) return;
             const result = StarFlow.recordObjective("chapter_briefing.ready", {source:"chapter_briefing_sequence"});
             if (!result.ok) { StarFlow.notify("locked"); return; }
             $("launchButton").disabled = true;
@@ -516,6 +572,15 @@
 
             ctx.globalAlpha = 1;
 
+            const cabin = $("cabinWindow");
+
+            if(cabin && !$("briefCabin").hidden) {
+                window.StarArt?.cabin?.(
+                    cabin.getContext("2d"),
+                    starTime / 1000
+                );
+            }
+
             requestAnimationFrame(drawStars);
 
         }
@@ -537,7 +602,16 @@
                 onDone: () => { cinematicActive = false; showScene(2); }
             });
         } else {
-            showScene(0);
+            cinematicActive = true;
+            $("launchButton").hidden = true;
+            $("nextButton").hidden = true;
+
+            if(cinematicHost) {
+                cinematicHost.hidden = false;
+                cinematicHost.textContent = language === "es"
+                    ? "No se pudo cargar el reproductor. Recarga la página."
+                    : "Player unavailable. Reload to retry.";
+            }
         }
         requestAnimationFrame(updateScene);
         requestAnimationFrame(drawStars);

@@ -147,6 +147,7 @@
       firstTime: "Primera vez: mirá la cinemática completa para comenzar la misión.",
       blocked: "Tocá el botón para comenzar la cinemática con sonido.",
       paused: "Cinemática en pausa.",
+      retry: "No se pudo reproducir. Pulsa Reproducir para reintentar.",
       error: "No se pudo reproducir el video. Te contamos la misma historia con texto.",
       next: "SIGUIENTE ›", finish: "CONTINUAR ›", part: "Parte {n} de {t}",
       galleryTitle: "✦ CINEMÁTICA · APOLLO 11", galleryButton: "VER CINEMÁTICA",
@@ -161,6 +162,7 @@
       firstTime: "First time: watch the whole cinematic to begin the mission.",
       blocked: "Tap the button to start the cinematic with sound.",
       paused: "Cinematic paused.",
+      retry: "Playback failed. Press Play to retry.",
       error: "The video could not be played. Here is the same story as text.",
       next: "NEXT ›", finish: "CONTINUE ›", part: "Part {n} of {t}",
       galleryTitle: "✦ CINEMATIC · APOLLO 11", galleryButton: "WATCH CINEMATIC",
@@ -309,7 +311,10 @@
       if (done || fallback) return;
       window.StarSound?.stopVoice?.();
       let result;
-      try { result = video.play(); } catch (error) { showNarrative(); return; }
+      try {
+        if(video.error && id === "rock_roll_intro") video.load();
+        result = video.play();
+      } catch (error) { showNarrative(); return; }
       if (result && typeof result.then === "function") {
         result.then(() => { startButton.hidden = true; setStatus(null); render(); })
           .catch(error => {
@@ -329,6 +334,14 @@
     // ── Narración alternativa (si el video falla) ───────────────
     function showNarrative() {
       if (done || fallback) return;
+
+      if(id === "rock_roll_intro") {
+        try { video.pause(); } catch {}
+        startButton.hidden = false;
+        setStatus("retry");
+        render();
+        return;
+      }
       fallback = true;
       try { video.pause(); } catch { /* sin video */ }
       video.hidden = true;

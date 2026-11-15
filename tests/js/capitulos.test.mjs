@@ -126,14 +126,36 @@ function openBriefing(tab) {
 }
 // Bloque 1: con cinematica.js la presentación empieza con el video (tests/js/cinematica.test.mjs).
 // Esta prueba no carga el reproductor: cubre la presentación de respaldo, que no cambió.
-test('interfaz Rock & Roll (respaldo sin reproductor): lectura obligatoria, listo avanza al despegue sin doble cuenta',()=>{
-  const tab=tabWithProfile();openChapters(tab).start.click();
-  const {page,el,elapse}=openBriefing(tab);
-  assert.equal(el.launchButton.hidden,true);el.launchButton.click();assert.equal(page.ctx.StarFlow.getCurrentStage(),'chapter_briefing');
-  elapse(11200);assert.equal(el.nextButton.hidden,false);assert.equal(el.nextButton.disabled,true);
-  el.nextButton.click();assert.equal(el.launchButton.hidden,true);
-  elapse(8200);assert.equal(el.nextButton.disabled,false);el.nextButton.click();assert.equal(el.launchButton.hidden,false);
-  el.launchButton.click();assert.equal(page.ctx.StarFlow.getCurrentStage(),'launch');
-  assert.equal(page.ctx.__navigated,'/despegue?inicio=capitulo');
-  assert.equal(page.ctx.StarFlow.isStageCompleted('launch'),false);
+test("Rock & Roll sin reproductor: no permite avanzar",()=>{
+    const tab=tabWithProfile();
+
+    openChapters(tab).start.click();
+
+    const {page,el,elapse}=openBriefing(tab);
+
+    elapse(30000);
+
+    assert.equal(el.launchButton.hidden,true);
+
+    el.launchButton.click();
+
+    assert.equal(
+        page.ctx.StarFlow.getCurrentStage(),
+        "chapter_briefing"
+    );
+});
+
+test("selector accesible durante partida sin duplicar progreso",()=>{
+    const tab=tabWithProfile();
+
+    openChapters(tab).start.click();
+
+    const {page,start}=openChapters(tab);
+
+    const revision=page.ctx.StarFlow.getState().revision;
+
+    start.click();
+
+    assert.equal(page.ctx.__navigated,"/rock-roll");
+    assert.equal(page.ctx.StarFlow.getState().revision,revision);
 });

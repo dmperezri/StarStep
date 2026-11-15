@@ -385,3 +385,79 @@
 
 /* Avisos de StarFlow en esta interfaz independiente. */
 .flow-notice { position:fixed; z-index:100; bottom:16px; left:50%; transform:translateX(-50%); width:min(92vw,560px); margin:0; padding:12px; background:var(--panel); color:var(--cream); border:3px solid var(--moon); text-align:center; cursor:pointer; }
+
+/* STARSTEP - CABINA ROCK ROLL */
+
+.ss-act-photo {
+    width: 100%;
+    height: 75px;
+    object-fit: contain;
+}
+
+.ss-cabin {
+    position: relative;
+    width: min(350px, 92%);
+    margin: auto;
+    padding: 6px;
+    border: 2px solid var(--violet);
+    background: var(--panel);
+}
+
+.ss-cabin #cabinWindow {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
+.ss-cabin #briefCadet {
+    position: absolute;
+    bottom: 32px;
+    left: 15%;
+    width: 60px;
+    image-rendering: pixelated;
+}
+
+.ss-cabin small {
+    color: var(--soft);
+    font-size: .65rem;
+}
+
+.ss-brief-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ss-brief-options button {
+    min-height: 44px;
+}
+
+.content:has(#briefCabin:not([hidden])) {
+    padding: 10px 0;
+    gap: 8px;
+}
+
+.content:has(#briefCabin:not([hidden])) .lito {
+    width: 52px;
+    margin-left: 12%;
+    margin-top: -87px;
+    z-index: 1;
+}
+
+.content:has(#briefCabin:not([hidden])) #titleBlock h1 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    margin: 4px 0;
+}
+
+.briefing {
+    background: var(--panel);
+    color: var(--cream);
+    border-color: var(--violet);
+}
+
+.briefing strong {
+    color: var(--mint);
+}

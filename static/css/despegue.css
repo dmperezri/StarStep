@@ -1,0 +1,99 @@
+
+
+.landing-briefing{
+    position: absolute;
+    z-index: 5;
+    top: max(65px, 9%);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(650px, 92%);
+    max-height: calc(100% - 90px);
+    overflow: auto;
+    display: grid;
+    gap: 12px;
+    padding: clamp(12px, 2vw, 22px);
+    border-color: var(--moon);
+}
+
+.landing-briefing h1 {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--moon);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.landing-photo {
+    margin: 0;
+    background: var(--cream);
+    color: var(--night);
+    border: 3px solid var(--border);
+    padding: 8px;
+    display: grid;
+    gap: 8px;
+}
+
+.landing-photo img {
+    width: 100%;
+    height: clamp(110px, 35vh, 330px);
+    object-fit: contain;
+    background: var(--night);
+    display: block;
+}
+
+.landing-photo figcaption {
+    display: grid;
+    gap: 6px;
+    font-size: .75rem;
+    line-height: 1.4;
+}
+
+.landing-photo strong {
+    background: var(--evidence-observed);
+    color: var(--night);
+    padding: 4px 8px;
+    justify-self: start;
+}
+
+.landing-briefing p {
+    margin: 0;
+    line-height: 1.55;
+    font-size: .85rem;
+}
+
+.landing-briefing button,
+#pauseSequence {
+    min-height: 44px;
+}
+
+#pauseSequence[aria-pressed="true"] {
+    background: var(--mint);
+    color: var(--night);
+}
+
+.launch-page .stage > canvas {
+    object-fit: contain;
+}
+
+.launch-page .hud-button {
+    text-shadow: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+@media(max-width: 520px) {
+
+    .landing-photo img {
+        height: clamp(100px, 29vh, 220px);
+    }
+
+    .launch-page .hud-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .launch-page .hud-button {
+        font-size: .65rem;
+        padding: 5px;
+    }
+}

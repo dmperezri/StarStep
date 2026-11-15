@@ -1,4 +1,38 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>StarStep · Despegue</title><link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}"><script defer src="{{ url_for('static',filename='js/main.js') }}"></script><script defer src="{{ url_for('static',filename='js/audio.js') }}"></script><script defer src="{{ url_for('static',filename='js/progreso.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo-definicion.js') }}"></script><script defer src="{{ url_for('static',filename='js/flujo.js') }}"></script><script defer src="{{ url_for('static',filename='js/planetas.js') }}"></script>
 <script defer src="{{ url_for('static',filename='js/scene.js') }}"></script><script defer src="{{ url_for('static',filename='js/despegue.js') }}"></script><script defer src="{{ url_for('static',filename='js/science-content.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/componentes.css') }}">
-</head><body class="star-page"><main class="stage"><canvas id="world" width="480" height="270"></canvas><div class="curtain"></div><header class="hud"><strong id="crew">TRIPULACIÓN · CADETE + LITO</strong><div class="hud-actions"><button class="hud-button" data-lang="es">ES</button><button class="hud-button" data-lang="en">EN</button><a class="hud-button" href="{{ url_for('bitacora') }}" data-i18n="journal">BITÁCORA</a></div></header><div class="countdown" id="countdown">★</div><div class="launch-message" id="travelCaption">CONTROL DE MISIÓN · PREPARADOS</div><div id="actCard" class="pixel-panel act-card" hidden><span data-i18n="moon.title">ACTO I • LUNA</span><h1 data-i18n="moon">Misión 1: Detective de lava</h1><p data-i18n="launch.arrived">LITO: ¡Llegamos! Exploremos las huellas de Apollo 11.</p></div><div class="launch-controls"><button id="startLaunch" class="pixel-button mint" data-i18n="launch.start">INICIAR DESPEGUE</button><a id="skipLaunch" class="pixel-button" href="{{ url_for('luna') }}" data-flow-requires="moon_exploration" data-i18n="launch.skip">SALTAR INTRO</a><a id="enterMoon" class="pixel-button mint" href="{{ url_for('luna') }}" hidden data-i18n="launch.enter">EXPLORAR LA LUNA</a></div></main></body></html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/despegue.css') }}">
+</head><body class="star-page launch-page"><main class="stage"><canvas id="world" width="480" height="270"></canvas><div class="curtain"></div><header class="hud"><strong id="crew">TRIPULACIÓN · CADETE + LITO</strong><div class="hud-actions">
+        <button type="button" class="hud-button"
+                id="pauseSequence"
+                aria-pressed="false" hidden>PAUSA</button><button class="hud-button" data-lang="es">ES</button><button class="hud-button" data-lang="en">EN</button><a class="hud-button" href="{{ url_for('bitacora') }}" data-i18n="journal">BITÁCORA</a></div></header><div class="countdown" id="countdown">★</div><div class="launch-message" id="travelCaption" role="status" aria-live="polite">CONTROL DE MISIÓN · PREPARADOS</div><section id="landingBriefing"
+             class="landing-briefing pixel-panel"
+             aria-labelledby="landingTitle" hidden>
+        <h1 id="landingTitle">
+            APOLLO 11 · SEPARACIÓN DEL EAGLE
+        </h1>
+
+        <figure class="landing-photo">
+            <img id="landingPhoto"
+                 src="{{ url_for('static', filename='assets/nasa/apollo-eagle.webp') }}"
+                 alt="Fotografía histórica del módulo lunar Eagle">
+
+            <figcaption>
+                <strong id="landingObserved">O · LO QUE SE VIO</strong>
+                <span id="landingPhotoCaption">
+                    El Eagle se separa del Columbia.
+                    NASA · AS11-44-6574.
+                </span>
+            </figcaption>
+        </figure>
+
+        <p id="landingIntro">
+            Lito: Cadete, observa esta fotografía histórica.
+            Ahora simularemos el descenso al Mar de la Tranquilidad.
+        </p>
+
+        <button class="pixel-button mint"
+                type="button"
+                id="beginDescent">INICIAR DESCENSO</button>
+    </section>
+    <div id="actCard" class="pixel-panel act-card" hidden><span data-i18n="moon.title">ACTO I • LUNA</span><h1 data-i18n="moon">Misión 1: Detective de lava</h1><p data-i18n="launch.arrived">LITO: ¡Llegamos! Exploremos las huellas de Apollo 11.</p></div><div class="launch-controls"><button id="startLaunch" class="pixel-button mint" data-i18n="launch.start">INICIAR DESPEGUE</button><a id="skipLaunch" hidden class="pixel-button" href="{{ url_for('luna') }}" data-flow-requires="moon_exploration" data-i18n="launch.skip">SALTAR INTRO</a><a id="enterMoon" class="pixel-button mint" href="{{ url_for('luna') }}" hidden data-i18n="launch.enter">EXPLORAR LA LUNA</a></div></main></body></html>
