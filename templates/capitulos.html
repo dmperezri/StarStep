@@ -16,6 +16,7 @@
     <script defer src="{{ url_for('static', filename='js/progreso.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/flujo-definicion.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/flujo.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/planetas.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/capitulos.js') }}"></script>
 
 
@@ -34,11 +35,14 @@
 
     <header>
 
-        <span class="brand">
-            OUTSTRIP · STARSTEP
-        </span>
+        <img class="ss-logo"
+        src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+        alt="StarStep">
 
-        <div class="language">
+        <div class="language" style="flex-wrap:wrap">
+            <a class="station-back"
+               href="{{ url_for('bitacora') }}"
+               data-i18n="journal">BITÁCORA</a>
             <a class="station-back" href="{{ url_for('inicio') }}" data-i18n="back">← VOLVER</a>
 
             <button type="button"
@@ -178,6 +182,31 @@
 
             </svg>
 
+            <div class="ss-gallery" id="chapterGallery">
+
+                <img id="chapterImage" hidden alt="NASA">
+
+                <div class="ss-gallery-actions">
+
+                    <button type="button"
+                            id="galleryPrev"
+                            aria-label="Anterior">◀</button>
+
+                    <span id="chapterImageLabel">Rock &amp; Roll</span>
+
+                    <button type="button"
+                            id="galleryNext"
+                            aria-label="Siguiente">▶</button>
+
+                </div>
+
+            </div>
+
+            <progress class="ss-chapter-progress"
+                      id="chapterProgress"
+                      max="1" value="0"
+                      aria-label="Progreso del capítulo"></progress>
+
             <span class="chapter-number"
                   data-text="chapter1">
                 CAPÍTULO 01
@@ -256,9 +285,7 @@
                 CAPÍTULO 02
             </span>
 
-            <h2 data-text="coming">
-                PRÓXIMAMENTE
-            </h2>
+            <h2 data-text="future2">RUEDAS Y POLVO</h2>
 
             <p data-text="lockedDescription">
                 Una nueva aventura te espera.
@@ -306,9 +333,7 @@
                 CAPÍTULO 03
             </span>
 
-            <h2 data-text="coming">
-                PRÓXIMAMENTE
-            </h2>
+            <h2 data-text="future3">SEÑALES LEJANAS</h2>
 
             <p data-text="lockedDescription">
                 Una nueva aventura te espera.

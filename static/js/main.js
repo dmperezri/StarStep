@@ -342,7 +342,9 @@ function updateAdventureButton() {
         : 'start.review';
     button.dataset.i18n = key;
     button.textContent = StarI18n.t(key);
-    button.href = entry.page;
+    button.href = window.StarFlow.isStageCompleted("cadet_custom")
+        ? "/capitulos"
+        : entry.page;
 }
 updateAdventureButton();
 document.addEventListener('starflow:change', updateAdventureButton);

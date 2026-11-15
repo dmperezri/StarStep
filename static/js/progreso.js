@@ -86,7 +86,13 @@ window.StarProgress = (() => {
     const check=window.StarFlowCore?.normalizeAlias?.(raw);
     const alias=check?(check.ok?check.alias:null):(raw.trim().length>=2?raw.trim().slice(0,18):null);
     if(alias===null)return false;
-    write(PROFILE,{alias,avatar:data.avatar||'astronauta'});
+    write(PROFILE,{
+      alias,
+      avatar:data.avatar||'astronauta',
+      ...(['8-10','11-12','13-14'].includes(data.age)
+         ? {age:data.age}
+         : {})
+    });
     return true;
   }
   function getNotes(){try{return localStorage.getItem(NOTES)||'';}catch{return '';}}

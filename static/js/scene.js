@@ -1277,6 +1277,42 @@ window.StarArt = (() => {
             fill(c, 27, 23, 3, 3, P.night);
         }
 
+        // Accesorios de identidad de los avatares.
+
+        if(id==='vice'){
+            fill(c,12,10,24,8,'#D9593A');
+            fill(c,16,21,16,7,P.outline);
+            fill(c,18,22,5,3,'#3FD0E0');
+            fill(c,26,22,5,3,'#3FD0E0');
+        }
+
+        if(id==='astronauta'){
+            fill(c,15,17,18,13,'#FFC93C');
+            fill(c,17,18,4,3,P.cream);
+        }
+
+        if(id==='jaguar'){
+            for(const [x,y] of [
+                [13,13],[29,13],[15,28],[32,28],[21,16]
+            ]) fill(c,x,y,2,2,'#9B5D25');
+        }
+
+        if(id==='geologa'){
+            fill(c,13,10,22,8,'#8A5A2B');
+            fill(c,9,17,30,3,'#B07A3F');
+        }
+
+        if(id==='piloto'){
+            fill(c,15,21,18,8,P.outline);
+            fill(c,17,23,14,3,P.mint);
+        }
+
+        if(id==='guardian'){
+            fill(c,12,12,24,21,'#868CA4');
+            fill(c,15,20,18,9,P.outline);
+            fill(c,17,22,14,4,P.mint);
+        }
+
         // Insignia del traje.
 
         fill(c, 22, 37, 5, 5, P.moon);
@@ -1284,12 +1320,56 @@ window.StarArt = (() => {
     }
 
     // =========================================================
+    // Cabina de personalizacion.
+
+    function cabin(c,t=0){
+        c.save();
+        c.scale(c.canvas.width/320,c.canvas.height/180);
+
+        fill(c,0,0,320,180,P.night);
+        fill(c,60,18,200,92,P.outline);
+        fill(c,64,22,192,84,'#05060F');
+
+        c.save();
+        c.beginPath();
+        c.rect(64,22,192,84);
+        c.clip();
+
+        for(let i=0;i<55;i++){
+            fill(c,64+(i*37+13)%192,
+                 22+(i*23)%84,
+                 i%7===0?2:1,1,P.cream);
+        }
+
+        if(window.StarPlanets){
+            window.StarPlanets.draw(c,'moon',200,64,16,t);
+        }else{
+            dot(c,200,64,16,'#C3C7D6');
+        }
+
+        c.restore();
+
+        fill(c,0,110,320,70,P.panel);
+        fill(c,0,110,320,3,P.crystal);
+
+        for(let i=0;i<8;i++){
+            fill(c,20+i*36,124,26,12,P.raised);
+            fill(c,23+i*36,127,4,3,
+                 Math.floor(t*2+i)%3?P.mint:'#FF6681');
+            fill(c,30+i*36,127,4,3,
+                 Math.floor(t*3+i)%2?P.moon:P.raised);
+        }
+
+        c.restore();
+    }
+
     // INTERFAZ PÚBLICA — COMPATIBILIDAD CON STARSTEP
     // =========================================================
 
     return {
         colors: P,
         earthScene,
+        cabin,
         launchScene,
         spaceScene,
         descentScene,

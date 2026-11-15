@@ -204,3 +204,258 @@ button:disabled {
     height: auto;
     object-fit: contain;
 }
+
+
+
+/* MODULO 04 - MI CADETE */
+
+.ss-profile-page .avatar-modal {
+    max-height: 85dvh;
+    overflow: auto;
+    scrollbar-color: var(--violet) var(--night);
+}
+
+.ss-profile-page select {
+    max-width: 100%;
+    background: var(--night);
+    color: var(--cream);
+    border: 2px solid var(--violet);
+    padding: 9px;
+}
+
+.ss-profile-page .stage > canvas#world {
+    object-fit: contain;
+}
+
+.ss-profile-page .hud a {
+    display: inline-flex;
+    align-items: center;
+    text-shadow: none;
+}
+
+@media(max-width:520px){
+    .ss-profile-page .avatar-modal {
+        padding: 14px;
+        top: 54%;
+    }
+
+    .ss-profile-page .avatar-grid {
+        grid-template-columns: repeat(3,minmax(0,1fr));
+        gap: 5px;
+        margin: 8px 0;
+    }
+
+    .ss-profile-page .avatar-card {
+        padding: 5px;
+        font-size: .65rem;
+        gap: 2px;
+    }
+
+    .ss-profile-page .avatar-card canvas {
+        width: min(100%,68px);
+    }
+
+    .ss-profile-page .subtitle {
+        font-size: .66rem;
+    }
+
+    .ss-profile-page #avatarForm {
+        gap: 7px;
+    }
+}
+
+/* MODULO 05 - GALERIA */
+
+.ss-gallery {
+    display: grid;
+    gap: 6px;
+}
+
+.ss-gallery img {
+    width: 100%;
+    height: 230px;
+    object-fit: contain;
+    background: var(--night);
+}
+
+.ss-gallery-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.ss-gallery-actions button {
+    min-height: 44px;
+    min-width: 44px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 2px solid var(--violet);
+    cursor: pointer;
+}
+
+.ss-chapter-progress {
+    width: 100%;
+    accent-color: var(--mint);
+}
+
+/* =====================================================
+   STARSTEP - MINI GALERIA FOTOGRAFICA
+   ===================================================== */
+
+.ss-photo-gallery {
+    display: grid;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.ss-photo-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    color: var(--soft);
+    font-size: .65rem;
+    letter-spacing: .06em;
+}
+
+.ss-photo-heading small {
+    font-size: .62rem;
+    letter-spacing: 0;
+}
+
+.ss-photo-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.ss-photo-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 108px;
+    padding: 4px;
+    background: var(--night);
+    border: 2px solid var(--violet);
+    box-shadow: 3px 3px 0 var(--border);
+    font-family: var(--font-game);
+    cursor: zoom-in;
+    transition: border-color .15s,
+                transform .15s;
+}
+
+.ss-photo-gallery .ss-photo-frame img {
+    display: block;
+    width: 100%;
+    height: 55px;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
+.ss-photo-frame span {
+    font-size: .62rem;
+    padding: 3px 0;
+    text-align: center;
+}
+
+.ss-photo-frame.moon {
+    color: var(--moon);
+}
+
+.ss-photo-frame.mars {
+    color: var(--water);
+}
+
+.ss-photo-frame:hover {
+    border-color: var(--mint);
+    transform: translateY(-2px);
+}
+
+.ss-photo-frame:focus-visible {
+    outline: 2px solid var(--mint);
+    outline-offset: 3px;
+}
+
+/* VISOR AMPLIADO */
+
+.ss-photo-viewer {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    box-sizing: border-box;
+    width: min(760px, 92vw);
+    max-height: 90dvh;
+    overflow: auto;
+    padding: 16px;
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--violet);
+    box-shadow: 6px 6px 0 var(--border);
+}
+
+.ss-photo-viewer::backdrop {
+    background: rgba(6, 9, 29, .9);
+}
+
+.ss-photo-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--moon);
+}
+
+.ss-photo-viewer img {
+    display: block;
+    width: 100%;
+    max-height: 65dvh;
+    object-fit: contain;
+    background: var(--night);
+    image-rendering: auto;
+}
+
+.ss-photo-close {
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--raised);
+    color: var(--cream);
+    border: 2px solid var(--violet);
+    cursor: pointer;
+}
+
+.ss-photo-credit {
+    margin: 10px 0 0;
+    text-align: right;
+    font-size: .7rem;
+    color: var(--soft);
+}
+
+@media (max-width: 520px) {
+
+    .ss-photo-frame {
+        width: 96px;
+    }
+
+    .ss-photo-gallery .ss-photo-frame img {
+        height: 46px;
+    }
+
+    .ss-photo-grid {
+        gap: 8px;
+    }
+
+    .ss-photo-viewer {
+        padding: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ss-photo-frame {
+        transition: none;
+        transform: none !important;
+    }
+}

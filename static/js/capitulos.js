@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     if (!window.StarFlow || !window.StarI18n) return;
-    if (StarFlow.getCurrentStage() !== "chapter_select") {
+    if (!StarFlow.canEnter("chapter_select")) {
         const entry = StarFlow.getEntryPoint();
         const target = !StarFlow.isStageCompleted("lito_welcome") ? "/" : entry.page;
         if (target !== location.pathname) location.replace(target);
@@ -18,12 +18,14 @@
             chapter2: "CAPÍTULO 02",
             chapter3: "CAPÍTULO 03",
             available: "● DISPONIBLE",
-            description: "Dos mundos, dos historias. Explorá la Luna y Marte y descubrí sus secretos científicos.",
+            description: "Dos mundos, dos historias: las huellas del pasado. Conviértete en detective de rocas junto a Lito y explora los descubrimientos de Apollo 11 y Opportunity.",
             moon: "I · LUNA",
             mars: "II · MARTE",
             traces: "III · HUELLAS",
             start: "INICIAR CAPÍTULO",
             coming: "PRÓXIMAMENTE",
+            future2: "RUEDAS Y POLVO",
+            future3: "SEÑALES LEJANAS",
             locked: "BLOQUEADO",
             lockedDescription: "Una nueva aventura te espera.",
             notice: "ROCK & ROLL seleccionado. La conexión con StarFlow se realizará después de integrar la presentación.",
@@ -37,12 +39,14 @@
             chapter2: "CHAPTER 02",
             chapter3: "CHAPTER 03",
             available: "● AVAILABLE",
-            description: "Two worlds, two stories. Explore the Moon and Mars and discover their scientific secrets.",
+            description: "Two worlds, two stories: traces of the past. Become a rock detective with Lito and explore the discoveries of Apollo 11 and Opportunity.",
             moon: "I · MOON",
             mars: "II · MARS",
             traces: "III · TRACES",
             start: "START CHAPTER",
             coming: "COMING SOON",
+            future2: "WHEELS & DUST",
+            future3: "DISTANT SIGNALS",
             locked: "LOCKED",
             lockedDescription: "A new adventure awaits you.",
             notice: "ROCK & ROLL selected. StarFlow integration will follow the introduction sequence.",
@@ -105,7 +109,57 @@
     document.addEventListener("starstep:language", () => changeLanguage(StarI18n.lang));
     const start = document.getElementById("startChapter");
     start.disabled = false;
+
+    const selected=StarFlow.isStageCompleted("chapter_select");
+    const finished=StarFlow.getEntryPoint().stage===null;
+
+    function stateLabels(){
+        const es=StarI18n.lang==="es";
+
+        if(selected){
+            start.textContent=finished
+                ? (es?"VER PROGRESO":"VIEW PROGRESS")
+                : (es?"CONTINUAR CAPÍTULO":"CONTINUE CHAPTER");
+
+            const status=document.querySelector(
+                ".chapter.available .status"
+            );
+
+            if(status) status.textContent=finished
+                ? (es?"COMPLETADO":"COMPLETED")
+                : (es?"EN PROGRESO":"IN PROGRESS");
+        }
+
+        const bar=document.getElementById("chapterProgress");
+
+        if(bar){
+            const exclude=[
+                "lito_welcome","profile",
+                "cadet_custom","chapter_select"
+            ];
+
+            const stages=StarFlow.getAvailableStages()
+                .filter(s=>s.implemented&&!exclude.includes(s.id));
+
+            const objectives=stages
+                .flatMap(s=>StarFlow.getObjectives(s.id).objectives||[])
+                .filter(o=>o.implemented);
+
+            bar.value=objectives.filter(o=>o.done).length
+                /Math.max(1,objectives.length);
+
+            bar.setAttribute("aria-label",
+                es?"Progreso del capítulo":"Chapter progress"
+            );
+        }
+    }
+
+    document.addEventListener("starstep:language",stateLabels);
     start.addEventListener("click", () => {
+        if(selected){
+            location.assign(StarFlow.getEntryPoint().page);
+            return;
+        }
         const result = StarFlow.recordObjective("chapter_select.chapter1", {source:"chapter_menu"});
         if (result.ok) {
             start.disabled = true;
@@ -164,6 +218,11 @@
 
         ctx.globalAlpha = 1;
 
+        if(window.StarPlanets){
+            StarPlanets.draw(ctx,"moon",39,55,20,time/1000);
+            StarPlanets.draw(ctx,"mars",438,202,28,time/1000);
+        }
+
         if (!reducedMotion.matches) {
 
             requestAnimationFrame(drawStars);
@@ -173,6 +232,130 @@
     }
 
     changeLanguage(StarI18n.lang);
+    stateLabels();
+
+
+    const gallery = document.getElementById("chapterGallery");
+
+    if (gallery) {
+
+        const photos = [
+            {
+                src: "/static/assets/nasa/apollo-footprint.webp",
+                title: "Apollo 11",
+                world: "moon"
+            },
+            {
+                src: "/static/assets/nasa/opportunity-eagle.webp",
+                title: "Opportunity",
+                world: "mars"
+            }
+        ];
+
+        gallery.replaceChildren();
+        gallery.classList.add("ss-photo-gallery");
+
+        const heading = document.createElement("div");
+        heading.className = "ss-photo-heading";
+
+        const title = document.createElement("span");
+        const counter = document.createElement("small");
+
+        heading.append(title, counter);
+        gallery.append(heading);
+
+        const thumbnails = document.createElement("div");
+        thumbnails.className = "ss-photo-grid";
+        gallery.append(thumbnails);
+
+        // Visor ampliado independiente del selector.
+
+        const viewer = document.createElement("dialog");
+        viewer.className = "ss-photo-viewer";
+        viewer.setAttribute("aria-labelledby", "ssPhotoTitle");
+
+        viewer.innerHTML = `
+            <div class="ss-photo-viewer-header">
+                <strong id="ssPhotoTitle"></strong>
+                <button type="button"
+                        class="ss-photo-close">✕</button>
+            </div>
+            <img alt="">
+            <p class="ss-photo-credit">NASA</p>
+        `;
+
+        document.body.append(viewer);
+
+        const close = viewer.querySelector(".ss-photo-close");
+        const image = viewer.querySelector("img");
+        const caption = viewer.querySelector("strong");
+
+        close.addEventListener("click", () => viewer.close());
+
+        viewer.addEventListener("click", event => {
+            if (event.target === viewer) {
+                const r = viewer.getBoundingClientRect();
+
+                if (event.clientX < r.left ||
+                    event.clientX > r.right ||
+                    event.clientY < r.top ||
+                    event.clientY > r.bottom) {
+                    viewer.close();
+                }
+            }
+        });
+
+        photos.forEach(photo => {
+
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "ss-photo-frame " + photo.world;
+
+            const thumb = document.createElement("img");
+            thumb.src = photo.src;
+            thumb.alt = photo.title;
+            thumb.loading = "lazy";
+
+            const name = document.createElement("span");
+            name.textContent = photo.title;
+
+            button.append(thumb, name);
+
+            button.addEventListener("click", () => {
+                image.src = photo.src;
+                image.alt = photo.title;
+                caption.textContent = photo.title;
+                viewer.showModal();
+            });
+
+            thumbnails.append(button);
+        });
+
+        function translateGallery() {
+            const es = StarI18n.lang === "es";
+
+            title.textContent = es
+                ? "ARCHIVO FOTOGRÁFICO"
+                : "PHOTO ARCHIVE";
+
+            counter.textContent = es
+                ? "2 fotografías"
+                : "2 photographs";
+
+            close.setAttribute("aria-label",
+                es ? "Cerrar fotografía" : "Close photograph"
+            );
+        }
+
+        document.addEventListener(
+            "starstep:language",
+            translateGallery
+        );
+
+        translateGallery();
+    }
+
     drawStars();
 
 })();
