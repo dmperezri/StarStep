@@ -227,7 +227,7 @@
     if (step !== "language" || busy) return;
     const s = sound();
     s?.init?.();          // primer gesto del jugador: habilita audio y voz
-    s?.startMusic?.();    // startMusic no duplica la música si ya suena
+    // La musica se reanuda al finalizar el video.    // startMusic no duplica la música si ya suena
     s?.effect?.("button");
     window.StarI18n?.setLang?.(choice);
     next();
@@ -236,6 +236,8 @@
   // 3. Introducción histórica.
 
   let videoActive = false;
+  let historyFailed = false;
+  let historyWatched = 0;
 
   const hv = () => $("historyVideo");
 
@@ -248,7 +250,12 @@
     const v = hv();
 
     $("historyVideoTitle").textContent =
-      trVideo("CAMINO AL APOLO 11", "ROAD TO APOLLO 11");
+      historyFailed
+        ? trVideo(
+            "No se pudo reproducir. Pulsa Reproducir para reintentar.",
+            "Playback failed. Press Play to retry."
+          )
+        : trVideo("CAMINO AL APOLO 11", "ROAD TO APOLLO 11");
 
     $("historyVideoPlay").textContent =
       v.paused
@@ -264,6 +271,11 @@
       trVideo("SALTAR", "SKIP");
 
     $("historyVideoSkip").hidden = !canSkipHistory;
+
+    if ($("historyVideoFull")) {
+      $("historyVideoFull").textContent =
+        trVideo("PANTALLA COMPLETA", "FULLSCREEN");
+    }
 
     const d =
       Number.isFinite(v.duration) && v.duration > 0
@@ -284,16 +296,25 @@
 
     sound()?.stopAll?.();
 
-    hv().play().catch(updateHistoryVideo);
+    if (hv().error) hv().load();
+
+    hv().play()
+      .then(() => {
+        historyFailed = false;
+        updateHistoryVideo();
+      })
+      .catch(fallbackHistoryVideo);
   }
 
   function openHistoryVideo() {
 
     const v = hv();
 
-    if (!v || v.error) return false;
+    if (!v) return false;
 
     videoActive = true;
+    historyFailed = false;
+    historyWatched = 0;
 
     stopNarration();
 
@@ -365,24 +386,32 @@
   }
 
   function fallbackHistoryVideo() {
+    if (step !== "history") return;
 
-    if (!videoActive) return;
+    historyFailed = true;
+    hv()?.pause();
 
-    closeHistoryVideo();
-
-    sceneIndex = 0;
-
-    renderScene(true);
-    startCanvas("history");
+    if (videoActive) {
+      updateHistoryVideo();
+    } else {
+      const title = $("introSceneTitle");
+      if (title) title.textContent = trVideo(
+        "Video no disponible. Recarga la pagina para reintentar.",
+        "Video unavailable. Reload the page to retry."
+      );
+      if ($("introNext")) $("introNext").hidden = true;
+      if ($("introSkip")) $("introSkip").hidden = true;
+    }
   }
 
   function showHistory() {
     sceneIndex = 0;
-    canSkipHistory = window.StarProgress?.hasSeenCinematic?.("history_intro") === true;
-    if (openHistoryVideo()) return;
-    renderScene(true);
-    startCanvas("history");
+    canSkipHistory =
+      window.StarProgress?.hasSeenCinematic?.("history_intro") === true;
+
+    if (!openHistoryVideo()) fallbackHistoryVideo();
   }
+
   function renderScene(speak) {
     const id = Core.SCENES[sceneIndex];
     const title = t(`intro.scene.${id}.title`), text = t(`intro.scene.${id}.text`);
@@ -401,18 +430,15 @@
     focus($("introNext"));
   }
   function nextScene() {
-    if (step !== "history" || busy) return;
-    sound()?.effect?.("button");
-    sceneIndex++;
-    if (sceneIndex < Core.SCENES.length) { renderScene(true); return; }
-    window.StarProgress?.markCinematicSeen?.("history_intro"); // vista completa: ya se puede saltar
-    next();
+    // No existe una presentacion narrativa de respaldo.
   }
+
   function skipHistory() {
-    if (step !== "history" || busy || !canSkipHistory) return;
-    sound()?.effect?.("button");
-    next();
+    if (videoActive && canSkipHistory) {
+      finishHistoryVideo(false);
+    }
   }
+
   function renderVoiceButtons() {
     const on = sound()?.voiceOn !== false;
     for (const id of ["introVoice", "litoVoice"]) {
@@ -428,7 +454,7 @@
     s.setVoice(!s.voiceOn);
     renderVoiceButtons();
     if (!s.voiceOn) { stopNarration(); return; }
-    if (step === "history") renderScene(true);
+    if (step === "history") updateHistoryVideo();
     else if (step === "lito") { stopNarration(); narrate(t("lito.welcome"), true); }
     else if (step === "newgame" && !leaving) { stopNarration(); narrate(t("lito.newgame"), true, briefVoiceEnded); }
   }
@@ -684,6 +710,32 @@
 
       video.addEventListener("error", fallbackHistoryVideo);
 
+      video.addEventListener("timeupdate", () => {
+        if (!video.seeking) {
+          historyWatched = Math.max(
+            historyWatched,
+            Number(video.currentTime) || 0
+          );
+        }
+      });
+
+      video.addEventListener("seeking", () => {
+        if (!canSkipHistory &&
+            video.currentTime > historyWatched + 0.5) {
+          video.currentTime = historyWatched;
+        }
+      });
+
+      $("historyVideoFull")?.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.();
+        } else if (video.requestFullscreen) {
+          video.requestFullscreen().catch(() => {});
+        } else {
+          video.webkitEnterFullscreen?.();
+        }
+      });
+
       document.addEventListener("visibilitychange", () => {
         if (document.hidden && videoActive) video.pause();
       });
@@ -707,8 +759,6 @@
       else if (step === "history") {
         if (videoActive) {
           updateHistoryVideo();
-        } else {
-          renderScene(true);
         }
       }
     

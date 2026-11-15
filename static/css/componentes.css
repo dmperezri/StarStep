@@ -144,3 +144,63 @@ button:disabled {
         transform: none !important;
     }
 }
+
+
+/* STARSTEP - AJUSTES DE LA ESTACION */
+
+.ss-settings {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(470px, 90vw);
+    max-height: 85dvh;
+    overflow: auto;
+    background: var(--panel);
+    color: var(--cream);
+    border: 3px solid var(--violet);
+    padding: 20px;
+    z-index: 1000;
+}
+
+.ss-settings::backdrop {
+    background: #0E1233D9;
+}
+
+.ss-settings h2 {
+    color: var(--mint);
+    margin-bottom: 16px;
+}
+
+.ss-settings label {
+    display: block;
+    margin: 12px 0;
+}
+
+.ss-settings input[type="range"] {
+    width: 100%;
+    accent-color: var(--mint);
+}
+
+.ss-settings button {
+    min-height: 44px;
+    margin: 5px 0;
+}
+
+.ss-secondary {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ss-lito-tip {
+    color: var(--soft);
+    font-size: .8rem;
+    line-height: 1.5;
+    margin: 5px 0;
+}
+
+.ss-logo {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+}

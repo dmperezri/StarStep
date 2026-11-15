@@ -66,9 +66,15 @@
       <!-- Barra superior -->
       <header class="hud">
 
-        <strong>OUTSTRIP · STARSTEP</strong>
+        <img class="ss-logo"
+         src="{{ url_for('static', filename='assets/branding/startrep.png') }}"
+         alt="StarStep">
 
         <div class="hud-actions">
+          <button class="hud-button"
+                  id="openSettings"
+                  data-i18n="settings"
+                  type="button">AJUSTES</button>
 
           <a
             class="hud-button"
@@ -157,7 +163,7 @@
           data-i18n="choose"
           href="{{ url_for('astronauta') }}"
         >
-          ELEGIR AVATAR
+          MI CADETE
         </a>
 
         <button
@@ -181,15 +187,53 @@
         <!-- Créditos del equipo y de las fuentes (creditos.js). -->
         <button class="pixel-button" id="creditsButton" type="button">CRÉDITOS</button>
 
-        <button class="pixel-button" id="music">
+
+        <button id="stationLito"
+                class="pixel-button"
+                type="button">LITO</button>
+
+        <p id="stationTip"
+           class="ss-lito-tip"
+           aria-live="polite"></p>
+
+      </section>
+
+      <dialog id="settingsDialog" class="ss-settings">
+
+        <h2 data-i18n="settings">AJUSTES</h2>
+
+        <div class="ss-secondary">
+<button class="pixel-button" id="music">
           ♪ MÚSICA ON
         </button>
 
         <button class="pixel-button" id="voice">
           VOZ ON
         </button>
+        </div>
 
-      </section>
+        <label>
+          <input id="settingsFX" type="checkbox">
+          <span id="fxLabel">Efectos sonoros</span>
+        </label>
+
+        <label id="volumeLabel" for="settingsVolume">
+          Volumen general
+        </label>
+
+        <input id="settingsVolume" type="range"
+               min="0" max="100" value="100">
+
+        <button id="settingsFull"
+                class="pixel-button"
+                type="button">Pantalla completa</button>
+
+        <button id="closeSettings"
+                class="pixel-button mint"
+                type="button">Cerrar</button>
+
+      </dialog>
+
 
       <!-- Ventana de instrucciones -->
       <section
@@ -361,6 +405,12 @@
         <progress id="historyVideoProgress" max="1" value="0"></progress>
 
         <div class="speech-actions">
+
+            <button type="button"
+                    class="pixel-button"
+                    id="historyVideoFull">
+                PANTALLA COMPLETA
+            </button>
 
             <button type="button" class="pixel-button" id="historyVideoMute">
                 AUDIO

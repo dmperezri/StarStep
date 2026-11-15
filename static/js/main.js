@@ -2,8 +2,8 @@
 /* Diccionario bilingüe compartido, cargado también en las demás páginas. */
 window.StarI18n=(()=>{
  const dict={
-  es:{start:'INICIAR AVENTURA',choose:'ELEGIR AVATAR',how:'CÓMO JUGAR',settings:'AJUSTES',journal:'BITÁCORA',continue:'CONTINUAR',transmit:'INICIAR TRANSMISIÓN',menu:'ABRIR MENÚ',alias:'NOMBRE DEL CADETE',launch:'INICIAR AVENTURA',select:'ELIGE TU AVATAR',moon:'ACTO I • LUNA | Misión 1: Detective de lava',back:'← VOLVER',note:'MIS ANOTACIONES',save:'GUARDAR NOTAS',earth:'TIERRA',lang:'ES',speech:[['CONTROL DE MISIÓN','Desde la Tierra te damos la bienvenida a StarStep. Hoy comienza una aventura para descubrir lo que la NASA dejó en otros mundos.'],['CONTROL DE MISIÓN','En la Luna y en Marte hay instrumentos y exploradores que guardan pistas del pasado. Vamos a seguir sus huellas.'],['LITO','¡Hola! Soy LITO, tu compañero espacial. Vamos a elegir tu personaje y prepararnos para viajar a la Luna.']]},
-  en:{start:'START ADVENTURE',choose:'CHOOSE AVATAR',how:'HOW TO PLAY',settings:'SETTINGS',journal:'JOURNAL',continue:'CONTINUE',transmit:'START TRANSMISSION',menu:'OPEN MENU',alias:'CADET NAME',launch:'START ADVENTURE',select:'CHOOSE YOUR AVATAR',moon:'ACT I • MOON | Mission 1: Lava Detective',back:'← BACK',note:'MY NOTES',save:'SAVE NOTES',earth:'EARTH',lang:'EN',speech:[['MISSION CONTROL','Welcome to StarStep from Earth. Today you begin an adventure to discover what NASA left behind on other worlds.'],['MISSION CONTROL','On the Moon and Mars, instruments and explorers still hold clues about the past. Let us follow their traces.'],['LITO','Hello! I am LITO, your space companion. Let us choose your character and prepare for our journey to the Moon.']]}
+  es:{start:'INICIAR AVENTURA',choose:'MI CADETE',how:'CÓMO JUGAR',settings:'AJUSTES',journal:'BITÁCORA',continue:'CONTINUAR',transmit:'INICIAR TRANSMISIÓN',menu:'ABRIR MENÚ',alias:'NOMBRE DEL CADETE',launch:'INICIAR AVENTURA',select:'ELIGE TU AVATAR',moon:'ACTO I • LUNA | Misión 1: Detective de lava',back:'← VOLVER',note:'MIS ANOTACIONES',save:'GUARDAR NOTAS',earth:'TIERRA',lang:'ES',speech:[['CONTROL DE MISIÓN','Desde la Tierra te damos la bienvenida a StarStep. Hoy comienza una aventura para descubrir lo que la NASA dejó en otros mundos.'],['CONTROL DE MISIÓN','En la Luna y en Marte hay instrumentos y exploradores que guardan pistas del pasado. Vamos a seguir sus huellas.'],['LITO','¡Hola! Soy LITO, tu compañero espacial. Vamos a elegir tu personaje y prepararnos para viajar a la Luna.']]},
+  en:{start:'START ADVENTURE',choose:'MY CADET',how:'HOW TO PLAY',settings:'SETTINGS',journal:'JOURNAL',continue:'CONTINUE',transmit:'START TRANSMISSION',menu:'OPEN MENU',alias:'CADET NAME',launch:'START ADVENTURE',select:'CHOOSE YOUR AVATAR',moon:'ACT I • MOON | Mission 1: Lava Detective',back:'← BACK',note:'MY NOTES',save:'SAVE NOTES',earth:'EARTH',lang:'EN',speech:[['MISSION CONTROL','Welcome to StarStep from Earth. Today you begin an adventure to discover what NASA left behind on other worlds.'],['MISSION CONTROL','On the Moon and Mars, instruments and explorers still hold clues about the past. Let us follow their traces.'],['LITO','Hello! I am LITO, your space companion. Let us choose your character and prepare for our journey to the Moon.']]}
  };
 
  Object.assign(dict.es,{
@@ -414,7 +414,88 @@ function startEarthScene() {
 // Secuencia de entrada (intro-secuencia.js):
 //   apertura real o recarga ... OUTSTRIP → idioma → intro histórica → LITO (hasta completarla) → menú
 //   regreso interno ........... menú directo cuando getHomeMode() === 'menu'
-function onMenuShown() { updateAdventureButton(); updateNewGameButton(); startEarthScene(); }
+function stationGreeting(tip=false) {
+    const element = $('stationTip');
+    if (!element) return;
+
+    const es = StarI18n.lang === 'es';
+    const started = StarFlow.isStageCompleted('chapter_select');
+
+    const message = tip
+      ? (es
+         ? 'Selecciona tu aventura. La bitacora conserva tus evidencias.'
+         : 'Choose your adventure. Your journal keeps your evidence.')
+      : started
+        ? (es
+           ? '¡Que bueno verte de nuevo, cadete!'
+           : 'Good to see you again, cadet!')
+        : (es
+           ? '¡Bienvenido a la Estacion StarStep! Tenemos dos mundos por explorar.'
+           : 'Welcome to StarStep Station! We have two worlds to explore.');
+
+    element.textContent = message;
+
+    if (StarSound.voiceOn) {
+      StarSound.speak(message, {lito:true});
+    }
+}
+
+$('stationLito')?.addEventListener('click', () => {
+    stationGreeting(true);
+});
+
+const settings = $('settingsDialog');
+
+if (settings) {
+    $('openSettings').addEventListener('click', () => {
+      settings.showModal();
+      $('settingsFX').checked = StarSound.fxOn;
+      $('settingsVolume').value =
+        Math.round(StarSound.volume * 100);
+    });
+
+    $('closeSettings').addEventListener('click', () => {
+      settings.close();
+    });
+
+    $('settingsFX').addEventListener('change', () => {
+      StarSound.setFX($('settingsFX').checked);
+    });
+
+    $('settingsVolume').addEventListener('input', () => {
+      StarSound.setVolume(Number($('settingsVolume').value)/100);
+    });
+
+    $('settingsFull').addEventListener('click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      } else {
+        document.documentElement.requestFullscreen?.();
+      }
+    });
+
+    function translateSettings() {
+      const es = StarI18n.lang === 'es';
+      $('fxLabel').textContent =
+        es ? 'Efectos sonoros' : 'Sound effects';
+      $('volumeLabel').textContent =
+        es ? 'Volumen general' : 'Master volume';
+      $('settingsFull').textContent =
+        es ? 'Pantalla completa' : 'Fullscreen';
+      $('closeSettings').textContent =
+        es ? 'Cerrar' : 'Close';
+    }
+
+    document.addEventListener('starstep:language', translateSettings);
+    translateSettings();
+}
+
+function onMenuShown() {
+    updateAdventureButton();
+    updateNewGameButton();
+    startEarthScene();
+    stationGreeting();
+}
 if (window.StarIntro) {
     window.StarIntro.start({ onMenu: onMenuShown });
 } else {

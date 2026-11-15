@@ -4,6 +4,10 @@ window.StarSound=(()=>{
  let ac,master,musicTimer,beat=0,currentUtterance=null,wordCb=null;
  const settings=(()=>{try{return JSON.parse(localStorage.getItem('starstep_audio'))||{};}catch{return {};}})();
  let musicOn=settings.music!==false,fxOn=settings.fx!==false,voiceOn=settings.voice!==false;
+
+ let volume=Number.isFinite(settings.volume)
+   ? Math.max(0,Math.min(1,settings.volume))
+   : 1;
  const THEMES={
  title:{b:262,sp:.2,n:[0,7,12,7,4,7,12,16, 0,7,12,7,5,9,12,17],bass:[0,0,5,5]},
  launch:{b:294,sp:.15,n:[0,12,7,12,3,12,7,12, 0,12,7,12,5,12,10,12],bass:[0,0,-2,-2]},
@@ -13,7 +17,7 @@ window.StarSound=(()=>{
  end:{b:262,sp:.24,n:[0,4,7,11,12,11,7,4, 5,9,12,16,14,12,9,7],bass:[0,0,5,7]}
 };
  let activeTheme=null;
- function init(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;try{if(!ac){ac=new AC();master=ac.createGain();master.gain.value=.32;master.connect(ac.destination);}if(ac.state==='suspended')ac.resume().catch(()=>{});return true;}catch{return false;}}
+ function init(){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;try{if(!ac){ac=new AC();master=ac.createGain();master.gain.value=.32*volume;master.connect(ac.destination);}if(ac.state==='suspended')ac.resume().catch(()=>{});return true;}catch{return false;}}
  function tone(freq,dur=.1,delay=0,type='square',vol=.06,slide=0){if(!ac)return;const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),t+dur);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.03,dur));o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.03);}
  function noise(dur=.22,vol=.15){if(!ac)return;const b=ac.createBuffer(1,Math.ceil(ac.sampleRate*dur),ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1;const src=ac.createBufferSource(),lp=ac.createBiquadFilter(),gain=ac.createGain();src.buffer=b;lp.type='lowpass';lp.frequency.value=1100;gain.gain.setValueAtTime(vol,ac.currentTime);gain.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+dur);src.connect(lp);lp.connect(gain);gain.connect(master);src.start();src.stop(ac.currentTime+dur);}
  // Procedural chiptune score and SFX adapted from the supplied Rock & Roll prototype.
@@ -40,16 +44,22 @@ window.StarSound=(()=>{
  case 'scan':tone(800,.15);tone(1020,.17,.18);break;
  }}
  function stopVoice(){if('speechSynthesis'in window)window.speechSynthesis.cancel();currentUtterance=null;}
- function speak(text,{lito=false,onStart=()=>{},onEnd=()=>{}}={}){stopVoice();if(!voiceOn||!('speechSynthesis'in window)){onEnd();return;}const u=new SpeechSynthesisUtterance(text);u.lang=(window.StarI18n?.lang||'es')==='en'?'en-US':'es-ES';u.rate=1.16;u.pitch=lito?1.16:1.02;u.volume=.95;const choices=speechSynthesis.getVoices(),voice=choices.find(v=>v.lang.toLowerCase().startsWith(u.lang.slice(0,2).toLowerCase()));if(voice)u.voice=voice;u.onstart=onStart;u.onend=onEnd;u.onerror=onEnd;currentUtterance=u;speechSynthesis.speak(u);}
- function persist(){try{localStorage.setItem('starstep_audio',JSON.stringify({music:musicOn,fx:fxOn,voice:voiceOn}));}catch{}}
+ function speak(text,{lito=false,onStart=()=>{},onEnd=()=>{}}={}){stopVoice();if(!voiceOn||!('speechSynthesis'in window)){onEnd();return;}const u=new SpeechSynthesisUtterance(text);u.lang=(window.StarI18n?.lang||'es')==='en'?'en-US':'es-ES';u.rate=1.16;u.pitch=lito?1.16:1.02;u.volume=.95*volume;const choices=speechSynthesis.getVoices(),voice=choices.find(v=>v.lang.toLowerCase().startsWith(u.lang.slice(0,2).toLowerCase()));if(voice)u.voice=voice;u.onstart=onStart;u.onend=onEnd;u.onerror=onEnd;currentUtterance=u;speechSynthesis.speak(u);}
+ function persist(){try{localStorage.setItem('starstep_audio',JSON.stringify({music:musicOn,fx:fxOn,voice:voiceOn,volume}));}catch{}}
  function setMusic(v){musicOn=!!v;musicOn?startMusic():stopMusic();persist();}
  function setVoice(v){voiceOn=!!v;if(!voiceOn)stopVoice();persist();}
  function setFX(v){fxOn=!!v;persist();}
+ function setVolume(value){
+   volume=Math.max(0,Math.min(1,Number(value)||0));
+   if(master) master.gain.value=.32*volume;
+   persist();
+ }
+
  function stopAll(){stopMusic();stopVoice();}
  // Start mission music only after a player gesture; never over a cinematic.
  const resumeMissionMusic=()=>{if(['/luna','/marte','/vuelo','/huellas'].includes(window.location?.pathname)&&!videoOpen())startMusic();};
  document.addEventListener('pointerdown',resumeMissionMusic,{passive:true});
  document.addEventListener('keydown',resumeMissionMusic);
  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopMusic();stopVoice();}});
- return {init,effect,startMusic,stopMusic,stopVoice,stopAll,speak,setMusic,setVoice,setFX,get musicOn(){return musicOn;},get voiceOn(){return voiceOn;},get fxOn(){return fxOn;}};
+ return {init,effect,startMusic,stopMusic,stopVoice,stopAll,speak,setMusic,setVoice,setFX,setVolume,get volume(){return volume;},get musicOn(){return musicOn;},get voiceOn(){return voiceOn;},get fxOn(){return fxOn;}};
 })();
